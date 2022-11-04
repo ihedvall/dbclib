@@ -1,2 +1,2 @@
 # dbclib
-C++ library that parses CAN DBC files
+C++ library that parses CAN DBC files. Under development.
