@@ -7,8 +7,13 @@
 #include <fstream>
 #include <string>
 #include <memory>
+
 #ifndef yyFlexLexerOnce
+
+#undef yyFlexLexer
+#define yyFlexLexer ddFlexLexer
 #include <FlexLexer.h>
+
 #endif
 
 #include "dbcparser.hpp"
@@ -17,10 +22,12 @@
 #include <map>
 namespace dbc {
 
-class DbcScanner : public yyFlexLexer  {
+
+class DbcScanner : public ddFlexLexer  {
  public:
   explicit DbcScanner(std::ifstream& in);
-  int yylex(DbcParser::value_type* yylval);
+  int ddlex(DbcParser::value_type* yylval);
+
   Network& GetNetwork();
 
   void AddToStringList(const std::string& text);

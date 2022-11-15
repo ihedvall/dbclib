@@ -13,7 +13,7 @@ namespace dbc {
 class DbcFile {
  public:
   void Filename(const std::string& filename) {filename_ = filename; }
-  [[nodiscard]] const std::string& FileName() const {return filename_; }
+  [[nodiscard]] const std::string& Filename() const {return filename_; }
 
   [[nodiscard]] std::string Name() const;
 

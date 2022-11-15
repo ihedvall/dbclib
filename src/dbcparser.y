@@ -1,21 +1,28 @@
-%skeleton "lalr1.cc"
+// %skeleton "lalr1.cc"
 %require "3.2"
 %language "c++"
 
+%define api.prefix {dd}
 %define api.namespace {dbc}
 %define api.parser.class {DbcParser}
+
+
 %code requires {
+    #include "dbc/attribute.h"
+    #include "dbc/signal.h"
     namespace dbc {
         class DbcScanner;
     }
 }
+
 %parse-param { dbc::DbcScanner &scanner  }
 
 %code  {
     #include <sstream>
     #include "dbcscanner.h"
+
     #undef yylex
-    #define yylex scanner.yylex
+    #define yylex scanner.ddlex
 }
 
 %define api.value.type variant
@@ -81,6 +88,14 @@
 %token <uint64_t>    HEX_VAL
 %token EOL 0
 
+%nterm <std::string> attribute_value
+%nterm <double> double_val
+%nterm <AttributeType> attribute_object_type
+%nterm <bool> attribute_definition_object_or_relation
+%nterm <std::string> mux_info
+%nterm <bool> little_endian
+%nterm <SignalDataType> signedness
+
 %start dbc_file
 %%
 
@@ -120,7 +135,7 @@ symbol_section:
 
 symbol_list:
       symbol
-    | symbol symbol_list;
+    | symbol_list symbol ;
 
 symbol:
       TAG_NS_DESC
@@ -155,7 +170,7 @@ symbol:
 
 envvar_list:
       %empty
-    | envvar envvar_list;
+    |  envvar_list envvar;
 
 
 
@@ -179,10 +194,10 @@ envvar:
         auto& network = scanner.GetNetwork();
         auto& env_var = network.GetEnvVar($2);
         env_var.Type(static_cast<EnvType>($4));
-        env_var.Min( $<double>6 );
-        env_var.Max( $<double>8 );
+        env_var.Min( $6 );
+        env_var.Max( $8 );
         env_var.Unit( $10 );
-        env_var.InitValue($<double>11);
+        env_var.InitValue($11);
         env_var.Ident(static_cast<uint64_t>($12));
         env_var.Access(static_cast<AccessType>($13));
         const auto& list = scanner.StringList();
@@ -192,7 +207,7 @@ envvar:
 
 envvar_data_list:
       %empty
-    | envvar_data envvar_data_list;
+    | envvar_data_list envvar_data;
 
 envvar_data:
       TAG_ENVVAR_DATA ID_VAL /* environment variable name */
@@ -212,22 +227,21 @@ category_definition:
 
 category_list:
 	%empty
-	| category category_list;
+	| category_list category;
 
 category:
 	  TAG_CAT TAG_BU ID_VAL INT_VAL TAG_SEMICOLON
 	| TAG_CAT TAG_BO INT_VAL INT_VAL TAG_SEMICOLON;
 
+
 attribute_value:
-     INT_VAL     { $<std::string>$ = std::to_string($1); }
-    | STRING_VAL { $<std::string>$ = $1; }
-    | DOUBLE_VAL { $<std::string>$ = std::to_string($1); }
-    ;
+     INT_VAL     { $$ = std::to_string($1); }
+    | STRING_VAL { $$ = $1; }
+    | DOUBLE_VAL { $$ = std::to_string($1); };
 
 attribute_list:
       %empty
-    | attribute attribute_list
-    ;
+    | attribute_list attribute;
 
 attribute:
       TAG_BA     /* BA_ (Notwork attributes) */
@@ -238,7 +252,7 @@ attribute:
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition($2);
 		auto& attribute = network.CreateAttribute( definition );
-		attribute.Value($<std::string>3);
+		attribute.Value($3);
 		scanner.ResetTempList();
 	  }
     | TAG_BA /* BA_ (Node attribute) */
@@ -253,7 +267,7 @@ attribute:
 		auto* node = network.GetNode( $4 );
 		if ( node != nullptr) {
 			auto& attribute = node->CreateAttribute( definition );
-            attribute.Value($<std::string>5);
+            attribute.Value($5);
 		}
 		scanner.ResetTempList();
 	  }
@@ -269,7 +283,7 @@ attribute:
 		auto* message = network.GetMessage( static_cast<uint64_t>($4));
 		if ( message != nullptr ) {
 			auto& attribute = message->CreateAttribute( definition );
-            attribute.Value($<std::string>5);
+            attribute.Value($5);
 		}
 		scanner.ResetTempList();
 	  }
@@ -286,15 +300,14 @@ attribute:
 		 auto* signal = network.GetSignal( static_cast<uint64_t>($4), $5);
 		 if ( signal != nullptr ) {
 		   auto& attribute = signal->CreateAttribute( definition );
-           attribute.Value($<std::string>6);
+           attribute.Value($6);
 	     }
 	     scanner.ResetTempList();
 	  };
 
 attribute_rel_list:
      %empty
-    | attribute_rel attribute_rel_list
-    ;
+    | attribute_rel_list attribute_rel;
 
 attribute_rel:
       /* node-message relational attribute */
@@ -310,13 +323,12 @@ attribute_rel:
 	  {
 		/* To be defined */
 		scanner.ResetTempList();
-	  }
-	  ;
+	  };
 
 attribute_def_list :
 	%empty
-   | attribute_definition_default attribute_def_list
-   | attribute_definition attribute_def_list
+   | attribute_def_list attribute_definition_default
+   | attribute_def_list attribute_definition
    ;
 
 
@@ -326,7 +338,7 @@ attribute_definition_default:
 	  {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition( $2 );
-		definition.Value( $<double>3 );
+		definition.Value( $3 );
 		scanner.ResetTempList();
 	  }
     | attribute_definition_object_or_relation STRING_VAL STRING_VAL TAG_SEMICOLON
@@ -338,8 +350,8 @@ attribute_definition_default:
 	  };
 
 attribute_definition_object_or_relation:
-      TAG_BA_DEF_DEF  { $<bool>$ = false; }
-    | TAG_BA_DEF_DEF_REL { $<bool>$ = true; }
+      TAG_BA_DEF_DEF  { $$ = false; }
+    | TAG_BA_DEF_DEF_REL { $$ = true; }
     ;
 
 
@@ -348,7 +360,7 @@ attribute_definition:
 	  {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( $2 );
-       	definition.Type( $<AttributeType>1 );
+       	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::IntegerValue);
 		definition.Min(static_cast<double>( $4 ));
 		definition.Max(static_cast<double>( $5 ));
@@ -358,17 +370,17 @@ attribute_definition:
 	  {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( $2 );
-       	definition.Type( $<AttributeType>1 );
+       	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::FloatValue);
-		definition.Min( $<double>4 );
-		definition.Max( $<double>5 );
+		definition.Min( $4 );
+		definition.Max( $5 );
 		scanner.ResetTempList();
 	  }
     | attribute_object_type STRING_VAL TAG_STRING TAG_SEMICOLON
 	  {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( $2 );
-       	definition.Type( $<AttributeType>1 );
+       	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::StringValue);
        	scanner.ResetTempList();
 	  }
@@ -376,7 +388,7 @@ attribute_definition:
  	  {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( $2 );
-       	definition.Type( $<AttributeType>1 );
+       	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::EnumValue);
        	const auto& list = scanner.StringList();
         definition.EnumList(list);
@@ -386,7 +398,7 @@ attribute_definition:
  	  {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( $2 );
-       	definition.Type( $<AttributeType>1 );
+       	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::HexValue);
 		definition.Min(static_cast<double>( $4 ));
 		definition.Max(static_cast<double>( $5 ));
@@ -394,22 +406,22 @@ attribute_definition:
 	  };
 
 attribute_object_type:
-      TAG_BA_DEF		   { $<AttributeType>$ = AttributeType::DbcNetwork; }
-    | TAG_BA_DEF  TAG_BU   { $<AttributeType>$ = AttributeType::DbcNode; }
-    | TAG_BA_DEF  TAG_BO   { $<AttributeType>$ = AttributeType::DbcMessage; }
-    | TAG_BA_DEF  TAG_SG   { $<AttributeType>$ = AttributeType::DbcSignal; }
-    | TAG_BA_DEF  TAG_EV   { $<AttributeType>$ = AttributeType::EnvironmentVariable; }
+      TAG_BA_DEF		   { $$ = AttributeType::DbcNetwork; }
+    | TAG_BA_DEF  TAG_BU   { $$ = AttributeType::DbcNode; }
+    | TAG_BA_DEF  TAG_BO   { $$ = AttributeType::DbcMessage; }
+    | TAG_BA_DEF  TAG_SG   { $$ = AttributeType::DbcSignal; }
+    | TAG_BA_DEF  TAG_EV   { $$ = AttributeType::EnvironmentVariable; }
       /* node-signal relation ("Node - Mapped Rx Signal") */
-    | TAG_BA_DEF_REL TAG_BU_SG_REL { $<AttributeType>$ = AttributeType::NodeSignalRelation; }
+    | TAG_BA_DEF_REL TAG_BU_SG_REL { $$ = AttributeType::NodeSignalRelation; }
       /* node-message relation ("Node - Tx Message") */
-    | TAG_BA_DEF_REL TAG_BU_BO_REL { $<AttributeType>$ = AttributeType::NodeMessageRelation; }
+    | TAG_BA_DEF_REL TAG_BU_BO_REL { $$ = AttributeType::NodeMessageRelation; }
     ;
 
 /*********************************************************************/
 
 val_list:
      %empty
-    | val val_list
+    | val_list val
     ;
 
 val:
@@ -450,8 +462,7 @@ val_map_entry:
 
 sig_valtype_list:
       %empty
-    | sig_valtype sig_valtype_list
-    ;
+    | sig_valtype_list sig_valtype;
 
 /*
  * set signal value type in target signal
@@ -487,8 +498,7 @@ sig_valtype:
 
 comment_list:
      %empty
-    | comment comment_list
-    ;
+    | comment_list comment;
 
 comment:
     TAG_CM STRING_VAL TAG_SEMICOLON
@@ -534,7 +544,7 @@ comment:
 
 message_list:
       %empty
-    | message signal_list message_list
+    | message_list message signal_list
     ;
 
 message:
@@ -550,7 +560,7 @@ message:
 
 signal_list:
       %empty
-    | signal signal_list
+    | signal_list signal
     ;
 
 signal:
@@ -581,8 +591,14 @@ signal:
 		auto* message = network.LastMessage();
 		if (message != nullptr) {
 		    auto& signal = message->CreateSignal($2);
-		    const std::string mux = $<std::string>3;
-		    if (!mux.empty() && mux[0] == 'M') {
+		    signal.MessageId(message->Ident()); // Used to find its message later on
+		    std::string mux = $3;
+		    if (mux.size() > 2 && mux.back() == 'M' && mux.front() == 'm') {
+		        // Extended multiplexed value.
+		      signal.Mux(MuxType::ExtendedMultiplexor);
+		      mux.pop_back(); // So parsing of index works below
+   		      signal.MuxValue( std::stoi(mux.substr(1)) );
+		    } else if (!mux.empty() && mux[0] == 'M') {
 		      signal.Mux(MuxType::Multiplexor);
 		      signal.MuxValue(0);
 		    } else if (!mux.empty() && mux[0] == 'm') {
@@ -594,12 +610,12 @@ signal:
 		    }
 		    signal.BitStart(static_cast<size_t>($5));
 		    signal.BitLength(static_cast<size_t>($7));
-		    signal.LittleEndian($<bool>9);
-		    signal.DataType($<SignalDataType>10);
-		    signal.Scale($<double>12);
-		    signal.Offset($<double>14);
-		    signal.Min($<double>17);
-            signal.Max($<double>19);
+		    signal.LittleEndian($9);
+		    signal.DataType($10);
+		    signal.Scale($12);
+		    signal.Offset($14);
+		    signal.Min($17);
+            signal.Max($19);
             signal.Unit($21);
             const auto& list = scanner.StringList();
             signal.Receivers(list);
@@ -612,20 +628,20 @@ signal:
 mux_info:
     %empty
     {
-	  $<std::string>$ = "";
+	  $$ = "";
     }
     | ID_VAL
-	{
-		$<std::string>$ = $1;
- 	};
+    {
+        $$ = $1;
+    };
 
 signal_name_list: space_identifier_list;
 
 space_identifier_list:
 	   %empty
-     | ID_VAL space_identifier_list
+     | space_identifier_list ID_VAL
 	 {
-		scanner.AddToStringList( $1 );
+		scanner.AddToStringList( $2 );
 	 };
 
 comma_identifier_list:
@@ -634,42 +650,44 @@ comma_identifier_list:
     {
 		scanner.AddToStringList( $1 );
     }
-    | ID_VAL TAG_COMMA comma_identifier_list
+    | comma_identifier_list TAG_COMMA ID_VAL
     {
-		scanner.AddToStringList( $1 );
+		scanner.AddToStringList( $3 );
     };
 
 comma_string_list:
-    STRING_VAL
-	{
-		scanner.AddToStringList( $1 );
-	}
-    | STRING_VAL TAG_COMMA comma_string_list
-	{
-		scanner.AddToStringList( $1 );
-	};
+     STRING_VAL
+    {
+        scanner.AddToStringList( $1 );
+    }
+    | comma_string_list TAG_COMMA STRING_VAL
+   	{
+    	scanner.AddToStringList( $3 );
+    }
+
+
 
 /* double_val or int_val as float */
 double_val:
-      DOUBLE_VAL { $<double>$ = $1; }
-    | TAG_NAN    { $<double>$ = std::numeric_limits<double>::quiet_NaN(); }
-    | INT_VAL    { $<double>$ = static_cast<double>($1); }
+      DOUBLE_VAL { $$ = $1; }
+    | TAG_NAN    { $$ = std::numeric_limits<double>::quiet_NaN(); }
+    | INT_VAL    { $$ = static_cast<double>($1); }
     ;
 
-little_endian: INT_VAL { $<bool>$ = $1 == 1; };
+little_endian: INT_VAL { $$ = $1 == 1; };
 
 signedness:
-      TAG_PLUS { $<SignalDataType>$ = SignalDataType::UnsignedData; }
-    | TAG_MINUS { $<SignalDataType>$ = SignalDataType::SignedData; }
+      TAG_PLUS { $$ = SignalDataType::UnsignedData; }
+    | TAG_MINUS { $$ = SignalDataType::SignedData; }
     ;
 
 /* list of nodes */
 
 space_node_list:
      %empty
-    | ID_VAL space_node_list
+    | space_node_list ID_VAL
 {
-	scanner.AddToStringList( $1 );
+	scanner.AddToStringList( $2 );
 };
 
 node_list: TAG_BU TAG_COLON space_node_list
@@ -687,8 +705,7 @@ node_list: TAG_BU TAG_COLON space_node_list
 
 valtable_list:
       %empty
-    | valtable valtable_list
-    ;
+    | valtable_list valtable ;
 
 /* Global value tables are commonly not used */
 valtable:
@@ -725,11 +742,11 @@ signal_group:
 /* signal group_list */
 signal_group_list:
       %empty
-    | signal_group signal_group_list;
+    | signal_group_list signal_group;
 
 extended_mux_list:
     %empty
-    | extended_mux extended_mux_list;
+    | extended_mux_list extended_mux ;
 
 extended_mux:
     TAG_SG_MUL_VAL      /* SG_MUL_VAL_ */
@@ -742,7 +759,7 @@ extended_mux:
         auto& network = scanner.GetNetwork();
         auto* signal = network.GetSignal(static_cast<uint64_t>($2), $3);
         if (signal != nullptr) {
-            auto& mux = signal->CreateExtendedMux();
+            auto& mux = signal->GetExtendedMux();
             mux.multiplexor = $4;
             const auto& list = scanner.RangeList();
             mux.range_list = list;
@@ -752,7 +769,7 @@ extended_mux:
 
 value_range_list:
     value_range
-    | value_range value_range_list;
+    | value_range_list value_range ;
 
 value_range:
     INT_VAL

@@ -7,7 +7,7 @@
 namespace dbc {
 
 DbcScanner::DbcScanner(std::ifstream& message)
-    : yyFlexLexer(&message), yylval(nullptr) {
+    : ddFlexLexer(&message), yylval(nullptr) {
 
 }
 

@@ -18,7 +18,11 @@ class Node {
   void Comment(const std::string& comment) { comment_ = comment; }
   [[nodiscard]] const std::string& Comment() const { return comment_; }
 
+  [[nodiscard]] const std::vector<Attribute>& Attributes() const {
+    return attribute_list_;
+  }
   Attribute& CreateAttribute(const Attribute& definition);
+
 
  private:
   std::string name_;

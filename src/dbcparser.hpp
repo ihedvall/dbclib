@@ -42,16 +42,18 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_YY_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
-# define YY_YY_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+#ifndef YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+# define YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
 // "%code requires" blocks.
-#line 7 "D:/projects/dbclib/src/dbcparser.y"
+#line 10 "D:/projects/dbclib/src/dbcparser.y"
 
+    #include "dbc/attribute.h"
+    #include "dbc/signal.h"
     namespace dbc {
         class DbcScanner;
     }
 
-#line 55 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 57 "D:/projects/dbclib/src/dbcparser.hpp"
 
 
 # include <cstdlib> // std::abort
@@ -181,13 +183,21 @@
 # endif
 
 /* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
+#ifndef DDDEBUG
+# if defined YYDEBUG
+#if YYDEBUG
+#   define DDDEBUG 1
+#  else
+#   define DDDEBUG 0
+#  endif
+# else /* ! defined YYDEBUG */
+#  define DDDEBUG 0
+# endif /* ! defined YYDEBUG */
+#endif  /* ! defined DDDEBUG */
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 6 "D:/projects/dbclib/src/dbcparser.y"
 namespace dbc {
-#line 191 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 201 "D:/projects/dbclib/src/dbcparser.hpp"
 
 
 
@@ -196,11 +206,11 @@ namespace dbc {
   class DbcParser
   {
   public:
-#ifdef YYSTYPE
+#ifdef DDSTYPE
 # ifdef __GNUC__
-#  pragma GCC message "bison: do not #define YYSTYPE in C++, use %define api.value.type"
+#  pragma GCC message "bison: do not #define DDSTYPE in C++, use %define api.value.type"
 # endif
-    typedef YYSTYPE value_type;
+    typedef DDSTYPE value_type;
 #else
   /// A buffer to store and retrieve objects.
   ///
@@ -383,22 +393,35 @@ namespace dbc {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // attribute_object_type
+      char dummy1[sizeof (AttributeType)];
+
+      // signedness
+      char dummy2[sizeof (SignalDataType)];
+
+      // attribute_definition_object_or_relation
+      // little_endian
+      char dummy3[sizeof (bool)];
+
       // DOUBLE_VAL
-      char dummy1[sizeof (double)];
+      // double_val
+      char dummy4[sizeof (double)];
 
       // TAG_DUMMY_NODE_VECTOR
       // ENUM_VAL
-      char dummy2[sizeof (int)];
+      char dummy5[sizeof (int)];
 
       // INT_VAL
-      char dummy3[sizeof (int64_t)];
+      char dummy6[sizeof (int64_t)];
 
       // ID_VAL
       // STRING_VAL
-      char dummy4[sizeof (std::string)];
+      // attribute_value
+      // mux_info
+      char dummy7[sizeof (std::string)];
 
       // HEX_VAL
-      char dummy5[sizeof (uint64_t)];
+      char dummy8[sizeof (uint64_t)];
     };
 
     /// The size of the largest semantic type.
@@ -438,10 +461,10 @@ namespace dbc {
     {
       enum token_kind_type
       {
-        YYEMPTY = -2,
+        DDEMPTY = -2,
     EOL = 0,                       // EOL
-    YYerror = 256,                 // error
-    YYUNDEF = 257,                 // "invalid token"
+    DDerror = 256,                 // error
+    DDUNDEF = 257,                 // "invalid token"
     TAG_COLON = 258,               // TAG_COLON
     TAG_SEMICOLON = 259,           // TAG_SEMICOLON
     TAG_SEP = 260,                 // TAG_SEP
@@ -672,7 +695,21 @@ namespace dbc {
       {
         switch (this->kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.move< AttributeType > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.move< SignalDataType > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.move< bool > (std::move (that.value));
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.move< double > (std::move (that.value));
         break;
 
@@ -687,6 +724,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.move< std::string > (std::move (that.value));
         break;
 
@@ -712,6 +751,42 @@ namespace dbc {
 #else
       basic_symbol (typename Base::kind_type t)
         : Base (t)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, AttributeType&& v)
+        : Base (t)
+        , value (std::move (v))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const AttributeType& v)
+        : Base (t)
+        , value (v)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, SignalDataType&& v)
+        : Base (t)
+        , value (std::move (v))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const SignalDataType& v)
+        : Base (t)
+        , value (v)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, bool&& v)
+        : Base (t)
+        , value (std::move (v))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const bool& v)
+        : Base (t)
+        , value (v)
       {}
 #endif
 
@@ -799,7 +874,21 @@ namespace dbc {
         // Value type destructor.
 switch (yykind)
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.template destroy< AttributeType > ();
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.template destroy< SignalDataType > ();
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.template destroy< bool > ();
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.template destroy< double > ();
         break;
 
@@ -814,6 +903,8 @@ switch (yykind)
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.template destroy< std::string > ();
         break;
 
@@ -828,13 +919,13 @@ switch (yykind)
         Base::clear ();
       }
 
-#if YYDEBUG || 0
+#if DDDEBUG || 0
       /// The user-facing name of this symbol.
       const char *name () const YY_NOEXCEPT
       {
         return DbcParser::symbol_name (this->kind ());
       }
-#endif // #if YYDEBUG || 0
+#endif // #if DDDEBUG || 0
 
 
       /// Backward compatibility (Bison 3.6).
@@ -978,7 +1069,7 @@ switch (yykind)
     /// \returns  0 iff parsing succeeded.
     virtual int parse ();
 
-#if YYDEBUG
+#if DDDEBUG
     /// The current debugging stream.
     std::ostream& debug_stream () const YY_ATTRIBUTE_PURE;
     /// Set the current debugging stream.
@@ -999,11 +1090,11 @@ switch (yykind)
     /// Report a syntax error.
     void error (const syntax_error& err);
 
-#if YYDEBUG || 0
+#if DDDEBUG || 0
     /// The user-facing name of the symbol whose (internal) number is
     /// YYSYMBOL.  No bounds checking.
     static const char *symbol_name (symbol_kind_type yysymbol);
-#endif // #if YYDEBUG || 0
+#endif // #if DDDEBUG || 0
 
 
     // Implementation of make_symbol for each token kind.
@@ -1025,31 +1116,31 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_YYerror ()
+      make_DDerror ()
       {
-        return symbol_type (token::YYerror);
+        return symbol_type (token::DDerror);
       }
 #else
       static
       symbol_type
-      make_YYerror ()
+      make_DDerror ()
       {
-        return symbol_type (token::YYerror);
+        return symbol_type (token::DDerror);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_YYUNDEF ()
+      make_DDUNDEF ()
       {
-        return symbol_type (token::YYUNDEF);
+        return symbol_type (token::DDUNDEF);
       }
 #else
       static
       symbol_type
-      make_YYUNDEF ()
+      make_DDUNDEF ()
       {
-        return symbol_type (token::YYUNDEF);
+        return symbol_type (token::DDUNDEF);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -1972,10 +2063,10 @@ switch (yykind)
     /// are valid, yet not members of the token_kind_type enum.
     static symbol_kind_type yytranslate_ (int t) YY_NOEXCEPT;
 
-#if YYDEBUG || 0
+#if DDDEBUG || 0
     /// For a symbol, its name in clear.
     static const char* const yytname_[];
-#endif // #if YYDEBUG || 0
+#endif // #if DDDEBUG || 0
 
 
     // Tables.
@@ -2012,7 +2103,7 @@ switch (yykind)
     static const signed char yyr2_[];
 
 
-#if YYDEBUG
+#if DDDEBUG
     // YYRLINE[YYN] -- Source line where rule number YYN was defined.
     static const short yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
@@ -2241,7 +2332,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 272,     ///< Last index in yytable_.
+      yylast_ = 258,     ///< Last index in yytable_.
       yynnts_ = 57,  ///< Number of nonterminal symbols.
       yyfinal_ = 5 ///< Termination state number.
     };
@@ -2253,11 +2344,11 @@ switch (yykind)
   };
 
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 6 "D:/projects/dbclib/src/dbcparser.y"
 } // dbc
-#line 2259 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 2350 "D:/projects/dbclib/src/dbcparser.hpp"
 
 
 
 
-#endif // !YY_YY_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+#endif // !YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED

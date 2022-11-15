@@ -36,6 +36,7 @@ class EnvVar {
 
     void Type(EnvType type) { type_ = type; }
     [[nodiscard]] EnvType Type() const { return type_; }
+    [[nodiscard]] std::string TypeAsString() const;
 
     void Min(double min) { min_ = min; }
     [[nodiscard]] double Min() const { return min_;}

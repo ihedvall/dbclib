@@ -6,7 +6,7 @@ project(dbcLib
         DESCRIPTION "CAN DBC C++ library."
         LANGUAGES CXX)
 
-option(DBC_SHARED_LIBS "Static libraries are preferred" OFF)
+option(CMAKE_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
 option(DBC_TOOLS "Building applications" ON)
 option(DBC_TEST "Building unit test" ON)
@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_DEBUG_POSTFIX d)
 
 include(CMakePrintHelpers)
-include(script/boost.cmake)
+# include(script/boost.cmake)
 
 if (DBC_TOOLS)
 include(script/wxwidgets.cmake)
@@ -71,8 +71,8 @@ target_include_directories(dbc PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         )
-
-target_include_directories(dbc PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(dbc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# target_include_directories(dbc PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(dbc PRIVATE ${FLEX_INCLUDE_DIRS})
 
 cmake_print_properties(TARGETS dbc PROPERTIES INCLUDE_DIRECTORIES)
@@ -91,7 +91,7 @@ if (DBC_TOOLS)
 endif ()
 
 if (wxWidgets_FOUND AND DBC_TOOLS)
-#    add_subdirectory(dbcviewer)
+    add_subdirectory(dbcviewer)
 endif ()
 
 if (GTEST_FOUND AND DBC_TEST)

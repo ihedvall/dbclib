@@ -36,9 +36,19 @@ Node* Network::GetNode(const std::string& name) {
   return itr != node_list_.end() ? &itr->second : nullptr;
 }
 
+const Node* Network::GetNode(const std::string& name) const {
+  const auto itr = node_list_.find(name);
+  return itr != node_list_.cend() ? &itr->second : nullptr;
+}
+
 Message* Network::GetMessage(uint64_t message_id) {
   auto itr = message_list_.find(message_id);
   return itr != message_list_.end() ? &itr->second : nullptr;
+}
+
+const Message* Network::GetMessage(uint64_t message_id) const {
+  const auto itr = message_list_.find(message_id);
+  return itr != message_list_.cend() ? &itr->second : nullptr;
 }
 
 Signal* Network::GetSignal(uint64_t message_id,
@@ -47,6 +57,21 @@ Signal* Network::GetSignal(uint64_t message_id,
   return message != nullptr ? message->GetSignal(signal_name) : nullptr;
 }
 
+const SignalGroup* Network::GetSignalGroup(uint64_t message_id,
+                           const std::string& name) const {
+  const auto itr = std::ranges::find_if(signal_group_list_,
+                                        [&] (const auto& group) {
+    return group.MessageId() == message_id &&
+           group.Name() == name;
+  });
+  return itr != signal_group_list_.cend() ? &(*itr) : nullptr;
+}
+
+const Signal* Network::GetSignal(uint64_t message_id,
+                                 const std::string& signal_name) const {
+  const auto* message = GetMessage(message_id);
+  return message != nullptr ? message->GetSignal(signal_name) : nullptr;
+}
 Message& Network::CreateMessage(uint64_t message_id) {
   auto itr = message_list_.find(message_id);
   if (itr == message_list_.end()) {

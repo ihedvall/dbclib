@@ -1,0 +1,53 @@
+# Copyright 2022 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
+cmake_minimum_required(VERSION 3.20)
+project(MdfViewer
+        VERSION 1.0
+        DESCRIPTION "Simple DBC file browser"
+        LANGUAGES CXX)
+
+include("../script/boost.cmake")
+include("../script/utillib.cmake")
+
+add_executable(dbcview
+        src/dbcviewer.cpp src/dbcviewer.h
+        src/mainframe.cpp src/mainframe.h
+        src/dbcdocument.cpp src/dbcdocument.h
+        src/dbcview.cpp src/dbcview.h
+        src/dbcviewer.rc
+        src/childframe.cpp src/childframe.h
+        src/windowid.h
+        src/channelobserverlistview.cpp src/channelobserverlistview.h
+        src/channelobserverframe.cpp src/channelobserverframe.h)
+
+
+target_include_directories(dbcview PRIVATE ${wxWidgets_INCLUDE_DIRS})
+target_include_directories(dbcview PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(dbcview PRIVATE util)
+target_include_directories(dbcview PRIVATE dbc)
+
+target_compile_definitions(dbcview PRIVATE XML_STATIC)
+
+if (MINGW)
+target_link_options(dbcview PRIVATE -mwindows -static -fstack-protector)
+endif()
+
+if (MSVC)
+target_link_options(dbcview PRIVATE /SUBSYSTEM:WINDOWS)
+target_compile_definitions(dbcview PRIVATE _WIN32_WINNT=0x0A00)
+endif()
+
+target_link_libraries(dbcview PRIVATE dbc)
+target_link_libraries(dbcview PRIVATE util)
+target_link_libraries(dbcview PRIVATE expat)
+target_link_libraries(dbcview PRIVATE ${wxWidgets_LIBRARIES})
+target_link_libraries(dbcview PRIVATE ${Boost_LIBRARIES})
+
+if (MINGW)
+    target_link_libraries(dbcview PRIVATE iconv)
+endif()
+
+if (WIN32)
+target_link_libraries(dbcview PRIVATE bcrypt)
+target_link_libraries(dbcview PRIVATE ws2_32)
+endif()

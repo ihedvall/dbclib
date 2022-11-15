@@ -28,8 +28,18 @@ class Network {
   [[nodiscard]] const std::string& Comment() const { return comment_; }
 
   Node* GetNode(const std::string& name);
-  Message* GetMessage(uint64_t message_id);
-  Signal* GetSignal(uint64_t message_id, const std::string& signal_name);
+  const Node* GetNode(const std::string& name) const;
+
+  [[nodiscard]] const Message* GetMessage(uint64_t message_id) const;
+  [[nodiscard]]  Message* GetMessage(uint64_t message_id);
+
+  [[nodiscard]] Signal* GetSignal(uint64_t message_id,
+                                  const std::string& signal_name);
+  [[nodiscard]] const Signal* GetSignal(uint64_t message_id,
+                          const std::string& signal_name) const;
+
+  [[nodiscard]] const SignalGroup* GetSignalGroup(uint64_t message_id,
+                                        const std::string& name) const;
 
   [[nodiscard]] const std::map<std::string, EnvVar>& EnvVars() const {
     return env_var_list_;
@@ -37,6 +47,22 @@ class Network {
 
   [[nodiscard]] const std::map<uint64_t, Message>& Messages() const {
     return message_list_;
+  }
+
+  [[nodiscard]] const std::map<std::string, Node>& Nodes() const {
+    return node_list_;
+  }
+
+  [[nodiscard]] const std::vector<SignalGroup>& SignalGroups() const {
+    return signal_group_list_;
+  }
+
+  [[nodiscard]] const std::map<std::string, EnumMap>& Enums() const {
+    return value_table_list_;
+  }
+
+  [[nodiscard]] const std::vector<Attribute>& Attributes() const {
+    return attribute_list_;
   }
 
   void AddValueTable(const std::string& name, const EnumMap& list);
@@ -51,13 +77,12 @@ class Network {
   [[nodiscard]] Message*  LastMessage();
  private:
 
-
   std::string version_;
   std::string comment_;
   std::map<std::string, EnvVar> env_var_list_;
   uint64_t last_message_id_ = 0;
 
-  // Only define the ame and type of value
+  // Only define the name and type of value
   std::map<std::string, Attribute> definition_list_;
   std::vector<Attribute> attribute_list_;
   std::map<std::string, Node> node_list_;

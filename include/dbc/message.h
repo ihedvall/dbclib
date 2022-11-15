@@ -23,6 +23,10 @@ class Message {
      return ident_;
    }
 
+   [[nodiscard]] bool IsExtended() const;
+
+   [[nodiscard]] uint32_t CanId() const;
+
    void Name(const std::string& name) { name_ = name; }
    [[nodiscard]] const std::string& Name() const { return name_; }
 
@@ -43,7 +47,23 @@ class Message {
      return  node_;
    }
 
-   Signal* GetSignal(const std::string& name);
+   [[nodiscard]] Signal* GetSignal(const std::string& name);
+   [[nodiscard]] const Signal* GetSignal(const std::string& name) const;
+   [[nodiscard]] Signal* GetMultiplexor();
+
+   [[nodiscard]] const std::map<std::string, Signal>& Signals() const {
+     return signal_list_;
+   }
+   [[nodiscard]] const std::vector<std::string>& Senders() const {
+     return sender_list_;
+   }
+   [[nodiscard]] const std::vector<Attribute>& Attributes() const {
+     return attribute_list_;
+   }
+
+   [[nodiscard]] bool IsNodeSender(const std::string& node_name) const;
+
+   void ParseMessage(const std::vector<uint8_t>& message);
 
    Attribute& CreateAttribute(const Attribute& definition);
    Signal& CreateSignal(const std::string& name);

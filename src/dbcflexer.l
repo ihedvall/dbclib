@@ -2,13 +2,13 @@
     #include <cstdint>
 }
 %{
-
     #include "dbcscanner.h"
     #undef  YY_DECL
-    #define YY_DECL int dbc::DbcScanner::yylex(dbc::DbcParser::value_type* yy_value)
+    #define YY_DECL int dbc::DbcScanner::ddlex(dbc::DbcParser::value_type* yy_value)
     using token = dbc::DbcParser::token;
 %}
 
+%option prefix="dd"
 %option 8bit
 %option nounistd
 %option noyywrap
@@ -18,6 +18,7 @@
 %option yyclass="dbc:DbcScanner"
 %option noinput
 %option yylineno
+
 
 ws              [ \t]+
 signed_number   [-+]?[0-9]+
@@ -193,6 +194,7 @@ nl              [\n\r]
 "("              { return token::TAG_PAR_OPEN; }
 ")"              { return token::TAG_PAR_CLOSE; }
 
-. {}
+
+.                {}
 %%
 

@@ -40,6 +40,7 @@ class Attribute {
 
     void ValueType(AttributeValueType type ) { value_type_ = type; }
     [[nodiscard]] AttributeValueType ValueType() const { return value_type_; }
+    std::string ValueTypeAsString() const;
 
     void Min(double min ) { min_ = min; }
     [[nodiscard]] double Min() const { return min_; }
@@ -68,8 +69,34 @@ class Attribute {
 
 template <typename T>
 void Attribute::Value(const T& value) {
-  value_float_ = static_cast<double>(value);
-  value_string_ = std::to_string(value);
+  try {
+    value_float_ = static_cast<double>(value);
+    switch (value_type_) {
+      case AttributeValueType::IntegerValue:
+        value_string_ = std::to_string(static_cast<int64_t>(value));
+        break;
+
+      case AttributeValueType::FloatValue:
+        value_string_ = std::to_string(static_cast<double>(value));
+        break;
+
+      case AttributeValueType::EnumValue: {
+        const auto index = static_cast<size_t>(value_float_);
+        if ( index < enum_list_.size()) {
+          value_string_ = enum_list_[index];
+        }
+        break;
+      }
+
+      default:
+        value_string_ = std::to_string(value);
+        break;
+    }
+
+  } catch (const std::exception&) {
+    value_float_ = 0.0;
+    value_string_ = "Conversion error";
+  }
 }
 
 template<>
@@ -96,6 +123,8 @@ T Attribute::Value() const {
   }
   return value;
 }
+
+
 
 template <>
 [[nodiscard]] std::string Attribute::Value() const;

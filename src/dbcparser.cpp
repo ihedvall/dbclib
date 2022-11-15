@@ -35,6 +35,8 @@
 // private implementation details that can be changed or removed.
 
 
+// Take the name prefix into account.
+#define yylex   ddlex
 
 
 
@@ -42,14 +44,15 @@
 
 
 // Unqualified %code blocks.
-#line 14 "D:/projects/dbclib/src/dbcparser.y"
+#line 20 "D:/projects/dbclib/src/dbcparser.y"
 
     #include <sstream>
     #include "dbcscanner.h"
-    #undef yylex
-    #define yylex scanner.yylex
 
-#line 53 "D:/projects/dbclib/src/dbcparser.cpp"
+    #undef yylex
+    #define yylex scanner.ddlex
+
+#line 56 "D:/projects/dbclib/src/dbcparser.cpp"
 
 
 #ifndef YY_
@@ -77,7 +80,7 @@
 
 
 // Enable debugging if requested.
-#if YYDEBUG
+#if DDDEBUG
 
 // A pseudo ostream that takes yydebug_ into account.
 # define YYCDEBUG if (yydebug_) (*yycdebug_)
@@ -104,14 +107,14 @@
       yy_stack_print_ ();                \
   } while (false)
 
-#else // !YYDEBUG
+#else // !DDDEBUG
 
 # define YYCDEBUG if (false) std::cerr
 # define YY_SYMBOL_PRINT(Title, Symbol)  YY_USE (Symbol)
 # define YY_REDUCE_PRINT(Rule)           static_cast<void> (0)
 # define YY_STACK_PRINT()                static_cast<void> (0)
 
-#endif // !YYDEBUG
+#endif // !DDDEBUG
 
 #define yyerrok         (yyerrstatus_ = 0)
 #define yyclearin       (yyla.clear ())
@@ -121,13 +124,13 @@
 #define YYERROR         goto yyerrorlab
 #define YYRECOVERING()  (!!yyerrstatus_)
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 6 "D:/projects/dbclib/src/dbcparser.y"
 namespace dbc {
-#line 127 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 130 "D:/projects/dbclib/src/dbcparser.cpp"
 
   /// Build a parser object.
   DbcParser::DbcParser (dbc::DbcScanner &scanner_yyarg)
-#if YYDEBUG
+#if DDDEBUG
     : yydebug_ (false),
       yycdebug_ (&std::cerr),
 #else
@@ -154,7 +157,21 @@ namespace dbc {
   {
     switch (this->kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.copy< AttributeType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.copy< SignalDataType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.copy< bool > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.copy< double > (YY_MOVE (that.value));
         break;
 
@@ -169,6 +186,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.copy< std::string > (YY_MOVE (that.value));
         break;
 
@@ -207,7 +226,21 @@ namespace dbc {
     super_type::move (s);
     switch (this->kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.move< AttributeType > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.move< SignalDataType > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.move< bool > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.move< double > (YY_MOVE (s.value));
         break;
 
@@ -222,6 +255,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.move< std::string > (YY_MOVE (s.value));
         break;
 
@@ -329,7 +364,21 @@ namespace dbc {
   {
     switch (that.kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.YY_MOVE_OR_COPY< AttributeType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.YY_MOVE_OR_COPY< SignalDataType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.YY_MOVE_OR_COPY< bool > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.YY_MOVE_OR_COPY< double > (YY_MOVE (that.value));
         break;
 
@@ -344,6 +393,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.YY_MOVE_OR_COPY< std::string > (YY_MOVE (that.value));
         break;
 
@@ -366,7 +417,21 @@ namespace dbc {
   {
     switch (that.kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.move< AttributeType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.move< SignalDataType > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.move< bool > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.move< double > (YY_MOVE (that.value));
         break;
 
@@ -381,6 +446,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.move< std::string > (YY_MOVE (that.value));
         break;
 
@@ -403,7 +470,21 @@ namespace dbc {
     state = that.state;
     switch (that.kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.copy< AttributeType > (that.value);
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.copy< SignalDataType > (that.value);
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.copy< bool > (that.value);
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.copy< double > (that.value);
         break;
 
@@ -418,6 +499,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.copy< std::string > (that.value);
         break;
 
@@ -438,7 +521,21 @@ namespace dbc {
     state = that.state;
     switch (that.kind ())
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        value.move< AttributeType > (that.value);
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        value.move< SignalDataType > (that.value);
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        value.move< bool > (that.value);
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         value.move< double > (that.value);
         break;
 
@@ -453,6 +550,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         value.move< std::string > (that.value);
         break;
 
@@ -478,7 +577,7 @@ namespace dbc {
       YY_SYMBOL_PRINT (yymsg, yysym);
   }
 
-#if YYDEBUG
+#if DDDEBUG
   template <typename Base>
   void
   DbcParser::yy_print_ (std::ostream& yyo, const basic_symbol<Base>& yysym) const
@@ -523,7 +622,7 @@ namespace dbc {
     yystack_.pop (n);
   }
 
-#if YYDEBUG
+#if DDDEBUG
   std::ostream&
   DbcParser::debug_stream () const
   {
@@ -548,7 +647,7 @@ namespace dbc {
   {
     yydebug_ = l;
   }
-#endif // YYDEBUG
+#endif // DDDEBUG
 
   DbcParser::state_type
   DbcParser::yy_lr_goto_state_ (state_type yystate, int yysym)
@@ -713,7 +812,21 @@ namespace dbc {
          when using variants.  */
       switch (yyr1_[yyn])
     {
+      case symbol_kind::S_attribute_object_type: // attribute_object_type
+        yylhs.value.emplace< AttributeType > ();
+        break;
+
+      case symbol_kind::S_signedness: // signedness
+        yylhs.value.emplace< SignalDataType > ();
+        break;
+
+      case symbol_kind::S_attribute_definition_object_or_relation: // attribute_definition_object_or_relation
+      case symbol_kind::S_little_endian: // little_endian
+        yylhs.value.emplace< bool > ();
+        break;
+
       case symbol_kind::S_DOUBLE_VAL: // DOUBLE_VAL
+      case symbol_kind::S_double_val: // double_val
         yylhs.value.emplace< double > ();
         break;
 
@@ -728,6 +841,8 @@ namespace dbc {
 
       case symbol_kind::S_ID_VAL: // ID_VAL
       case symbol_kind::S_STRING_VAL: // STRING_VAL
+      case symbol_kind::S_attribute_value: // attribute_value
+      case symbol_kind::S_mux_info: // mux_info
         yylhs.value.emplace< std::string > ();
         break;
 
@@ -750,273 +865,273 @@ namespace dbc {
           switch (yyn)
             {
   case 3: // version: TAG_VERSION STRING_VAL
-#line 110 "D:/projects/dbclib/src/dbcparser.y"
+#line 125 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 		network.Version(yystack_[0].value.as < std::string > ());
 		scanner.ResetTempList();
 	}
-#line 760 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 875 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 39: // envvar: TAG_EV ID_VAL TAG_COLON INT_VAL TAG_BOX_OPEN double_val TAG_SEP double_val TAG_BOX_CLOSE STRING_VAL double_val INT_VAL TAG_DUMMY_NODE_VECTOR comma_identifier_list TAG_SEMICOLON
-#line 178 "D:/projects/dbclib/src/dbcparser.y"
+#line 193 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         auto& env_var = network.GetEnvVar(yystack_[13].value.as < std::string > ());
         env_var.Type(static_cast<EnvType>(yystack_[11].value.as < int64_t > ()));
-        env_var.Min( yystack_[9].value.as< double > () );
-        env_var.Max( yystack_[7].value.as< double > () );
+        env_var.Min( yystack_[9].value.as < double > () );
+        env_var.Max( yystack_[7].value.as < double > () );
         env_var.Unit( yystack_[5].value.as < std::string > () );
-        env_var.InitValue(yystack_[4].value.as< double > ());
+        env_var.InitValue(yystack_[4].value.as < double > ());
         env_var.Ident(static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()));
         env_var.Access(static_cast<AccessType>(yystack_[2].value.as < int > ()));
         const auto& list = scanner.StringList();
         env_var.NodeList(list);
         scanner.ResetTempList();
     }
-#line 779 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 894 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 42: // envvar_data: TAG_ENVVAR_DATA ID_VAL TAG_COLON INT_VAL TAG_SEMICOLON
-#line 201 "D:/projects/dbclib/src/dbcparser.y"
+#line 216 "D:/projects/dbclib/src/dbcparser.y"
           {
 		/* To be defined what to do here */
 		scanner.ResetTempList();
 	  }
-#line 788 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 903 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 50: // attribute_value: INT_VAL
-#line 222 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< std::string > () = std::to_string(yystack_[0].value.as < int64_t > ()); }
-#line 794 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 238 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < std::string > () = std::to_string(yystack_[0].value.as < int64_t > ()); }
+#line 909 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 51: // attribute_value: STRING_VAL
-#line 223 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< std::string > () = yystack_[0].value.as < std::string > (); }
-#line 800 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 239 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 915 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 52: // attribute_value: DOUBLE_VAL
-#line 224 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< std::string > () = std::to_string(yystack_[0].value.as < double > ()); }
-#line 806 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 240 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < std::string > () = std::to_string(yystack_[0].value.as < double > ()); }
+#line 921 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 55: // attribute: TAG_BA STRING_VAL attribute_value TAG_SEMICOLON
-#line 237 "D:/projects/dbclib/src/dbcparser.y"
+#line 251 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition(yystack_[2].value.as < std::string > ());
 		auto& attribute = network.CreateAttribute( definition );
-		attribute.Value(yystack_[1].value.as< std::string > ());
+		attribute.Value(yystack_[1].value.as < std::string > ());
 		scanner.ResetTempList();
 	  }
-#line 818 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 933 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 56: // attribute: TAG_BA STRING_VAL TAG_BU ID_VAL attribute_value TAG_SEMICOLON
-#line 250 "D:/projects/dbclib/src/dbcparser.y"
+#line 264 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition(yystack_[4].value.as < std::string > ());
 		auto* node = network.GetNode( yystack_[2].value.as < std::string > () );
 		if ( node != nullptr) {
 			auto& attribute = node->CreateAttribute( definition );
-            attribute.Value(yystack_[1].value.as< std::string > ());
+            attribute.Value(yystack_[1].value.as < std::string > ());
 		}
 		scanner.ResetTempList();
 	  }
-#line 833 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 948 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 57: // attribute: TAG_BA STRING_VAL TAG_BO INT_VAL attribute_value TAG_SEMICOLON
-#line 266 "D:/projects/dbclib/src/dbcparser.y"
+#line 280 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition(yystack_[4].value.as < std::string > ());
 		auto* message = network.GetMessage( static_cast<uint64_t>(yystack_[2].value.as < int64_t > ()));
 		if ( message != nullptr ) {
 			auto& attribute = message->CreateAttribute( definition );
-            attribute.Value(yystack_[1].value.as< std::string > ());
+            attribute.Value(yystack_[1].value.as < std::string > ());
 		}
 		scanner.ResetTempList();
 	  }
-#line 848 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 963 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 58: // attribute: TAG_BA STRING_VAL TAG_SG INT_VAL ID_VAL attribute_value TAG_SEMICOLON
-#line 283 "D:/projects/dbclib/src/dbcparser.y"
+#line 297 "D:/projects/dbclib/src/dbcparser.y"
           {
 		 auto& network = scanner.GetNetwork();
 		 auto& definition = network.GetDefinition(yystack_[5].value.as < std::string > ());
 		 auto* signal = network.GetSignal( static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()), yystack_[2].value.as < std::string > ());
 		 if ( signal != nullptr ) {
 		   auto& attribute = signal->CreateAttribute( definition );
-           attribute.Value(yystack_[1].value.as< std::string > ());
+           attribute.Value(yystack_[1].value.as < std::string > ());
 	     }
 	     scanner.ResetTempList();
 	  }
-#line 863 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 978 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 61: // attribute_rel: TAG_BA_REL STRING_VAL TAG_BU_SG_REL ID_VAL TAG_SG INT_VAL ID_VAL attribute_value TAG_SEMICOLON
-#line 310 "D:/projects/dbclib/src/dbcparser.y"
+#line 323 "D:/projects/dbclib/src/dbcparser.y"
           {
 		/* To be defined */
 		scanner.ResetTempList();
 	  }
-#line 872 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 987 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 65: // attribute_definition_default: attribute_definition_object_or_relation STRING_VAL double_val TAG_SEMICOLON
-#line 326 "D:/projects/dbclib/src/dbcparser.y"
+#line 338 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition( yystack_[2].value.as < std::string > () );
-		definition.Value( yystack_[1].value.as< double > () );
+		definition.Value( yystack_[1].value.as < double > () );
 		scanner.ResetTempList();
 	  }
-#line 883 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 998 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 66: // attribute_definition_default: attribute_definition_object_or_relation STRING_VAL STRING_VAL TAG_SEMICOLON
-#line 333 "D:/projects/dbclib/src/dbcparser.y"
+#line 345 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.GetDefinition( yystack_[2].value.as < std::string > () );
 		definition.Value( yystack_[1].value.as < std::string > () );
 		scanner.ResetTempList();
 	  }
-#line 894 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1009 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 67: // attribute_definition_object_or_relation: TAG_BA_DEF_DEF
-#line 341 "D:/projects/dbclib/src/dbcparser.y"
-                      { yylhs.value.as< bool > () = false; }
-#line 900 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 353 "D:/projects/dbclib/src/dbcparser.y"
+                      { yylhs.value.as < bool > () = false; }
+#line 1015 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 68: // attribute_definition_object_or_relation: TAG_BA_DEF_DEF_REL
-#line 342 "D:/projects/dbclib/src/dbcparser.y"
-                         { yylhs.value.as< bool > () = true; }
-#line 906 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 354 "D:/projects/dbclib/src/dbcparser.y"
+                         { yylhs.value.as < bool > () = true; }
+#line 1021 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 69: // attribute_definition: attribute_object_type STRING_VAL TAG_INT INT_VAL INT_VAL TAG_SEMICOLON
-#line 348 "D:/projects/dbclib/src/dbcparser.y"
+#line 360 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( yystack_[4].value.as < std::string > () );
-       	definition.Type( yystack_[5].value.as< AttributeType > () );
+       	definition.Type( yystack_[5].value.as < AttributeType > () );
        	definition.ValueType( AttributeValueType::IntegerValue);
 		definition.Min(static_cast<double>( yystack_[2].value.as < int64_t > () ));
 		definition.Max(static_cast<double>( yystack_[1].value.as < int64_t > () ));
 		scanner.ResetTempList();
 	  }
-#line 920 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1035 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 70: // attribute_definition: attribute_object_type STRING_VAL TAG_FLOAT double_val double_val TAG_SEMICOLON
-#line 358 "D:/projects/dbclib/src/dbcparser.y"
+#line 370 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( yystack_[4].value.as < std::string > () );
-       	definition.Type( yystack_[5].value.as< AttributeType > () );
+       	definition.Type( yystack_[5].value.as < AttributeType > () );
        	definition.ValueType( AttributeValueType::FloatValue);
-		definition.Min( yystack_[2].value.as< double > () );
-		definition.Max( yystack_[1].value.as< double > () );
+		definition.Min( yystack_[2].value.as < double > () );
+		definition.Max( yystack_[1].value.as < double > () );
 		scanner.ResetTempList();
 	  }
-#line 934 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1049 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 71: // attribute_definition: attribute_object_type STRING_VAL TAG_STRING TAG_SEMICOLON
-#line 368 "D:/projects/dbclib/src/dbcparser.y"
+#line 380 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( yystack_[2].value.as < std::string > () );
-       	definition.Type( yystack_[3].value.as< AttributeType > () );
+       	definition.Type( yystack_[3].value.as < AttributeType > () );
        	definition.ValueType( AttributeValueType::StringValue);
        	scanner.ResetTempList();
 	  }
-#line 946 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1061 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 72: // attribute_definition: attribute_object_type STRING_VAL TAG_ENUM comma_string_list TAG_SEMICOLON
-#line 376 "D:/projects/dbclib/src/dbcparser.y"
+#line 388 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( yystack_[3].value.as < std::string > () );
-       	definition.Type( yystack_[4].value.as< AttributeType > () );
+       	definition.Type( yystack_[4].value.as < AttributeType > () );
        	definition.ValueType( AttributeValueType::EnumValue);
        	const auto& list = scanner.StringList();
         definition.EnumList(list);
 		scanner.ResetTempList();
 	  }
-#line 960 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1075 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 73: // attribute_definition: attribute_object_type STRING_VAL TAG_HEX INT_VAL INT_VAL TAG_SEMICOLON
-#line 386 "D:/projects/dbclib/src/dbcparser.y"
+#line 398 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.GetDefinition( yystack_[4].value.as < std::string > () );
-       	definition.Type( yystack_[5].value.as< AttributeType > () );
+       	definition.Type( yystack_[5].value.as < AttributeType > () );
        	definition.ValueType( AttributeValueType::HexValue);
 		definition.Min(static_cast<double>( yystack_[2].value.as < int64_t > () ));
 		definition.Max(static_cast<double>( yystack_[1].value.as < int64_t > () ));
 		scanner.ResetTempList();
 	  }
-#line 974 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1089 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 74: // attribute_object_type: TAG_BA_DEF
-#line 397 "D:/projects/dbclib/src/dbcparser.y"
-                                   { yylhs.value.as< AttributeType > () = AttributeType::DbcNetwork; }
-#line 980 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 409 "D:/projects/dbclib/src/dbcparser.y"
+                                   { yylhs.value.as < AttributeType > () = AttributeType::DbcNetwork; }
+#line 1095 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 75: // attribute_object_type: TAG_BA_DEF TAG_BU
-#line 398 "D:/projects/dbclib/src/dbcparser.y"
-                           { yylhs.value.as< AttributeType > () = AttributeType::DbcNode; }
-#line 986 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 410 "D:/projects/dbclib/src/dbcparser.y"
+                           { yylhs.value.as < AttributeType > () = AttributeType::DbcNode; }
+#line 1101 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 76: // attribute_object_type: TAG_BA_DEF TAG_BO
-#line 399 "D:/projects/dbclib/src/dbcparser.y"
-                           { yylhs.value.as< AttributeType > () = AttributeType::DbcMessage; }
-#line 992 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 411 "D:/projects/dbclib/src/dbcparser.y"
+                           { yylhs.value.as < AttributeType > () = AttributeType::DbcMessage; }
+#line 1107 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 77: // attribute_object_type: TAG_BA_DEF TAG_SG
-#line 400 "D:/projects/dbclib/src/dbcparser.y"
-                           { yylhs.value.as< AttributeType > () = AttributeType::DbcSignal; }
-#line 998 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 412 "D:/projects/dbclib/src/dbcparser.y"
+                           { yylhs.value.as < AttributeType > () = AttributeType::DbcSignal; }
+#line 1113 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 78: // attribute_object_type: TAG_BA_DEF TAG_EV
-#line 401 "D:/projects/dbclib/src/dbcparser.y"
-                           { yylhs.value.as< AttributeType > () = AttributeType::EnvironmentVariable; }
-#line 1004 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 413 "D:/projects/dbclib/src/dbcparser.y"
+                           { yylhs.value.as < AttributeType > () = AttributeType::EnvironmentVariable; }
+#line 1119 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 79: // attribute_object_type: TAG_BA_DEF_REL TAG_BU_SG_REL
-#line 403 "D:/projects/dbclib/src/dbcparser.y"
-                                   { yylhs.value.as< AttributeType > () = AttributeType::NodeSignalRelation; }
-#line 1010 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 415 "D:/projects/dbclib/src/dbcparser.y"
+                                   { yylhs.value.as < AttributeType > () = AttributeType::NodeSignalRelation; }
+#line 1125 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 80: // attribute_object_type: TAG_BA_DEF_REL TAG_BU_BO_REL
-#line 405 "D:/projects/dbclib/src/dbcparser.y"
-                                   { yylhs.value.as< AttributeType > () = AttributeType::NodeMessageRelation; }
-#line 1016 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 417 "D:/projects/dbclib/src/dbcparser.y"
+                                   { yylhs.value.as < AttributeType > () = AttributeType::NodeMessageRelation; }
+#line 1131 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 83: // val: TAG_VAL INT_VAL ID_VAL val_map TAG_SEMICOLON
-#line 418 "D:/projects/dbclib/src/dbcparser.y"
+#line 430 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto* signal = network.GetSignal(static_cast<uint64_t>( yystack_[3].value.as < int64_t > () ), yystack_[2].value.as < std::string > ());
@@ -1026,11 +1141,11 @@ namespace dbc {
 	    }
 	    scanner.ResetTempList();
 	}
-#line 1030 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1145 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 84: // val: TAG_VAL ID_VAL val_map TAG_SEMICOLON
-#line 429 "D:/projects/dbclib/src/dbcparser.y"
+#line 441 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto& env_var = network.GetEnvVar( yystack_[2].value.as < std::string > () );
@@ -1038,19 +1153,19 @@ namespace dbc {
 	    env_var.EnumList(list);
 	    scanner.ResetTempList();
 	}
-#line 1042 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1157 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 87: // val_map_entry: INT_VAL STRING_VAL
-#line 444 "D:/projects/dbclib/src/dbcparser.y"
+#line 456 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    scanner.AddToEnumList(yystack_[1].value.as < int64_t > (), yystack_[0].value.as < std::string > () ); /* Temp storage on network */
 	}
-#line 1050 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1165 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 90: // sig_valtype: TAG_SIG_VALTYPE INT_VAL ID_VAL TAG_COLON INT_VAL TAG_SEMICOLON
-#line 466 "D:/projects/dbclib/src/dbcparser.y"
+#line 477 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto* signal = network.GetSignal(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()), yystack_[3].value.as < std::string > ());
@@ -1070,32 +1185,32 @@ namespace dbc {
 	        }
 	    }
 	}
-#line 1074 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1189 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 93: // comment: TAG_CM STRING_VAL TAG_SEMICOLON
-#line 495 "D:/projects/dbclib/src/dbcparser.y"
+#line 505 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  network.Comment( yystack_[1].value.as < std::string > () );
 	  scanner.ResetTempList();
     }
-#line 1084 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1199 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 94: // comment: TAG_CM TAG_EV ID_VAL STRING_VAL TAG_SEMICOLON
-#line 501 "D:/projects/dbclib/src/dbcparser.y"
+#line 511 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto& env_var = network.GetEnvVar(yystack_[2].value.as < std::string > ());
 	  env_var.Comment(yystack_[1].value.as < std::string > ());
 	  scanner.ResetTempList();
     }
-#line 1095 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1210 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 95: // comment: TAG_CM TAG_BU ID_VAL STRING_VAL TAG_SEMICOLON
-#line 508 "D:/projects/dbclib/src/dbcparser.y"
+#line 518 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto* node = network.GetNode( yystack_[2].value.as < std::string > () );
@@ -1104,11 +1219,11 @@ namespace dbc {
 	  }
 	  scanner.ResetTempList();
     }
-#line 1108 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1223 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 96: // comment: TAG_CM TAG_BO INT_VAL STRING_VAL TAG_SEMICOLON
-#line 517 "D:/projects/dbclib/src/dbcparser.y"
+#line 527 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto* message = network.GetMessage( static_cast<uint64_t>(yystack_[2].value.as < int64_t > ()));
@@ -1117,11 +1232,11 @@ namespace dbc {
 	  }
 	  scanner.ResetTempList();
     }
-#line 1121 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1236 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 97: // comment: TAG_CM TAG_SG INT_VAL ID_VAL STRING_VAL TAG_SEMICOLON
-#line 526 "D:/projects/dbclib/src/dbcparser.y"
+#line 536 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto* signal = network.GetSignal( static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()), yystack_[2].value.as < std::string > ());
@@ -1130,11 +1245,11 @@ namespace dbc {
 	  }
 	  scanner.ResetTempList();
     }
-#line 1134 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1249 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 100: // message: TAG_BO INT_VAL ID_VAL TAG_COLON INT_VAL ID_VAL
-#line 542 "D:/projects/dbclib/src/dbcparser.y"
+#line 552 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto& message = network.CreateMessage(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()));
@@ -1143,18 +1258,24 @@ namespace dbc {
 	  message.Node(yystack_[0].value.as < std::string > ());
 	  scanner.ResetTempList();
     }
-#line 1147 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1262 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 103: // signal: TAG_SG ID_VAL mux_info TAG_COLON INT_VAL TAG_SEP INT_VAL TAG_AT little_endian signedness TAG_PAR_OPEN double_val TAG_COMMA double_val TAG_PAR_CLOSE TAG_BOX_OPEN double_val TAG_SEP double_val TAG_BOX_CLOSE STRING_VAL comma_identifier_list
-#line 579 "D:/projects/dbclib/src/dbcparser.y"
+#line 589 "D:/projects/dbclib/src/dbcparser.y"
         {
 		auto& network = scanner.GetNetwork();
 		auto* message = network.LastMessage();
 		if (message != nullptr) {
 		    auto& signal = message->CreateSignal(yystack_[20].value.as < std::string > ());
-		    const std::string mux = yystack_[19].value.as< std::string > ();
-		    if (!mux.empty() && mux[0] == 'M') {
+		    signal.MessageId(message->Ident()); // Used to find its message later on
+		    std::string mux = yystack_[19].value.as < std::string > ();
+		    if (mux.size() > 2 && mux.back() == 'M' && mux.front() == 'm') {
+		        // Extended multiplexed value.
+		      signal.Mux(MuxType::ExtendedMultiplexor);
+		      mux.pop_back(); // So parsing of index works below
+   		      signal.MuxValue( std::stoi(mux.substr(1)) );
+		    } else if (!mux.empty() && mux[0] == 'M') {
 		      signal.Mux(MuxType::Multiplexor);
 		      signal.MuxValue(0);
 		    } else if (!mux.empty() && mux[0] == 'm') {
@@ -1166,123 +1287,123 @@ namespace dbc {
 		    }
 		    signal.BitStart(static_cast<size_t>(yystack_[17].value.as < int64_t > ()));
 		    signal.BitLength(static_cast<size_t>(yystack_[15].value.as < int64_t > ()));
-		    signal.LittleEndian(yystack_[13].value.as< bool > ());
-		    signal.DataType(yystack_[12].value.as< SignalDataType > ());
-		    signal.Scale(yystack_[10].value.as< double > ());
-		    signal.Offset(yystack_[8].value.as< double > ());
-		    signal.Min(yystack_[5].value.as< double > ());
-            signal.Max(yystack_[3].value.as< double > ());
+		    signal.LittleEndian(yystack_[13].value.as < bool > ());
+		    signal.DataType(yystack_[12].value.as < SignalDataType > ());
+		    signal.Scale(yystack_[10].value.as < double > ());
+		    signal.Offset(yystack_[8].value.as < double > ());
+		    signal.Min(yystack_[5].value.as < double > ());
+            signal.Max(yystack_[3].value.as < double > ());
             signal.Unit(yystack_[1].value.as < std::string > ());
             const auto& list = scanner.StringList();
             signal.Receivers(list);
 		}
 		scanner.ResetTempList();
 	}
-#line 1182 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1303 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 104: // mux_info: %empty
-#line 614 "D:/projects/dbclib/src/dbcparser.y"
+#line 630 "D:/projects/dbclib/src/dbcparser.y"
     {
-	  yylhs.value.as< std::string > () = "";
+	  yylhs.value.as < std::string > () = "";
     }
-#line 1190 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1311 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 105: // mux_info: ID_VAL
-#line 618 "D:/projects/dbclib/src/dbcparser.y"
-        {
-		yylhs.value.as< std::string > () = yystack_[0].value.as < std::string > ();
- 	}
-#line 1198 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 634 "D:/projects/dbclib/src/dbcparser.y"
+    {
+        yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
+    }
+#line 1319 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
-  case 108: // space_identifier_list: ID_VAL space_identifier_list
-#line 627 "D:/projects/dbclib/src/dbcparser.y"
+  case 108: // space_identifier_list: space_identifier_list ID_VAL
+#line 643 "D:/projects/dbclib/src/dbcparser.y"
          {
-		scanner.AddToStringList( yystack_[1].value.as < std::string > () );
+		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
 	 }
-#line 1206 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1327 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 110: // comma_identifier_list: ID_VAL
-#line 634 "D:/projects/dbclib/src/dbcparser.y"
+#line 650 "D:/projects/dbclib/src/dbcparser.y"
     {
 		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1214 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1335 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
-  case 111: // comma_identifier_list: ID_VAL TAG_COMMA comma_identifier_list
-#line 638 "D:/projects/dbclib/src/dbcparser.y"
+  case 111: // comma_identifier_list: comma_identifier_list TAG_COMMA ID_VAL
+#line 654 "D:/projects/dbclib/src/dbcparser.y"
     {
-		scanner.AddToStringList( yystack_[2].value.as < std::string > () );
+		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1222 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1343 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 112: // comma_string_list: STRING_VAL
-#line 644 "D:/projects/dbclib/src/dbcparser.y"
-        {
-		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
-	}
-#line 1230 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 660 "D:/projects/dbclib/src/dbcparser.y"
+    {
+        scanner.AddToStringList( yystack_[0].value.as < std::string > () );
+    }
+#line 1351 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
-  case 113: // comma_string_list: STRING_VAL TAG_COMMA comma_string_list
-#line 648 "D:/projects/dbclib/src/dbcparser.y"
+  case 113: // comma_string_list: comma_string_list TAG_COMMA STRING_VAL
+#line 664 "D:/projects/dbclib/src/dbcparser.y"
         {
-		scanner.AddToStringList( yystack_[2].value.as < std::string > () );
-	}
-#line 1238 "D:/projects/dbclib/src/dbcparser.cpp"
+    	scanner.AddToStringList( yystack_[0].value.as < std::string > () );
+    }
+#line 1359 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 114: // double_val: DOUBLE_VAL
-#line 654 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< double > () = yystack_[0].value.as < double > (); }
-#line 1244 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 672 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
+#line 1365 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 115: // double_val: TAG_NAN
-#line 655 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< double > () = std::numeric_limits<double>::quiet_NaN(); }
-#line 1250 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 673 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < double > () = std::numeric_limits<double>::quiet_NaN(); }
+#line 1371 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 116: // double_val: INT_VAL
-#line 656 "D:/projects/dbclib/src/dbcparser.y"
-                 { yylhs.value.as< double > () = static_cast<double>(yystack_[0].value.as < int64_t > ()); }
-#line 1256 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 674 "D:/projects/dbclib/src/dbcparser.y"
+                 { yylhs.value.as < double > () = static_cast<double>(yystack_[0].value.as < int64_t > ()); }
+#line 1377 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 117: // little_endian: INT_VAL
-#line 659 "D:/projects/dbclib/src/dbcparser.y"
-                       { yylhs.value.as< bool > () = yystack_[0].value.as < int64_t > () == 1; }
-#line 1262 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 677 "D:/projects/dbclib/src/dbcparser.y"
+                       { yylhs.value.as < bool > () = yystack_[0].value.as < int64_t > () == 1; }
+#line 1383 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 118: // signedness: TAG_PLUS
-#line 662 "D:/projects/dbclib/src/dbcparser.y"
-               { yylhs.value.as< SignalDataType > () = SignalDataType::UnsignedData; }
-#line 1268 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 680 "D:/projects/dbclib/src/dbcparser.y"
+               { yylhs.value.as < SignalDataType > () = SignalDataType::UnsignedData; }
+#line 1389 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 119: // signedness: TAG_MINUS
-#line 663 "D:/projects/dbclib/src/dbcparser.y"
-                { yylhs.value.as< SignalDataType > () = SignalDataType::SignedData; }
-#line 1274 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 681 "D:/projects/dbclib/src/dbcparser.y"
+                { yylhs.value.as < SignalDataType > () = SignalDataType::SignedData; }
+#line 1395 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
-  case 121: // space_node_list: ID_VAL space_node_list
-#line 671 "D:/projects/dbclib/src/dbcparser.y"
+  case 121: // space_node_list: space_node_list ID_VAL
+#line 689 "D:/projects/dbclib/src/dbcparser.y"
 {
-	scanner.AddToStringList( yystack_[1].value.as < std::string > () );
+	scanner.AddToStringList( yystack_[0].value.as < std::string > () );
 }
-#line 1282 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1403 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 122: // node_list: TAG_BU TAG_COLON space_node_list
-#line 676 "D:/projects/dbclib/src/dbcparser.y"
+#line 694 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         const auto& list = scanner.StringList();
@@ -1294,22 +1415,22 @@ namespace dbc {
        }
        scanner.ResetTempList();
     }
-#line 1298 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1419 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 125: // valtable: TAG_VAL_TABLE ID_VAL val_map TAG_SEMICOLON
-#line 696 "D:/projects/dbclib/src/dbcparser.y"
+#line 713 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& list = scanner.EnumList();
 		auto& network = scanner.GetNetwork();
 		network.AddValueTable(yystack_[2].value.as < std::string > (), list );
 		scanner.ResetTempList();
 	}
-#line 1309 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1430 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 129: // signal_group: TAG_SIG_GROUP INT_VAL ID_VAL INT_VAL TAG_COLON signal_name_list TAG_SEMICOLON
-#line 713 "D:/projects/dbclib/src/dbcparser.y"
+#line 730 "D:/projects/dbclib/src/dbcparser.y"
   {
     auto& network = scanner.GetNetwork();
     SignalGroup temp;
@@ -1321,37 +1442,37 @@ namespace dbc {
     network.AddSignalGroup(temp);
     scanner.ResetTempList();
   }
-#line 1325 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1446 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 134: // extended_mux: TAG_SG_MUL_VAL INT_VAL ID_VAL ID_VAL value_range_list TAG_SEMICOLON
-#line 741 "D:/projects/dbclib/src/dbcparser.y"
+#line 758 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         auto* signal = network.GetSignal(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()), yystack_[3].value.as < std::string > ());
         if (signal != nullptr) {
-            auto& mux = signal->CreateExtendedMux();
+            auto& mux = signal->GetExtendedMux();
             mux.multiplexor = yystack_[2].value.as < std::string > ();
             const auto& list = scanner.RangeList();
             mux.range_list = list;
         }
         scanner.ResetTempList();
     }
-#line 1341 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1462 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 137: // value_range: INT_VAL INT_VAL
-#line 760 "D:/projects/dbclib/src/dbcparser.y"
+#line 777 "D:/projects/dbclib/src/dbcparser.y"
     {
         const auto low = static_cast<size_t>(yystack_[1].value.as < int64_t > ());
         const auto high = static_cast<size_t>(-yystack_[0].value.as < int64_t > ()); /* Solves the integer problem) */
         scanner.AddToRangeList(low, high);
     }
-#line 1351 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1472 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 138: // message_transmitters: TAG_BO_TX_BU INT_VAL TAG_COLON comma_identifier_list TAG_SEMICOLON
-#line 768 "D:/projects/dbclib/src/dbcparser.y"
+#line 785 "D:/projects/dbclib/src/dbcparser.y"
         {
 		auto& network = scanner.GetNetwork();
 		auto* message = network.GetMessage(static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()));
@@ -1363,11 +1484,11 @@ namespace dbc {
 		}
 		scanner.ResetTempList();
 	}
-#line 1367 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1488 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
 
-#line 1371 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1492 "D:/projects/dbclib/src/dbcparser.cpp"
 
             default:
               break;
@@ -1540,13 +1661,13 @@ namespace dbc {
     error (yyexc.what ());
   }
 
-#if YYDEBUG || 0
+#if DDDEBUG || 0
   const char *
   DbcParser::symbol_name (symbol_kind_type yysymbol)
   {
     return yytname_[yysymbol];
   }
-#endif // #if YYDEBUG || 0
+#endif // #if DDDEBUG || 0
 
 
 
@@ -1556,44 +1677,43 @@ namespace dbc {
 
 
 
-  const short DbcParser::yypact_ninf_ = -194;
+  const short DbcParser::yypact_ninf_ = -253;
 
   const signed char DbcParser::yytable_ninf_ = -1;
 
   const short
   DbcParser::yypact_[] =
   {
-      12,   -26,    42,    31,  -194,  -194,    43,    41,   149,    56,
-      44,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,
-    -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,
-    -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,  -194,
-     149,     2,    59,    27,  -194,    60,     9,    10,    52,    27,
-      13,     9,  -194,    14,    15,    29,    50,  -194,    61,  -194,
-      18,    72,    14,    21,    20,    29,    62,    23,    52,    50,
-      22,  -194,  -194,  -194,    79,    80,  -194,    28,    54,    62,
-      30,  -194,  -194,  -194,    32,    33,    84,    35,    66,    54,
-    -194,  -194,    90,    38,    82,    92,    39,    95,    -5,   -12,
-      66,  -194,    45,  -194,    33,  -194,    91,    46,    47,    51,
-      53,    57,    97,    26,  -194,   -40,  -194,    75,   -12,    55,
-     -12,    58,  -194,   103,  -194,   -30,    98,    63,    64,    67,
-      65,  -194,  -194,  -194,  -194,  -194,  -194,  -194,    68,    71,
-      75,  -194,   -24,  -194,   -14,    69,  -194,  -194,  -194,   104,
-    -194,   106,   112,    73,   113,    -9,    76,    93,    71,  -194,
-     115,   120,    70,   -30,    77,    74,   122,   123,   -30,  -194,
-    -194,   131,  -194,    78,    81,    85,  -194,  -194,  -194,   134,
-      94,   -38,   114,    93,  -194,  -194,  -194,    86,   -30,   129,
-     141,    88,  -194,    89,   138,  -194,    -4,    -4,    96,  -194,
-      99,    14,   100,   101,   126,   114,  -194,   145,   146,    77,
-    -194,   150,  -194,     8,   105,   153,   154,    -4,   143,   159,
-      14,   109,     6,   127,   126,  -194,  -194,  -194,  -194,  -194,
-    -194,  -194,   156,   -30,  -194,  -194,   164,   140,  -194,   195,
-     142,   144,   147,   148,   163,   127,  -194,   -30,   151,  -194,
-     152,  -194,   201,   155,   157,   158,   160,   163,   162,  -194,
-     194,   161,    -4,  -194,   207,   208,   214,   165,  -194,   166,
-    -194,   162,   -30,    33,   215,  -194,  -194,   167,   168,   171,
-    -194,   210,   216,  -194,   219,   225,   173,   221,  -194,  -194,
-     175,   174,   -30,   175,   229,  -194,   176,   231,   174,   232,
-    -194,  -194,  -194,  -194,  -194,   -30,   226,   181,    33,  -194
+       1,   -23,    43,    30,  -253,  -253,    59,    54,   133,    68,
+      55,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,
+    -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,
+    -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,   133,
+    -253,    15,    71,  -253,  -253,    72,  -253,    39,    20,    21,
+      23,    -5,  -253,    67,  -253,    26,    27,    28,  -253,    40,
+    -253,    29,    32,    78,    26,    34,    80,    73,  -253,    74,
+    -253,  -253,  -253,  -253,    89,    38,    44,  -253,    46,  -253,
+      64,    45,  -253,    19,    49,    93,    50,  -253,    75,    51,
+    -253,    52,  -253,    95,    53,    96,    -6,    -9,  -253,  -253,
+    -253,    56,   100,    57,    58,    62,    63,    69,   106,    42,
+    -253,   -29,  -253,    88,  -253,    47,  -253,    60,   108,   -28,
+     115,    66,    70,    76,    77,  -253,  -253,  -253,  -253,  -253,
+    -253,  -253,    79,  -253,    81,   -32,     2,    82,  -253,  -253,
+    -253,   121,  -253,   116,   124,    85,   125,   -10,    86,  -253,
+      41,   127,   129,    87,   -28,    90,    91,   131,   132,   -28,
+    -253,  -253,   135,  -253,    92,   126,    94,  -253,  -253,  -253,
+     140,   101,   -12,   128,  -253,   111,  -253,  -253,  -253,   130,
+     -28,  -253,    24,   134,  -253,   136,   141,  -253,   -17,   -17,
+     137,  -253,   139,    26,   142,   143,   156,  -253,   180,   181,
+    -253,   144,   183,  -253,    61,   145,   185,   186,   -17,   173,
+     192,    26,   146,    48,  -253,   158,  -253,  -253,  -253,  -253,
+    -253,  -253,   189,   -28,  -253,  -253,   199,   147,  -253,   202,
+     203,   150,   153,   152,  -253,   174,   -28,   155,  -253,   159,
+    -253,  -253,   160,   161,   164,   163,  -253,   166,   198,   162,
+     -17,   212,   218,   220,   168,   167,  -253,   -28,    38,   222,
+    -253,  -253,   169,   170,   175,   217,    25,  -253,   226,   229,
+     177,   225,  -253,  -253,  -253,   178,   -28,   231,   182,   179,
+       0,  -253,   234,  -253,  -253,  -253,  -253,  -253,   -28,   230,
+     184,    38,   232
   };
 
   const unsigned char
@@ -1603,121 +1723,116 @@ namespace dbc {
        0,     9,    10,    11,    12,    13,    14,    15,    16,    17,
       18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
       28,    29,    30,    31,    32,    33,    34,    35,    36,     6,
-       7,   127,     0,   123,     8,     0,   120,     0,    98,   123,
-       0,   120,   122,    85,     0,   139,   101,   124,     0,   121,
-       0,     0,    85,     0,     0,   139,    37,     0,    98,   101,
-       0,    87,   125,    86,     0,     0,   140,     0,    40,    37,
-     104,    99,   102,   128,     0,   109,     0,     0,    91,    40,
-      38,   105,     0,     0,   110,     0,     0,     0,     0,    62,
-      91,    41,     0,   100,   109,   138,     0,     0,     0,     0,
-       0,     0,     0,    74,    67,     0,    68,    53,    62,     0,
-      62,     0,    92,     0,   111,     0,     0,     0,     0,     0,
-       0,    93,    76,    75,    77,    78,    79,    80,     0,    59,
-      53,    63,     0,    64,     0,     0,   115,   116,   114,     0,
-      42,     0,     0,     0,     0,     0,     0,    81,    59,    54,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    96,
-      95,     0,    94,     0,     0,     0,    51,    50,    52,     0,
-       0,     0,    43,    81,    60,    66,    65,     0,     0,   112,
-       0,     0,    71,     0,     0,    97,     0,     0,     0,    55,
-       0,    85,     0,     0,    46,    43,    82,     0,     0,     0,
-      72,     0,   117,     0,     0,     0,     0,     0,     0,     0,
-      85,     0,     0,    88,    46,    44,    69,    70,   113,    73,
+       7,   127,     0,   123,     8,     0,   120,    98,     0,   122,
+       0,   139,   124,     0,   121,    85,     0,     0,   101,   139,
+      37,     0,     0,     0,    85,     0,     0,    99,   140,    40,
+     128,    87,   125,    86,     0,   109,     0,   102,     0,    38,
+      91,     0,   110,     0,   104,     0,     0,    41,    62,     0,
+     138,     0,   105,     0,     0,     0,     0,    53,    92,   100,
+     111,     0,     0,     0,     0,     0,     0,     0,     0,    74,
+      67,     0,    68,    59,    63,     0,    64,     0,     0,     0,
+       0,     0,     0,     0,     0,    93,    76,    75,    77,    78,
+      79,    80,     0,    54,    81,     0,     0,     0,   115,   116,
+     114,     0,    42,     0,     0,     0,     0,     0,     0,    60,
+      43,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+      96,    95,     0,    94,     0,     0,     0,    51,    50,    52,
+       0,     0,     0,     0,    46,    43,    82,    66,    65,     0,
+       0,   112,     0,     0,    71,     0,     0,    97,     0,     0,
+       0,    55,     0,    85,     0,     0,    88,    44,     0,     0,
+      72,     0,     0,   117,     0,     0,     0,     0,     0,     0,
+       0,    85,     0,     0,    47,   130,    69,    70,   113,    73,
      118,   119,     0,     0,    57,    56,     0,     0,    84,     0,
-       0,     0,     0,     0,   130,    88,    47,     0,     0,    58,
-       0,    83,     0,     0,     0,     0,     0,   130,   132,    89,
-       0,     0,     0,    45,     0,     0,     0,     0,   131,     0,
-       2,   132,     0,   109,     0,    49,    48,     0,     0,     0,
-     133,     0,     0,    61,     0,     0,     0,     0,    39,    90,
-     107,     0,     0,   107,     0,   106,     0,     0,   135,     0,
-     108,   129,   137,   134,   136,     0,     0,     0,   109,   103
+       0,     0,     0,     0,    89,   132,     0,     0,    58,     0,
+      83,    45,     0,     0,     0,     0,   131,     2,     0,     0,
+       0,     0,     0,     0,     0,     0,   133,     0,   109,     0,
+      49,    48,     0,     0,     0,     0,     0,    61,     0,     0,
+       0,     0,    39,    90,   107,     0,     0,     0,   106,     0,
+       0,   135,     0,   129,   108,   137,   134,   136,     0,     0,
+       0,   109,   103
   };
 
   const short
   DbcParser::yypgoto_[] =
   {
-    -194,  -194,  -194,  -194,   199,  -194,   169,  -194,   170,  -194,
-      36,  -194,    16,  -194,  -193,   102,  -194,    87,  -194,   -62,
-    -194,  -194,  -194,  -194,    83,  -194,   -60,  -194,    -2,  -194,
-     172,  -194,   178,  -194,   180,  -194,  -194,  -194,   -49,  -104,
-      48,  -141,  -194,  -194,   196,  -194,   202,  -194,  -194,  -194,
-      -7,   -19,  -194,   -45,  -194,  -194,   189
+    -253,  -253,  -253,  -253,  -253,   204,  -253,  -253,  -253,  -253,
+      83,  -253,  -253,  -253,  -186,  -253,  -253,  -253,  -253,  -253,
+    -253,  -253,  -253,  -253,  -253,  -253,   -63,  -253,  -253,  -253,
+    -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -252,
+    -253,  -135,  -253,  -253,  -253,  -253,  -253,  -253,  -253,  -253,
+    -253,  -253,  -253,  -253,   -38,  -253,   187
   };
 
   const short
   DbcParser::yydefgoto_[] =
   {
-       0,     2,     3,     7,    39,    40,    78,    79,    88,    89,
-     204,   205,   223,   224,   179,   139,   140,   157,   158,   117,
-     118,   119,   120,   121,   182,   183,    61,    62,   244,   245,
-      99,   100,    55,    56,    68,    69,    92,   294,   295,    95,
-     190,   149,   213,   232,    52,    43,    48,    49,    10,   257,
-     258,   270,   271,   297,   298,    65,    66
+       0,     2,     3,     7,    39,    40,    69,    79,    80,    87,
+     174,   175,   196,   214,   170,   113,   133,   134,   149,    97,
+     114,   115,   116,   117,   150,   176,    63,    64,   215,   234,
+      88,    98,    51,    58,    67,    77,    93,   277,   278,    83,
+     182,   141,   204,   222,    49,    43,    47,    52,    10,   246,
+     235,   247,   256,   280,   281,    59,    60
   };
 
   const short
   DbcParser::yytable_[] =
   {
-     124,   161,    73,   215,   216,   136,   173,   137,   174,   175,
-     108,   113,   109,   110,   111,   230,   231,   114,   201,   146,
-     202,   241,   188,   242,   236,   146,     1,   194,   147,   148,
-     115,     4,   116,   160,   147,   148,   162,   163,   164,   165,
-     166,   132,     5,   133,   134,   135,     8,   208,   176,   177,
-     178,     6,   112,   176,   177,   178,   141,     9,   143,    41,
-      45,    42,    46,    50,    47,    51,    53,    54,    67,   274,
-      64,    58,    60,    63,    70,    71,    72,    74,    75,    80,
-      83,    77,    84,    85,    86,    87,    91,    96,    98,    94,
-      93,    97,   248,   102,   103,   104,   105,   106,   107,   138,
-     125,   131,   150,   123,   126,   127,   260,   128,   145,   168,
-     169,   129,   142,   130,   156,   144,   170,   172,   181,   185,
-     151,   152,   154,   153,   186,   155,   192,   167,   187,   193,
-     171,   281,   191,   180,   189,   195,   196,   197,   199,   200,
-     203,   219,   209,   198,   207,   210,   211,   212,   214,   226,
-     227,   299,   217,   222,   229,   218,   220,   234,   235,   221,
-     239,   237,   233,   238,   306,   240,   243,   247,   249,   282,
-      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
-      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,   250,   251,
-     252,   256,   253,   254,   309,   263,   255,   272,   262,   261,
-     269,   275,   276,   264,   266,   265,   273,   277,   267,   283,
-     288,   278,   287,   289,   279,   284,   285,   286,   290,   291,
-     292,   293,   296,   301,   302,   303,   307,   305,   308,    44,
-     246,   225,   159,   259,   300,   184,    81,    59,    90,    82,
-     268,    57,   280,   304,    76,     0,     0,   228,     0,   101,
-       0,     0,     0,     0,     0,     0,   206,     0,     0,     0,
-       0,     0,   122
+     152,    73,   206,   207,   286,   164,   266,   165,   166,   104,
+      56,   105,   106,   107,   109,     1,   130,   138,   131,   180,
+     110,   138,   226,    90,   186,   151,   139,   140,   200,   272,
+     139,   140,    91,   111,     4,   112,    57,   201,    91,   292,
+     167,   168,   169,     5,   193,   199,   194,   167,   168,   169,
+       6,   108,   153,   154,   155,   156,   157,   126,   279,   127,
+     128,   129,     8,   231,   259,   232,   172,   173,   220,   221,
+       9,    41,    42,    45,    46,    48,    50,    54,    53,    55,
+      61,    57,    72,    75,    62,    65,    66,    70,   237,    71,
+      74,    76,    81,    78,    82,    86,    94,    96,   101,   103,
+      84,   248,    85,    89,   135,    92,    95,    99,   100,   119,
+     125,   102,   132,   137,   118,   120,   121,   136,   122,   142,
+     160,   123,   265,   143,   148,   124,   159,   144,   161,   163,
+     210,   177,   145,   178,   146,   184,   147,   173,   185,   187,
+     158,   282,   162,   171,   191,   179,   192,   181,   229,   183,
+     188,   205,   190,   289,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,   189,   213,   216,   217,   195,   219,   198,   224,
+     225,   227,   202,   208,   203,   209,   228,   233,   211,   212,
+     236,   218,   223,   238,   230,   239,   240,   241,   242,   243,
+     244,   257,   245,   249,   255,   250,   260,   258,   251,   252,
+     253,   254,   261,   262,   263,   264,   267,   268,   269,   271,
+     273,   270,   274,   275,   276,   283,   279,   285,   284,   288,
+     290,   291,   287,    44,     0,    91,    68,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   197
   };
 
   const short
   DbcParser::yycheck_[] =
   {
-     104,   142,    62,   196,   197,    45,    15,    47,    17,    18,
-      15,    23,    17,    18,    19,     7,     8,    29,    56,    49,
-      58,    15,   163,    17,   217,    49,    14,   168,    58,    59,
-      42,    57,    44,    57,    58,    59,    50,    51,    52,    53,
-      54,    15,     0,    17,    18,    19,     3,   188,    57,    58,
-      59,    20,    57,    57,    58,    59,   118,    16,   120,     3,
-      58,    17,     3,     3,    37,    56,    56,    15,    18,   262,
-      41,    58,    58,    58,    13,    57,     4,    56,    58,    56,
-      58,    19,     3,     3,    56,    31,    56,     3,    22,    56,
-      58,    56,   233,     3,    56,    13,     4,    58,     3,    24,
-       9,     4,     4,    58,    58,    58,   247,    56,     5,     5,
-       4,    58,    57,    56,    43,    57,     4,     4,    25,     4,
-      57,    57,    57,    56,     4,    57,     4,    58,    58,     6,
-      57,   272,    58,    57,    57,     4,    58,    56,     4,    45,
-      26,   201,    13,    58,    58,     4,    58,    58,    10,     4,
-       4,   292,    56,    27,     4,    56,    56,     4,     4,    58,
-     220,    18,    57,     4,   305,    56,    39,    11,     4,   273,
-      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
-      41,    42,    43,    44,    45,    46,    47,    48,    58,     4,
-      58,    38,    58,    56,   308,     4,    58,    13,    56,    58,
-      48,     4,     4,    58,    56,    58,    55,     3,    58,     4,
-       4,    56,    12,     4,    58,    58,    58,    56,     3,    56,
-       9,    56,    58,     4,    58,     4,    10,     5,    57,    40,
-     224,   205,   140,   245,   293,   158,    68,    51,    79,    69,
-     257,    49,   271,   298,    65,    -1,    -1,   209,    -1,    89,
-      -1,    -1,    -1,    -1,    -1,    -1,   183,    -1,    -1,    -1,
-      -1,    -1,   100
+     135,    64,   188,   189,     4,    15,   258,    17,    18,    15,
+      15,    17,    18,    19,    23,    14,    45,    49,    47,   154,
+      29,    49,   208,     4,   159,    57,    58,    59,     4,     4,
+      58,    59,    13,    42,    57,    44,    41,    13,    13,   291,
+      57,    58,    59,     0,    56,   180,    58,    57,    58,    59,
+      20,    57,    50,    51,    52,    53,    54,    15,    58,    17,
+      18,    19,     3,    15,   250,    17,    25,    26,     7,     8,
+      16,     3,    17,    58,     3,     3,    37,    56,    58,    56,
+      13,    41,     4,     3,    58,    58,    58,    58,   223,    57,
+      56,    18,     3,    19,    56,    31,     3,    22,     3,     3,
+      56,   236,    56,    58,    57,    56,    56,    56,    56,     9,
+       4,    58,    24,     5,    58,    58,    58,    57,    56,     4,
+       4,    58,   257,    57,    43,    56,     5,    57,     4,     4,
+     193,     4,    56,     4,    57,     4,    57,    26,     6,     4,
+      58,   276,    57,    57,     4,    58,    45,    57,   211,    58,
+      58,    10,    58,   288,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
+      47,    48,    56,    27,     4,     4,    58,     4,    58,     4,
+       4,    18,    58,    56,    58,    56,     4,    39,    56,    56,
+      11,    57,    57,     4,    58,    58,     4,     4,    58,    56,
+      58,    13,    38,    58,    48,    56,     4,    55,    58,    58,
+      56,    58,     4,     3,    56,    58,     4,    58,    58,    12,
+       4,    56,     3,    56,     9,     4,    58,    58,    56,     5,
+      10,    57,   280,    39,    -1,    13,    59,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   175
   };
 
   const signed char
@@ -1727,33 +1842,32 @@ namespace dbc {
      110,    21,    22,    23,    24,    25,    26,    27,    28,    29,
       30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
       40,    41,    42,    43,    44,    45,    46,    47,    48,    66,
-      67,     3,    17,   107,    66,    58,     3,    37,   108,   109,
-       3,    56,   106,    56,    15,    94,    95,   108,    58,   106,
-      58,    88,    89,    58,    41,   117,   118,    18,    96,    97,
-      13,    57,     4,    88,    56,    58,   118,    19,    68,    69,
-      56,    94,    96,    58,     3,     3,    56,    31,    70,    71,
-      68,    56,    98,    58,    56,   101,     3,    56,    22,    92,
-      93,    70,     3,    56,    13,     4,    58,     3,    15,    17,
-      18,    19,    57,    23,    29,    42,    44,    81,    82,    83,
-      84,    85,    92,    58,   101,     9,    58,    58,    56,    58,
-      56,     4,    15,    17,    18,    19,    45,    47,    24,    77,
-      78,    81,    57,    81,    57,     5,    49,    58,    59,   103,
-       4,    57,    57,    56,    57,    57,    43,    79,    80,    77,
-      57,   103,    50,    51,    52,    53,    54,    58,     5,     4,
-       4,    57,     4,    15,    17,    18,    57,    58,    59,    76,
-      57,    25,    86,    87,    79,     4,     4,    58,   103,    57,
-     102,    58,     4,     6,   103,     4,    58,    56,    58,     4,
-      45,    56,    58,    26,    72,    73,    86,    58,   103,    13,
-       4,    58,    58,   104,    10,    76,    76,    56,    56,    88,
-      56,    58,    27,    74,    75,    72,     4,     4,   102,     4,
+      67,     3,    17,   107,    67,    58,     3,   108,     3,   106,
+      37,    94,   109,    58,    56,    56,    15,    41,    95,   117,
+     118,    13,    58,    88,    89,    58,    58,    96,   118,    68,
+      58,    57,     4,    88,    56,     3,    18,    97,    19,    69,
+      70,     3,    56,   101,    56,    56,    31,    71,    92,    58,
+       4,    13,    56,    98,     3,    56,    22,    81,    93,    56,
+      56,     3,    58,     3,    15,    17,    18,    19,    57,    23,
+      29,    42,    44,    77,    82,    83,    84,    85,    58,     9,
+      58,    58,    56,    58,    56,     4,    15,    17,    18,    19,
+      45,    47,    24,    78,    79,    57,    57,     5,    49,    58,
+      59,   103,     4,    57,    57,    56,    57,    57,    43,    80,
+      86,    57,   103,    50,    51,    52,    53,    54,    58,     5,
+       4,     4,    57,     4,    15,    17,    18,    57,    58,    59,
+      76,    57,    25,    26,    72,    73,    87,     4,     4,    58,
+     103,    57,   102,    58,     4,     6,   103,     4,    58,    56,
+      58,     4,    45,    56,    58,    58,    74,    72,    58,   103,
+       4,    13,    58,    58,   104,    10,    76,    76,    56,    56,
+      88,    56,    56,    27,    75,    90,     4,     4,    57,     4,
        7,     8,   105,    57,     4,     4,    76,    18,     4,    88,
-      56,    15,    17,    39,    90,    91,    74,    11,   103,     4,
-      58,     4,    58,    58,    56,    58,    38,   111,   112,    90,
-     103,    58,    56,     4,    58,    58,    56,    58,   112,    48,
-     113,   114,    13,    55,    76,     4,     4,     3,    56,    58,
-     113,   103,   101,     4,    58,    58,    56,    12,     4,     4,
-       3,    56,     9,    56,    99,   100,    58,   115,   116,   103,
-     100,     4,    58,     4,   115,     5,   103,    10,    57,   101
+      58,    15,    17,    39,    91,   112,    11,   103,     4,    58,
+       4,     4,    58,    56,    58,    38,   111,   113,   103,    58,
+      56,    58,    58,    56,    58,    48,   114,    13,    55,    76,
+       4,     4,     3,    56,    58,   103,   101,     4,    58,    58,
+      56,    12,     4,     4,     3,    56,     9,    99,   100,    58,
+     115,   116,   103,     4,    56,    58,     4,   116,     5,   103,
+      10,    57,   101
   };
 
   const signed char
@@ -1797,7 +1911,7 @@ namespace dbc {
   };
 
 
-#if YYDEBUG
+#if DDDEBUG
   // YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
   // First, the terminals, then, starting at \a YYNTOKENS, nonterminals.
   const char*
@@ -1836,25 +1950,25 @@ namespace dbc {
 #endif
 
 
-#if YYDEBUG
+#if DDDEBUG
   const short
   DbcParser::yyrline_[] =
   {
-       0,    88,    88,   109,   117,   118,   119,   122,   123,   126,
-     127,   128,   129,   130,   131,   132,   133,   134,   135,   136,
-     137,   138,   139,   140,   141,   142,   143,   144,   145,   146,
-     147,   148,   149,   150,   151,   152,   153,   157,   158,   163,
-     194,   195,   198,   207,   208,   211,   214,   215,   218,   219,
-     222,   223,   224,   228,   229,   233,   244,   260,   276,   295,
-     296,   301,   317,   318,   319,   325,   332,   341,   342,   347,
-     357,   367,   375,   385,   397,   398,   399,   400,   401,   403,
-     405,   411,   412,   417,   428,   438,   439,   443,   452,   453,
-     465,   489,   490,   494,   500,   507,   516,   525,   536,   537,
-     541,   552,   553,   557,   613,   617,   622,   625,   626,   632,
-     633,   637,   643,   647,   654,   655,   656,   659,   662,   663,
-     669,   670,   675,   689,   690,   695,   705,   706,   707,   712,
-     727,   728,   731,   732,   735,   754,   755,   758,   766,   781,
-     782
+       0,   103,   103,   124,   132,   133,   134,   137,   138,   141,
+     142,   143,   144,   145,   146,   147,   148,   149,   150,   151,
+     152,   153,   154,   155,   156,   157,   158,   159,   160,   161,
+     162,   163,   164,   165,   166,   167,   168,   172,   173,   178,
+     209,   210,   213,   222,   223,   226,   229,   230,   233,   234,
+     238,   239,   240,   243,   244,   247,   258,   274,   290,   309,
+     310,   314,   329,   330,   331,   337,   344,   353,   354,   359,
+     369,   379,   387,   397,   409,   410,   411,   412,   413,   415,
+     417,   423,   424,   429,   440,   450,   451,   455,   464,   465,
+     476,   500,   501,   504,   510,   517,   526,   535,   546,   547,
+     551,   562,   563,   567,   629,   633,   638,   641,   642,   648,
+     649,   653,   659,   663,   672,   673,   674,   677,   680,   681,
+     687,   688,   693,   707,   708,   712,   722,   723,   724,   729,
+     744,   745,   748,   749,   752,   771,   772,   775,   783,   798,
+     799
   };
 
   void
@@ -1882,7 +1996,7 @@ namespace dbc {
       YY_SYMBOL_PRINT ("   $" << yyi + 1 << " =",
                        yystack_[(yynrhs) - (yyi + 1)]);
   }
-#endif // YYDEBUG
+#endif // DDDEBUG
 
   DbcParser::symbol_kind_type
   DbcParser::yytranslate_ (int t) YY_NOEXCEPT
@@ -1937,11 +2051,11 @@ namespace dbc {
       return symbol_kind::S_YYUNDEF;
   }
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 6 "D:/projects/dbclib/src/dbcparser.y"
 } // dbc
-#line 1943 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 2057 "D:/projects/dbclib/src/dbcparser.cpp"
 
-#line 785 "D:/projects/dbclib/src/dbcparser.y"
+#line 802 "D:/projects/dbclib/src/dbcparser.y"
 
 
 
