@@ -20,10 +20,10 @@ namespace {
 namespace dbc::viewer {
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame)
-  EVT_UPDATE_UI(kIdSaveAttachment, MainFrame::OnUpdateNoDoc) // Disable the menu if no documents are open
-  EVT_UPDATE_UI(kIdShowGroupData, MainFrame::OnUpdateNoDoc)
-  EVT_UPDATE_UI(kIdShowChannelData, MainFrame::OnUpdateNoDoc)
-  EVT_UPDATE_UI(kIdPlotChannelData, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdShowMessageData, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdShowSignalData, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdPlotSignalData, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdImportMessageFile, MainFrame::OnUpdateNoDoc)
   EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
   EVT_CLOSE(MainFrame::OnClose)
   EVT_DROP_FILES(MainFrame::OnDropFiles)
@@ -51,19 +51,21 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
     // FILE
   auto* menu_file = new wxMenu;
   menu_file->Append(wxID_OPEN);
+  menu_file->AppendSeparator();
   menu_file->Append(wxID_EXIT);
 
   doc_manager->FileHistoryUseMenu(menu_file);
   doc_manager->FileHistoryLoad(*app_config);
 
-  // BLOCK_OPERATIONS
-  auto* menu_block = new wxMenu;
-  menu_block->Append(kIdShowGroupData, "Show Group Data");
-  menu_block->Append(kIdShowChannelData, "Show Channel Data");
-  menu_block->AppendSeparator();
-  menu_block->Append(kIdPlotChannelData, "Plot Channel Data");
-  menu_block->AppendSeparator();
-  menu_block->Append(kIdSaveAttachment, "Save Attachment File");
+  // DATA
+  auto* menu_data = new wxMenu;
+  menu_data->Append(kIdShowMessageData, "Show Message Data");
+  menu_data->Append(kIdShowSignalData, "Show Signal Data");
+  menu_data->AppendSeparator();
+  menu_data->Append(kIdPlotSignalData, "Plot Signal Data");
+  menu_data->AppendSeparator();
+  menu_data->Append(kIdImportMessageFile, "Import CAN Message File");
+
 
   // ABOUT
   auto* menu_about = new wxMenu;
@@ -74,7 +76,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
 
   auto* menu_bar = new wxMenuBar;
   menu_bar->Append(menu_file, wxGetStockLabel(wxID_FILE));
-  menu_bar->Append(menu_block, "Data");
+  menu_bar->Append(menu_data, "Data");
   menu_bar->Append(menu_about, wxGetStockLabel(wxID_HELP));
   wxFrameBase::SetMenuBar(menu_bar);
 }
@@ -168,12 +170,7 @@ void MainFrame::OnDropFiles(wxDropFilesEvent& event) {
       if (!std::filesystem::exists(p)) {
         continue;
       }
-/*
-      const bool dbc = dbc::IsMdfFile(p.string());
-      if (!dbc) {
-        continue;
-      }
-*/
+
         // Check if the file already is open
       const auto* doc_exist = man->FindDocumentByPath(file);
       if (doc_exist != nullptr) {

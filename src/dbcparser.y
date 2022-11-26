@@ -1,4 +1,3 @@
-// %skeleton "lalr1.cc"
 %require "3.2"
 %language "c++"
 
@@ -90,35 +89,44 @@
 
 %nterm <std::string> attribute_value
 %nterm <double> double_val
+%nterm <AttributeType> object_type
+%nterm <AttributeType> object_rel_type
 %nterm <AttributeType> attribute_object_type
 %nterm <bool> attribute_definition_object_or_relation
 %nterm <std::string> mux_info
 %nterm <bool> little_endian
 %nterm <SignalDataType> signedness
 
+%right TAG_NS_DESC TAG_CM
 %start dbc_file
 %%
 
-dbc_file:
+dbc_file: dbc_key_list;
+
+dbc_key_list: %empty
+    | dbc_key_list dbc_key;
+
+dbc_key:
     version
-    symbol_section
-    message_section
-	node_list
-	valtable_list
-    message_list
-    message_transmitter_list
-    envvar_list
-    envvar_data_list
-    comment_list
-    attribute_def_list
-    attribute_list
-	attribute_rel_list
-    val_list
-	category_definition_list
-	category_list
-    sig_valtype_list
-    signal_group_list
-    extended_mux_list;
+    | symbol_section
+    | bus_speed
+	| node
+	| valtable
+    | message_list
+    | message_transmitters
+    | envvar
+    | envvar_data
+    | comment_tag
+    | attribute_definition
+    | attribute_definition_default
+    | attribute
+	| attribute_rel
+    | val
+	| category_definition
+	| category
+    | signal_group
+    | sig_valtype
+    | extended_mux;
 
 version:
 	TAG_VERSION STRING_VAL
@@ -129,20 +137,17 @@ version:
 	};
 
 symbol_section:
-	%empty
-	| TAG_NS TAG_COLON
-    | TAG_NS TAG_COLON symbol_list;
+    TAG_NS TAG_COLON symbol_list;
 
-symbol_list:
-      symbol
-    | symbol_list symbol ;
+symbol_list: %empty
+    | symbol symbol_list ;
 
-symbol:
-      TAG_NS_DESC
+symbol:  TAG_NS_DESC
     | TAG_CM
     | TAG_BA_DEF
     | TAG_BA
     | TAG_VAL
+    | TAG_EV
     | TAG_CAT_DEF
     | TAG_CAT
     | TAG_FILTER
@@ -167,12 +172,6 @@ symbol:
     | TAG_BU_BO_REL
     | TAG_SG_MUL_VAL
     ;
-
-envvar_list:
-      %empty
-    |  envvar_list envvar;
-
-
 
 envvar:
       TAG_EV                    /* EV_               */
@@ -205,10 +204,6 @@ envvar:
         scanner.ResetTempList();
     };
 
-envvar_data_list:
-      %empty
-    | envvar_data_list envvar_data;
-
 envvar_data:
       TAG_ENVVAR_DATA ID_VAL /* environment variable name */
       TAG_COLON INT_VAL  /* length (data) */
@@ -218,16 +213,8 @@ envvar_data:
 		scanner.ResetTempList();
 	  };
 
-category_definition_list:
-	%empty
-	| category_definition category_definition_list;
-
 category_definition:
 	TAG_CAT_DEF INT_VAL ID_VAL INT_VAL TAG_SEMICOLON ;
-
-category_list:
-	%empty
-	| category_list category;
 
 category:
 	  TAG_CAT TAG_BU ID_VAL INT_VAL TAG_SEMICOLON
@@ -239,9 +226,6 @@ attribute_value:
     | STRING_VAL { $$ = $1; }
     | DOUBLE_VAL { $$ = std::to_string($1); };
 
-attribute_list:
-      %empty
-    | attribute_list attribute;
 
 attribute:
       TAG_BA     /* BA_ (Notwork attributes) */
@@ -250,7 +234,7 @@ attribute:
       TAG_SEMICOLON
 	  {
 		auto& network = scanner.GetNetwork();
-		auto& definition = network.GetDefinition($2);
+		auto& definition = network.CreateDefinition($2);
 		auto& attribute = network.CreateAttribute( definition );
 		attribute.Value($3);
 		scanner.ResetTempList();
@@ -263,7 +247,7 @@ attribute:
       TAG_SEMICOLON
  	  {
 		auto& network = scanner.GetNetwork();
-		auto& definition = network.GetDefinition($2);
+		auto& definition = network.CreateDefinition($2);
 		auto* node = network.GetNode( $4 );
 		if ( node != nullptr) {
 			auto& attribute = node->CreateAttribute( definition );
@@ -279,7 +263,7 @@ attribute:
        TAG_SEMICOLON
  	  {
 		auto& network = scanner.GetNetwork();
-		auto& definition = network.GetDefinition($2);
+		auto& definition = network.CreateDefinition($2);
 		auto* message = network.GetMessage( static_cast<uint64_t>($4));
 		if ( message != nullptr ) {
 			auto& attribute = message->CreateAttribute( definition );
@@ -296,7 +280,7 @@ attribute:
       TAG_SEMICOLON      /* ; */
  	  {
 		 auto& network = scanner.GetNetwork();
-		 auto& definition = network.GetDefinition($2);
+		 auto& definition = network.CreateDefinition($2);
 		 auto* signal = network.GetSignal( static_cast<uint64_t>($4), $5);
 		 if ( signal != nullptr ) {
 		   auto& attribute = signal->CreateAttribute( definition );
@@ -304,10 +288,6 @@ attribute:
 	     }
 	     scanner.ResetTempList();
 	  };
-
-attribute_rel_list:
-     %empty
-    | attribute_rel_list attribute_rel;
 
 attribute_rel:
       /* node-message relational attribute */
@@ -325,41 +305,33 @@ attribute_rel:
 		scanner.ResetTempList();
 	  };
 
-attribute_def_list :
-	%empty
-   | attribute_def_list attribute_definition_default
-   | attribute_def_list attribute_definition
-   ;
-
-
 /* set context dependent attribute value type */
 attribute_definition_default:
       attribute_definition_object_or_relation STRING_VAL double_val TAG_SEMICOLON
 	  {
 		auto& network = scanner.GetNetwork();
-		auto& definition = network.GetDefinition( $2 );
+		auto& definition = network.CreateDefinition( $2 );
 		definition.Value( $3 );
 		scanner.ResetTempList();
 	  }
     | attribute_definition_object_or_relation STRING_VAL STRING_VAL TAG_SEMICOLON
  	  {
 		auto& network = scanner.GetNetwork();
-		auto& definition = network.GetDefinition( $2 );
+		auto& definition = network.CreateDefinition( $2 );
 		definition.Value( $3 );
 		scanner.ResetTempList();
 	  };
 
 attribute_definition_object_or_relation:
       TAG_BA_DEF_DEF  { $$ = false; }
-    | TAG_BA_DEF_DEF_REL { $$ = true; }
-    ;
+    | TAG_BA_DEF_DEF_REL { $$ = true; };
 
 
 attribute_definition:
       attribute_object_type STRING_VAL TAG_INT INT_VAL INT_VAL TAG_SEMICOLON
 	  {
 	    auto& network = scanner.GetNetwork();
-       	auto& definition = network.GetDefinition( $2 );
+       	auto& definition = network.CreateDefinition( $2 );
        	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::IntegerValue);
 		definition.Min(static_cast<double>( $4 ));
@@ -369,7 +341,7 @@ attribute_definition:
     | attribute_object_type STRING_VAL TAG_FLOAT double_val double_val TAG_SEMICOLON
 	  {
 	    auto& network = scanner.GetNetwork();
-       	auto& definition = network.GetDefinition( $2 );
+       	auto& definition = network.CreateDefinition( $2 );
        	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::FloatValue);
 		definition.Min( $4 );
@@ -379,7 +351,7 @@ attribute_definition:
     | attribute_object_type STRING_VAL TAG_STRING TAG_SEMICOLON
 	  {
 	    auto& network = scanner.GetNetwork();
-       	auto& definition = network.GetDefinition( $2 );
+       	auto& definition = network.CreateDefinition( $2 );
        	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::StringValue);
        	scanner.ResetTempList();
@@ -387,7 +359,7 @@ attribute_definition:
     | attribute_object_type STRING_VAL TAG_ENUM comma_string_list TAG_SEMICOLON
  	  {
 	    auto& network = scanner.GetNetwork();
-       	auto& definition = network.GetDefinition( $2 );
+       	auto& definition = network.CreateDefinition( $2 );
        	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::EnumValue);
        	const auto& list = scanner.StringList();
@@ -397,7 +369,7 @@ attribute_definition:
    | attribute_object_type STRING_VAL TAG_HEX INT_VAL INT_VAL TAG_SEMICOLON
  	  {
 	    auto& network = scanner.GetNetwork();
-       	auto& definition = network.GetDefinition( $2 );
+       	auto& definition = network.CreateDefinition( $2 );
        	definition.Type( $1 );
        	definition.ValueType( AttributeValueType::HexValue);
 		definition.Min(static_cast<double>( $4 ));
@@ -406,27 +378,22 @@ attribute_definition:
 	  };
 
 attribute_object_type:
-      TAG_BA_DEF		   { $$ = AttributeType::DbcNetwork; }
-    | TAG_BA_DEF  TAG_BU   { $$ = AttributeType::DbcNode; }
-    | TAG_BA_DEF  TAG_BO   { $$ = AttributeType::DbcMessage; }
-    | TAG_BA_DEF  TAG_SG   { $$ = AttributeType::DbcSignal; }
-    | TAG_BA_DEF  TAG_EV   { $$ = AttributeType::EnvironmentVariable; }
-      /* node-signal relation ("Node - Mapped Rx Signal") */
-    | TAG_BA_DEF_REL TAG_BU_SG_REL { $$ = AttributeType::NodeSignalRelation; }
-      /* node-message relation ("Node - Tx Message") */
-    | TAG_BA_DEF_REL TAG_BU_BO_REL { $$ = AttributeType::NodeMessageRelation; }
-    ;
+    TAG_BA_DEF object_type {$$ = $<AttributeType>1;}
+    | TAG_BA_DEF_REL object_rel_type {$$ = $<AttributeType>1;};
 
-/*********************************************************************/
+object_type:
+    %empty { $$ = AttributeType::DbcNetwork; }
+    | TAG_BU   { $$ = AttributeType::DbcNode; }
+    | TAG_BO   { $$ = AttributeType::DbcMessage; }
+    | TAG_SG   { $$ = AttributeType::DbcSignal; }
+    | TAG_EV   { $$ = AttributeType::EnvironmentVariable; };
 
-val_list:
-     %empty
-    | val_list val
-    ;
+object_rel_type:
+    TAG_BU_SG_REL { $$ = AttributeType::NodeSignalRelation; }
+    | TAG_BU_BO_REL { $$ = AttributeType::NodeMessageRelation; };
 
 val:
-    /* VAL_  message_id signal_name  val_mapping ; */
-      TAG_VAL INT_VAL ID_VAL val_map TAG_SEMICOLON
+    TAG_VAL INT_VAL ID_VAL val_map TAG_SEMICOLON
  	{
 	    auto& network = scanner.GetNetwork();
 	    auto* signal = network.GetSignal(static_cast<uint64_t>( $2 ), $3);
@@ -458,12 +425,6 @@ val_map_entry:
 	}
     ;
 
-/*********************************************************************/
-
-sig_valtype_list:
-      %empty
-    | sig_valtype_list sig_valtype;
-
 /*
  * set signal value type in target signal
  *
@@ -494,36 +455,34 @@ sig_valtype:
 	    }
 	};
 
-/*********************************************************************/
+comment_tag:
+   comment_network
+ | comment_node
+ | comment_message
+ | comment_signal
+ | comment_env_var;
 
-comment_list:
-     %empty
-    | comment_list comment;
-
-comment:
+comment_network:
     TAG_CM STRING_VAL TAG_SEMICOLON
     {
 	  auto& network = scanner.GetNetwork();
 	  network.Comment( $2 );
 	  scanner.ResetTempList();
-    }
-    | TAG_CM TAG_EV ID_VAL STRING_VAL TAG_SEMICOLON
+    };
+
+comment_node:
+    TAG_CM TAG_BU ID_VAL STRING_VAL TAG_SEMICOLON
     {
-	  auto& network = scanner.GetNetwork();
-	  auto& env_var = network.GetEnvVar($3);
-	  env_var.Comment($4);
-	  scanner.ResetTempList();
-    }
-    | TAG_CM TAG_BU ID_VAL STRING_VAL TAG_SEMICOLON
-    {
-	  auto& network = scanner.GetNetwork();
-	  auto* node = network.GetNode( $3 );
-	  if ( node != nullptr ) {
-	    node->Comment( $4 );
-	  }
-	  scanner.ResetTempList();
-    }
-    | TAG_CM TAG_BO INT_VAL STRING_VAL TAG_SEMICOLON
+  	  auto& network = scanner.GetNetwork();
+  	  auto* node = network.GetNode( $3 );
+  	  if ( node != nullptr ) {
+  	    node->Comment( $4 );
+  	  }
+  	  scanner.ResetTempList();
+    };
+
+comment_message:
+    TAG_CM TAG_BO INT_VAL STRING_VAL TAG_SEMICOLON
     {
 	  auto& network = scanner.GetNetwork();
 	  auto* message = network.GetMessage( static_cast<uint64_t>($3));
@@ -531,21 +490,30 @@ comment:
 	    message->Comment( $4 );
 	  }
 	  scanner.ResetTempList();
-    }
-    | TAG_CM TAG_SG INT_VAL ID_VAL STRING_VAL TAG_SEMICOLON
+    };
+
+comment_signal:
+    TAG_CM TAG_SG INT_VAL ID_VAL STRING_VAL TAG_SEMICOLON
+    {
+ 	  auto& network = scanner.GetNetwork();
+ 	  auto* signal = network.GetSignal( static_cast<uint64_t>($3), $4);
+ 	  if ( signal != nullptr ) {
+ 	    signal->Comment( $5 );
+ 	  }
+ 	  scanner.ResetTempList();
+    };
+
+comment_env_var:
+    TAG_CM TAG_EV ID_VAL STRING_VAL TAG_SEMICOLON
     {
 	  auto& network = scanner.GetNetwork();
-	  auto* signal = network.GetSignal( static_cast<uint64_t>($3), $4);
-	  if ( signal != nullptr ) {
-	    signal->Comment( $5 );
-	  }
+	  auto& env_var = network.GetEnvVar($3);
+	  env_var.Comment($4);
 	  scanner.ResetTempList();
     };
 
-message_list:
-      %empty
-    | message_list message signal_list
-    ;
+
+message_list: message signal_list;
 
 message:
       TAG_BO INT_VAL ID_VAL TAG_COLON INT_VAL ID_VAL
@@ -690,7 +658,8 @@ space_node_list:
 	scanner.AddToStringList( $2 );
 };
 
-node_list: TAG_BU TAG_COLON space_node_list
+node:
+    TAG_BU TAG_COLON space_node_list
     {
         auto& network = scanner.GetNetwork();
         const auto& list = scanner.StringList();
@@ -703,9 +672,6 @@ node_list: TAG_BU TAG_COLON space_node_list
        scanner.ResetTempList();
     };
 
-valtable_list:
-      %empty
-    | valtable_list valtable ;
 
 /* Global value tables are commonly not used */
 valtable:
@@ -718,11 +684,9 @@ valtable:
 	};
 
 /* message section (BS_) Bit timing is obsolete but still exists in files */
-message_section:
-	%empty
-	|TAG_BS TAG_COLON
-	|TAG_BS TAG_COLON INT_VAL TAG_COLON INT_VAL TAG_COMMA INT_VAL
-    ;
+bus_speed:
+	TAG_BS TAG_COLON
+	| TAG_BS TAG_COLON INT_VAL TAG_COLON INT_VAL TAG_COMMA INT_VAL;
 
 /* signal group */
 signal_group:
@@ -738,15 +702,6 @@ signal_group:
     network.AddSignalGroup(temp);
     scanner.ResetTempList();
   };
-
-/* signal group_list */
-signal_group_list:
-      %empty
-    | signal_group_list signal_group;
-
-extended_mux_list:
-    %empty
-    | extended_mux_list extended_mux ;
 
 extended_mux:
     TAG_SG_MUL_VAL      /* SG_MUL_VAL_ */
@@ -794,11 +749,6 @@ message_transmitters: TAG_BO_TX_BU INT_VAL TAG_COLON
 		scanner.ResetTempList();
 	};
 
-message_transmitter_list:
-      %empty
-    | message_transmitters message_transmitter_list
-    ;
-
 %%
 
 
@@ -806,10 +756,10 @@ void dbc::DbcParser::error(const std::string& err) {
     const auto line = scanner.lineno();
     const auto column = scanner.YYLeng();
     const std::string near = scanner.YYText();
-
-    std::cout << "Error: " << err
-              << ", Line: " << line
-              << ", Column: " << column
-              << ", Near: " << near
-               << std::endl;
+    std::ostringstream error;
+    error << "Parser error: " << err
+          << ", Line: " << line
+          << ", Column: " << column
+          << ", Near: " << near;
+    scanner.LastError(error.str());
 }

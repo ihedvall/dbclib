@@ -16,7 +16,6 @@ template <>
 void Attribute::Value(const std::string& value) {
   switch (ValueType()) {
 
-
     case AttributeValueType::EnumValue: {
       value_float_ = 0;
       value_string_ = value;
@@ -40,9 +39,9 @@ void Attribute::Value(const std::string& value) {
     }
 
     default: {
+      value_string_ = value;
       try {
         value_float_ = std::stod(value);
-        value_string_ = value;
       } catch (const std::exception&) {
 
       }

@@ -6,7 +6,7 @@
 #include "dbc/message.h"
 #include <ranges>
 #include <algorithm>
-
+#include "dbchelper.h"
 namespace {
 
 constexpr uint64_t kMaxId = 0x07EF; ///< Max CAN ID for standard CAN
@@ -50,9 +50,10 @@ Signal& Message::CreateSignal(const std::string& name) {
   return itr->second;
 }
 
-void Message::ParseMessage(const std::vector<uint8_t>& message) {
+void Message::ParseMessage(uint64_t ns1970) {
   // First fix signals without any multiplexed, so we get a channel
   // value for the multiplexor signal first.
+  const bool j1939 = IsJ1939(); // Make extra valid check if all bits are set
   bool uses_mux = false;
   for (auto& itr : signal_list_) {
     auto& signal = itr.second;
@@ -61,7 +62,11 @@ void Message::ParseMessage(const std::vector<uint8_t>& message) {
       uses_mux = true;
       continue;
     }
-    signal.ParseMessage(message);
+    const auto valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+                                           signal.BitLength(), data_.data());
+    signal.Valid(valid);
+    signal.ParseMessage(data_, ns1970);
+    signal.StepSampleCounter();
   }
 
   if (!uses_mux) {
@@ -87,30 +92,36 @@ void Message::ParseMessage(const std::vector<uint8_t>& message) {
     }
     // Get the mux value
     size_t mux_value = 0;
-    const auto valid = multiplexor->EngValue(mux_value);
+    auto valid = multiplexor->EngValue(mux_value);
     // Check if value is in range
     if (valid && mux.InRange(mux_value)) {
-      signal.ParseMessage(message);
+      valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+                                             signal.BitLength(), data_.data());
+      signal.Valid(valid);
+      signal.ParseMessage(data_,ns1970);
+      signal.StepSampleCounter();
     }
   }
 
-  // Fix  MUX signals.
+  // Fix non-MUX signals.
   for (auto& itr : signal_list_) {
     auto& signal = itr.second;
-    if (signal.Mux() == MuxType::Multiplexed) {
-      signal.ParseMessage(message);
+    if (signal.Mux() != MuxType::Multiplexed) {
+      continue;
     }
-    const auto& mux = signal.GetExtendedMux();
-    Signal* multiplexor = mux.multiplexor.empty() ?
-      GetMultiplexor() : GetSignal(mux.multiplexor);
+    Signal* multiplexor = GetMultiplexor();
     if (multiplexor == nullptr) {
       // Might be considered as an error
       continue;
     }
     size_t mux_value = 0;
-    const auto valid = multiplexor->EngValue(mux_value);
+    auto valid = multiplexor->EngValue(mux_value);
     if (valid && signal.MuxValue() == mux_value) {
-      signal.ParseMessage(message);
+      valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+                                             signal.BitLength(), data_.data());
+      signal.Valid(valid);
+      signal.ParseMessage(data_,ns1970);
+      signal.StepSampleCounter();
     }
   }
 }
@@ -134,5 +145,96 @@ bool Message::IsNodeSender(const std::string& node_name) const {
   });
 }
 
+uint8_t Message::Priority() const {
+  auto temp = CanId();
+  temp >>= 18 + 8;
+  return static_cast<uint8_t>(temp);
+}
+
+uint32_t Message::Pgn() const {
+  auto temp = CanId();
+  temp >>=  8;
+  temp &= 0x3FFFF;
+  return static_cast<uint32_t>(temp);
+}
+
+uint8_t Message::Source() const {
+  auto temp = CanId();
+  temp &= 0xFF;
+  return static_cast<uint8_t>(temp);
+}
+
+bool Message::IsJ1939() const {
+  if (!IsExtended()) {
+    return false;
+  }
+  const auto* format = GetAttribute("VFrameFormat");
+  if (format == nullptr) {
+    return false;
+  }
+  return format->Value<std::string>() == "J1939PG";
+}
+
+const Attribute* Message::GetAttribute(const std::string& name) const {
+  const auto itr = std::ranges::find_if(attribute_list_,
+                                        [&] (const auto& attribute) {
+    return name == attribute.Name();
+  });
+  return itr != attribute_list_.cend() ? &(*itr) : nullptr;
+}
+
+bool Message::ExtendedDataPage() const {
+  return (CanId() & 0x20000) != 0;
+}
+
+bool Message::DataPage() const {
+  return (CanId() & 0x10000) != 0;
+}
+
+uint8_t Message::PduFormat() const {
+  return static_cast<uint8_t >((CanId() & 0xFF00) >> 8);
+}
+
+uint8_t Message::PduSpecific() const {
+  return static_cast<uint8_t>(CanId() & 0xFF);
+}
+
+bool Message::IsPdu1() const {
+  return PduFormat() <= 0xEF;
+}
+bool Message::IsPdu2() const {
+  return PduFormat() >= 0xF0;
+}
+
+void Message::ResetSampleCounter() const {
+  sample_counter_ = 0;
+  for (const auto& itr : signal_list_) {
+    itr.second.ResetSampleCounter();
+  }
+}
+
+void Message::NofBytes(size_t bytes) {
+  data_.resize(bytes, 0xFF);
+}
+
+size_t Message::NofBytes() const {
+  return  data_.size();
+}
+
+bool Message::UpdateData(const std::vector<uint8_t>& message,
+                         size_t offset, size_t data_index) {
+  bool last_byte = false; // Set tor true if last byte was received
+  for (auto index = offset; index < message.size(); ++index) {
+    if (data_index < data_.size()) {
+      data_[data_index] = message[index];
+      ++data_index;
+      if (data_index == data_.size()) {
+        last_byte = true;
+      }
+    }
+  }
+  ++sequence_number_; // Next expected sequence
+  return last_byte;
+}
 
 }  // namespace dbc

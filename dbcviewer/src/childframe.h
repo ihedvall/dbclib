@@ -23,6 +23,8 @@ class ChildFrame : public wxDocMDIChildFrame {
   ChildFrame() = default;
 
   void Update() override;
+  void RedrawTreeList();
+  void RedrawListView();
  protected:
   [[nodiscard]] DbcDocument* GetDoc();
 
@@ -39,8 +41,7 @@ class ChildFrame : public wxDocMDIChildFrame {
   wxSplitterWindow* splitter_ = nullptr;
   wxImageList image_list_;
 
-  void RedrawTreeList();
-  void RedrawListView();
+
   void RedrawMessageList(const Network& network);
   void RedrawMessage(const Message& message, const wxTreeItemId& root);
   void RedrawSignalList(const Message& message, const wxTreeItemId& root);
@@ -64,9 +65,15 @@ class ChildFrame : public wxDocMDIChildFrame {
   void OnTreeSelected(wxTreeEvent& event);
   void OnTreeRightClick(wxTreeEvent& event);
   void OnListItemActivated(wxListEvent& event);
+
+  void OnShowMessageData(wxCommandEvent& event);
+  void OnUpdateShowMessageData(wxUpdateUIEvent& event);
+  void OnShowSignalData(wxCommandEvent& event);
+  void OnUpdateShowSignalData(wxUpdateUIEvent& event);
+  void OnPlotSignalData(wxCommandEvent& event);
+  void OnUpdatePlotSignalData(wxUpdateUIEvent& event);
+
   wxDECLARE_EVENT_TABLE();
-
-
 };
 }
 

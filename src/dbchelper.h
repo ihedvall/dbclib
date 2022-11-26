@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace dbc {
 class DbcHelper {
@@ -22,7 +23,7 @@ class DbcHelper {
   static void UnsignedToRaw(bool little_endian, size_t start, size_t length,
                             uint64_t value, uint8_t* raw);
 
-  static std::string RawToString(size_t start, size_t length,
+  static std::vector<uint8_t> RawToByteArray(size_t start, size_t length,
                           const unsigned char* raw);
 
   static double RawToDouble(bool little_endian, size_t start, size_t length,

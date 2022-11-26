@@ -45,7 +45,7 @@
 #ifndef YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
 # define YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
 // "%code requires" blocks.
-#line 10 "D:/projects/dbclib/src/dbcparser.y"
+#line 9 "D:/projects/dbclib/src/dbcparser.y"
 
     #include "dbc/attribute.h"
     #include "dbc/signal.h"
@@ -195,7 +195,7 @@
 # endif /* ! defined YYDEBUG */
 #endif  /* ! defined DDDEBUG */
 
-#line 6 "D:/projects/dbclib/src/dbcparser.y"
+#line 5 "D:/projects/dbclib/src/dbcparser.y"
 namespace dbc {
 #line 201 "D:/projects/dbclib/src/dbcparser.hpp"
 
@@ -394,6 +394,8 @@ namespace dbc {
     union union_type
     {
       // attribute_object_type
+      // object_type
+      // object_rel_type
       char dummy1[sizeof (AttributeType)];
 
       // signedness
@@ -606,61 +608,56 @@ namespace dbc {
         S_HEX_VAL = 61,                          // HEX_VAL
         S_YYACCEPT = 62,                         // $accept
         S_dbc_file = 63,                         // dbc_file
-        S_version = 64,                          // version
-        S_symbol_section = 65,                   // symbol_section
-        S_symbol_list = 66,                      // symbol_list
-        S_symbol = 67,                           // symbol
-        S_envvar_list = 68,                      // envvar_list
-        S_envvar = 69,                           // envvar
-        S_envvar_data_list = 70,                 // envvar_data_list
+        S_dbc_key_list = 64,                     // dbc_key_list
+        S_dbc_key = 65,                          // dbc_key
+        S_version = 66,                          // version
+        S_symbol_section = 67,                   // symbol_section
+        S_symbol_list = 68,                      // symbol_list
+        S_symbol = 69,                           // symbol
+        S_envvar = 70,                           // envvar
         S_envvar_data = 71,                      // envvar_data
-        S_category_definition_list = 72,         // category_definition_list
-        S_category_definition = 73,              // category_definition
-        S_category_list = 74,                    // category_list
-        S_category = 75,                         // category
-        S_attribute_value = 76,                  // attribute_value
-        S_attribute_list = 77,                   // attribute_list
-        S_attribute = 78,                        // attribute
-        S_attribute_rel_list = 79,               // attribute_rel_list
-        S_attribute_rel = 80,                    // attribute_rel
-        S_attribute_def_list = 81,               // attribute_def_list
-        S_attribute_definition_default = 82,     // attribute_definition_default
-        S_attribute_definition_object_or_relation = 83, // attribute_definition_object_or_relation
-        S_attribute_definition = 84,             // attribute_definition
-        S_attribute_object_type = 85,            // attribute_object_type
-        S_val_list = 86,                         // val_list
-        S_val = 87,                              // val
-        S_val_map = 88,                          // val_map
-        S_val_map_entry = 89,                    // val_map_entry
-        S_sig_valtype_list = 90,                 // sig_valtype_list
-        S_sig_valtype = 91,                      // sig_valtype
-        S_comment_list = 92,                     // comment_list
-        S_comment = 93,                          // comment
-        S_message_list = 94,                     // message_list
-        S_message = 95,                          // message
-        S_signal_list = 96,                      // signal_list
-        S_signal = 97,                           // signal
-        S_mux_info = 98,                         // mux_info
-        S_signal_name_list = 99,                 // signal_name_list
-        S_space_identifier_list = 100,           // space_identifier_list
-        S_comma_identifier_list = 101,           // comma_identifier_list
-        S_comma_string_list = 102,               // comma_string_list
-        S_double_val = 103,                      // double_val
-        S_little_endian = 104,                   // little_endian
-        S_signedness = 105,                      // signedness
-        S_space_node_list = 106,                 // space_node_list
-        S_node_list = 107,                       // node_list
-        S_valtable_list = 108,                   // valtable_list
-        S_valtable = 109,                        // valtable
-        S_message_section = 110,                 // message_section
-        S_signal_group = 111,                    // signal_group
-        S_signal_group_list = 112,               // signal_group_list
-        S_extended_mux_list = 113,               // extended_mux_list
-        S_extended_mux = 114,                    // extended_mux
-        S_value_range_list = 115,                // value_range_list
-        S_value_range = 116,                     // value_range
-        S_message_transmitters = 117,            // message_transmitters
-        S_message_transmitter_list = 118         // message_transmitter_list
+        S_category_definition = 72,              // category_definition
+        S_category = 73,                         // category
+        S_attribute_value = 74,                  // attribute_value
+        S_attribute = 75,                        // attribute
+        S_attribute_rel = 76,                    // attribute_rel
+        S_attribute_definition_default = 77,     // attribute_definition_default
+        S_attribute_definition_object_or_relation = 78, // attribute_definition_object_or_relation
+        S_attribute_definition = 79,             // attribute_definition
+        S_attribute_object_type = 80,            // attribute_object_type
+        S_object_type = 81,                      // object_type
+        S_object_rel_type = 82,                  // object_rel_type
+        S_val = 83,                              // val
+        S_val_map = 84,                          // val_map
+        S_val_map_entry = 85,                    // val_map_entry
+        S_sig_valtype = 86,                      // sig_valtype
+        S_comment_tag = 87,                      // comment_tag
+        S_comment_network = 88,                  // comment_network
+        S_comment_node = 89,                     // comment_node
+        S_comment_message = 90,                  // comment_message
+        S_comment_signal = 91,                   // comment_signal
+        S_comment_env_var = 92,                  // comment_env_var
+        S_message_list = 93,                     // message_list
+        S_message = 94,                          // message
+        S_signal_list = 95,                      // signal_list
+        S_signal = 96,                           // signal
+        S_mux_info = 97,                         // mux_info
+        S_signal_name_list = 98,                 // signal_name_list
+        S_space_identifier_list = 99,            // space_identifier_list
+        S_comma_identifier_list = 100,           // comma_identifier_list
+        S_comma_string_list = 101,               // comma_string_list
+        S_double_val = 102,                      // double_val
+        S_little_endian = 103,                   // little_endian
+        S_signedness = 104,                      // signedness
+        S_space_node_list = 105,                 // space_node_list
+        S_node = 106,                            // node
+        S_valtable = 107,                        // valtable
+        S_bus_speed = 108,                       // bus_speed
+        S_signal_group = 109,                    // signal_group
+        S_extended_mux = 110,                    // extended_mux
+        S_value_range_list = 111,                // value_range_list
+        S_value_range = 112,                     // value_range
+        S_message_transmitters = 113             // message_transmitters
       };
     };
 
@@ -696,6 +693,8 @@ namespace dbc {
         switch (this->kind ())
     {
       case symbol_kind::S_attribute_object_type: // attribute_object_type
+      case symbol_kind::S_object_type: // object_type
+      case symbol_kind::S_object_rel_type: // object_rel_type
         value.move< AttributeType > (std::move (that.value));
         break;
 
@@ -875,6 +874,8 @@ namespace dbc {
 switch (yykind)
     {
       case symbol_kind::S_attribute_object_type: // attribute_object_type
+      case symbol_kind::S_object_type: // object_type
+      case symbol_kind::S_object_rel_type: // object_rel_type
         value.template destroy< AttributeType > ();
         break;
 
@@ -2332,9 +2333,9 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 258,     ///< Last index in yytable_.
-      yynnts_ = 57,  ///< Number of nonterminal symbols.
-      yyfinal_ = 5 ///< Termination state number.
+      yylast_ = 243,     ///< Last index in yytable_.
+      yynnts_ = 52,  ///< Number of nonterminal symbols.
+      yyfinal_ = 3 ///< Termination state number.
     };
 
 
@@ -2344,9 +2345,9 @@ switch (yykind)
   };
 
 
-#line 6 "D:/projects/dbclib/src/dbcparser.y"
+#line 5 "D:/projects/dbclib/src/dbcparser.y"
 } // dbc
-#line 2350 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 2351 "D:/projects/dbclib/src/dbcparser.hpp"
 
 
 

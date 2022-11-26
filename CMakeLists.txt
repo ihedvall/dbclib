@@ -15,7 +15,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_DEBUG_POSTFIX d)
 
 include(CMakePrintHelpers)
-# include(script/boost.cmake)
 
 if (DBC_TOOLS)
 include(script/wxwidgets.cmake)
@@ -34,7 +33,7 @@ include(script/bison.cmake)
 
 if (BISON_FOUND)
     BISON_TARGET(DBC_PARSER src/dbcparser.y ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcparser.cpp
-            COMPILE_FLAGS "-Wcounterexamples")
+            COMPILE_FLAGS "")
     cmake_print_variables(BISON_DBC_PARSER_DEFINED
             BISON_DBC_PARSER_INPUT
             BISON_DBC_PARSER_OUTPUT_SOURCE
@@ -65,7 +64,7 @@ add_library(dbc STATIC
         src/signalgroup.cpp include/dbc/signalgroup.h
         src/dbcscanner.cpp src/dbcscanner.h
         src/dbcfile.cpp include/dbc/dbcfile.h
-        src/dbchelper.cpp src/dbchelper.h)
+        src/dbchelper.cpp src/dbchelper.h src/dbcmessage.cpp include/dbc/dbcmessage.h include/dbc/isampleobserver.h src/signalobserver.cpp include/dbc/signalobserver.h)
 
 target_include_directories(dbc PUBLIC
         $<INSTALL_INTERFACE:include>

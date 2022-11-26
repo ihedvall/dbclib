@@ -403,17 +403,19 @@ void DbcHelper::UnsignedToRaw(bool little_endian, size_t start, size_t length,
   }
 }
 
-std::string DbcHelper::RawToString(size_t start, size_t length,
+std::vector<uint8_t> DbcHelper::RawToByteArray(size_t start, size_t length,
                                   const unsigned char* raw )
 {
   // Only byte aligned strings are supported
   if ( raw == nullptr || (length % 8) != 0 || (start % 8) != 0) {
     return {};
   }
-
+  const auto byte_start = start / 8;
   const auto byte_size = length / 8;
-  std::string result( reinterpret_cast<const char*>(raw), byte_size);
-  return result;
+  std::vector<uint8_t> temp;
+  temp.resize(byte_size, 0);
+  memcpy(temp.data(), raw + byte_start, byte_size);
+  return temp;
 }
 
 double DbcHelper::RawToDouble(bool little_endian, size_t start, size_t length,
@@ -605,6 +607,9 @@ void DbcHelper::SetAllBits(size_t start, size_t length, uint8_t* raw ) {
 bool DbcHelper::IsAllBitsSet(size_t start, size_t length, const uint8_t* raw) {
   if (raw == nullptr) {
     return true;
+  }
+  if (length <= 1) {
+    return false; // 1 bit cannot have an invalid flag
   }
   for (size_t index = 0; index < length; ++index) {
     auto bit = start + index;

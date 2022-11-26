@@ -5,9 +5,17 @@
 
 #include "dbc/signal.h"
 #include "dbchelper.h"
+#include <ranges>
 #include <algorithm>
 
 namespace dbc {
+Signal::~Signal() {
+  for (auto* observer : observer_list_) {
+    if (observer != nullptr) {
+      observer->DetachObserver();
+    }
+  }
+}
 
 Attribute& Signal::CreateAttribute(const Attribute& definition) {
   Attribute temp(definition);
@@ -39,8 +47,15 @@ bool Signal::IsMultiplexed() const {
   return /*!mux_list_.empty() || */ mux_type_ == MuxType::Multiplexed;
 }
 
-void Signal::ParseMessage(const std::vector<uint8_t>& message) {
-    switch (data_type_) {
+void Signal::ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970) {
+  SampleTime(ns1970);
+  if (!Valid()) {
+    channel_value_.reset();
+    FireOnSample();
+    return;
+  }
+
+  switch (data_type_) {
     case SignalDataType::SignedData: {
       const int64_t temp = DbcHelper::RawToSigned(little_endian_, bit_start_,
                                             bit_length_, message.data());
@@ -49,9 +64,19 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message) {
     }
 
     case SignalDataType::UnsignedData: {
-      const uint64_t temp = DbcHelper::RawToUnsigned(little_endian_, bit_start_,
-                                                  bit_length_, message.data());
-      channel_value_ = temp;
+      size_t bytes = bit_length_ / 8;
+      if ((bit_length_ % 8) != 0) {
+        ++bytes;
+      }
+      if (bytes > 8) {
+        auto temp = DbcHelper::RawToByteArray(bit_start_, bit_length_,
+                                              message.data());
+        channel_value_ = temp;
+      } else {
+        const uint64_t temp = DbcHelper::RawToUnsigned(
+            little_endian_, bit_start_, bit_length_, message.data());
+        channel_value_ = temp;
+      }
       break;
     }
 
@@ -73,6 +98,7 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message) {
       channel_value_.reset();
       break;
   }
+  FireOnSample();
 }
 
 bool ExtendedMux::InRange(size_t value) const {
@@ -83,6 +109,102 @@ bool ExtendedMux::InRange(size_t value) const {
 std::string Signal::GetEnumString(int64_t index) const {
   const auto itr = enum_list_.find(index);
   return itr != enum_list_.cend() ? itr->second : std::string();
+}
+
+template <>
+bool Signal::ChannelValue(std::string& value) const {
+  bool valid = false;
+  value.clear();
+
+  switch (data_type_) {
+    case SignalDataType::SignedData: {
+      try {
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<int64_t>(channel_value_);
+        value = std::to_string(temp);
+      } catch (const std::exception&) {
+        valid = false;
+      }
+      break;
+    }
+
+    case SignalDataType::UnsignedData: {
+      size_t bytes = bit_length_ / 8;
+      if ((bit_length_ % 8) != 0) {
+        ++bytes;
+      }
+      if (bytes > 8) {
+        try {
+          valid = channel_value_.has_value() && Valid();
+          const auto temp = std::any_cast<std::vector<uint8_t>>(channel_value_);
+          std::ostringstream out;
+          for (const auto input : temp) {
+            if (input == 0 || input == 0xFF) {
+              break;
+            }
+            out << static_cast<char>(input);
+          }
+          value = out.str();
+        } catch (const std::exception&) {
+          valid = false;
+        }
+      } else {
+        try {
+          valid = channel_value_.has_value() && Valid();
+          const auto temp = std::any_cast<uint64_t>(channel_value_);
+          value = std::to_string(temp);
+        } catch (const std::exception&) {
+          valid = false;
+        }
+      }
+      break;
+    }
+
+    case SignalDataType::FloatData: {
+      try {
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<float>(channel_value_);
+        std::ostringstream temp_text;
+        temp_text << temp;
+        value =temp_text.str();
+      } catch (const std::exception&) {
+        valid = false;
+      }
+      break;
+    }
+
+    case SignalDataType::DoubleData: {
+      try {
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<double>(channel_value_);
+        std::ostringstream temp_text;
+        temp_text << temp;
+        value =temp_text.str();
+      } catch (const std::exception&) {
+        valid = false;
+      }
+      break;
+    }
+
+    default:
+      break;
+  }
+  if (!valid) {
+    value = "*";
+  }
+  return valid;
+}
+
+template <>
+bool Signal::ChannelValue(std::any& value) const {
+  bool valid = channel_value_.has_value() && Valid();
+  if (valid) {
+    value = channel_value_;
+  } else {
+    value.reset();
+  }
+  value = channel_value_;
+  return valid;
 }
 
 
@@ -109,7 +231,9 @@ bool Signal::EngValue(std::string& value) const {
         auto temp = static_cast<double>(channel);
         temp *= scale_;
         temp += offset_;
-        value = std::to_string(temp);
+        std::ostringstream conv;
+        conv << temp;
+        value = conv.str();
       } else if (!enum_list_.empty()) {
         value = GetEnumString(channel);
       } else {
@@ -119,17 +243,27 @@ bool Signal::EngValue(std::string& value) const {
     }
 
     case SignalDataType::UnsignedData: {
-      uint64_t channel = 0;
-      valid = ChannelValue(channel);
-      if (need_to_convert) {
-        auto temp = static_cast<double>(channel);
-        temp *= scale_;
-        temp += offset_;
-        value = std::to_string(temp);
-      } else if (!enum_list_.empty()) {
-        value = GetEnumString(static_cast<int64_t>(channel));
+      size_t bytes = bit_length_ / 8;
+      if ((bit_length_ % 8) != 0) {
+        ++bytes;
+      }
+      if (bytes > 8) {
+         valid = ChannelValue(value);
       } else {
-        value = std::to_string(channel);
+        uint64_t channel = 0;
+        valid = ChannelValue(channel);
+        if (need_to_convert) {
+          auto temp = static_cast<double>(channel);
+          temp *= scale_;
+          temp += offset_;
+          std::ostringstream conv;
+          conv << temp;
+          value = conv.str();
+        } else if (!enum_list_.empty()) {
+          value = GetEnumString(static_cast<int64_t>(channel));
+        } else {
+          value = std::to_string(channel);
+        }
       }
       break;
     }
@@ -141,7 +275,9 @@ bool Signal::EngValue(std::string& value) const {
         auto temp = static_cast<double>(channel);
         temp *= scale_;
         temp += offset_;
-        value = std::to_string(temp);
+        std::ostringstream conv;
+        conv << temp;
+        value = conv.str();
       } else {
         value = std::to_string(channel);
       }
@@ -155,7 +291,9 @@ bool Signal::EngValue(std::string& value) const {
         auto temp = channel;
         temp *= scale_;
         temp += offset_;
-        value = std::to_string(temp);
+        std::ostringstream conv;
+        conv << temp;
+        value = conv.str();
       } else {
         value = std::to_string(channel);
       }
@@ -164,6 +302,9 @@ bool Signal::EngValue(std::string& value) const {
 
     default:
       break;
+  }
+  if (!valid) {
+    value = "*";
   }
   return valid;
 }
@@ -235,4 +376,25 @@ std::string Signal::MuxAsString() const {
   return temp.str();
 }
 
+void Signal::AttachObserver(ISampleObserver* observer) const {
+  observer_list_.push_back(observer);
+}
+
+void Signal::DetachObserver(const ISampleObserver* observer) const  {
+  for (auto itr = observer_list_.begin(); itr != observer_list_.end(); ) {
+    if ( *itr == observer) {
+      itr = observer_list_.erase(itr);
+    } else {
+      ++itr;
+    }
+  }
+}
+
+void Signal::FireOnSample() {
+  for (auto* observer : observer_list_) {
+    if (observer != nullptr) {
+      observer->OnSample();
+    }
+  }
+}
 }  // namespace dbc

@@ -10,6 +10,7 @@
 #include <map>
 #include <any>
 #include "dbc/attribute.h"
+#include "dbc/isampleobserver.h"
 
 namespace dbc {
 
@@ -35,6 +36,7 @@ struct ExtendedMux {
 
 class Signal {
  public:
+  virtual ~Signal();
   void Name(const std::string& name) { name_ = name; }
   [[nodiscard]] const std::string& Name() const { return name_; }
 
@@ -95,13 +97,25 @@ class Signal {
   [[nodiscard]] ExtendedMux& GetExtendedMux();
   [[nodiscard]] std::string GetEnumString(int64_t index) const;
 
-  void ParseMessage(const std::vector<uint8_t>& message);
+  void ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970);
+  void ResetSampleCounter() const {sample_counter_ = 0;}
+  void StepSampleCounter() const {++sample_counter_;}
+  size_t SampleCounter() const {return sample_counter_;}
+
+  void SampleTime(uint64_t ns1970) {sample_time_ = ns1970;};
+  [[nodiscard]] uint64_t SampleTime() const {return sample_time_;};
+
+  void Valid(bool valid) {valid_ = valid;}
+  [[nodiscard]] bool Valid() const {return valid_;}
 
   template <typename T>
   bool ChannelValue( T& value ) const;
 
   template <typename T>
   bool EngValue( T& value ) const;
+
+  void AttachObserver(ISampleObserver* observer) const;
+  void DetachObserver(const ISampleObserver* observer) const;
  private:
   std::string name_;
   std::string comment_;
@@ -124,9 +138,15 @@ class Signal {
   std::vector<Attribute> attribute_list_;
   std::map<int64_t, std::string> enum_list_;
 
-  std::any channel_value_; ///< Unscaled value
+  std::any channel_value_; ///< Unscaled value (last reported value)
 
   uint64_t message_id_ = 0;
+  mutable size_t sample_counter_ = 0;
+  bool valid_ = true;
+  uint64_t sample_time_ = 0; ///< Last sample time
+
+  mutable std::vector<ISampleObserver*> observer_list_;
+  void FireOnSample();
 
 };
 
@@ -138,10 +158,9 @@ bool Signal::ChannelValue(T& value) const {
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
-      int64_t temp = 0;
       try {
-        valid = channel_value_.has_value();
-        temp = std::any_cast<int64_t>(channel_value_);
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<int64_t>(channel_value_);
         value = static_cast<T>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -150,22 +169,28 @@ bool Signal::ChannelValue(T& value) const {
     }
 
     case SignalDataType::UnsignedData: {
-      uint64_t temp = 0;
-      try {
-        valid = channel_value_.has_value();
-        temp = std::any_cast<uint64_t>(channel_value_);
-        value = static_cast<T>(temp);
-      } catch (const std::exception&) {
+      size_t bytes = bit_length_ / 8;
+      if ((bit_length_ % 8) != 0) {
+        ++bytes;
+      }
+      if (bytes > 8) {
         valid = false;
+      } else {
+        try {
+          valid = channel_value_.has_value() && Valid();
+          const auto temp = std::any_cast<uint64_t>(channel_value_);
+          value = static_cast<T>(temp);
+        } catch (const std::exception&) {
+          valid = false;
+        }
       }
       break;
     }
 
     case SignalDataType::FloatData: {
-      float temp = 0;
       try {
-        valid = channel_value_.has_value();
-        temp = std::any_cast<float>(channel_value_);
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<float>(channel_value_);
         value = static_cast<T>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -174,10 +199,9 @@ bool Signal::ChannelValue(T& value) const {
     }
 
     case SignalDataType::DoubleData: {
-      double temp = 0;
       try {
-        valid = channel_value_.has_value();
-        temp = std::any_cast<float>(channel_value_);
+        valid = channel_value_.has_value() && Valid();
+        const auto temp = std::any_cast<double>(channel_value_);
         value = static_cast<T>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -190,6 +214,12 @@ bool Signal::ChannelValue(T& value) const {
    }
    return valid;
 }
+
+template <>
+bool Signal::ChannelValue(std::string& value) const;
+
+template <>
+bool Signal::ChannelValue(std::any& value) const;
 
 template <typename T>
 bool Signal::EngValue(T& value) const {
@@ -268,6 +298,7 @@ bool Signal::EngValue(T& value) const {
   }
   return valid;
 }
+
 
 template <>
 bool Signal::EngValue(std::string& value) const;

@@ -19,21 +19,15 @@ class DbcDocument : public wxDocument {
 
   bool OnOpenDocument(const wxString &filename) override;
 
-  [[nodiscard]] const DbcFile* GetFile() const {
+  [[nodiscard]] DbcFile* GetFile() const {
     return !dbc_file_  ? nullptr : dbc_file_.get();
   }
 
  private:
   std::unique_ptr<DbcFile> dbc_file_;
+  void OnImportCanMessageFile(wxCommandEvent& event);
+  void OnUpdateImportCanMessageFile(wxUpdateUIEvent& event);
 
-  void OnShowGroupData(wxCommandEvent& event);
-  void OnUpdateShowGroupData(wxUpdateUIEvent& event);
-
-  void OnShowChannelData(wxCommandEvent& event);
-  void OnUpdateShowChannelData(wxUpdateUIEvent& event);
-
-  void OnPlotChannelData(wxCommandEvent& event);
-  void OnUpdatePlotChannelData(wxUpdateUIEvent& event);
   wxDECLARE_DYNAMIC_CLASS(DbcDocument);
   wxDECLARE_EVENT_TABLE();
 };
