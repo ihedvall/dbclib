@@ -19,7 +19,7 @@ class SignalObserver : public ISampleObserver {
   [[nodiscard]] size_t MaxSamples() const { return value_list_.size();}
   [[nodiscard]] const Signal& GetSignal() const {return signal_;}
   [[nodiscard]] uint64_t Time(size_t index) const;
-
+  [[nodiscard]] uint32_t CanId(size_t index) const;
   template <typename V>
   bool ChannelValue(size_t index, uint64_t& ns1970, V& value) const;
 
@@ -30,7 +30,9 @@ class SignalObserver : public ISampleObserver {
 
   [[nodiscard]] size_t FirstIndex() const;
   [[nodiscard]] size_t LastIndex() const;
-  [[nodiscard]] size_t NofSamples() const {return nof_samples_;};
+  [[nodiscard]] size_t NofSamples() const {return nof_samples_;}
+  [[nodiscard]] size_t NofValidSamples() const;
+
   [[nodiscard]] size_t SampleToIndex(size_t sample) const;
   [[nodiscard]] std::optional<size_t> TimeToIndex(uint64_t time) const;
   void DetachObserver() override;
@@ -40,7 +42,12 @@ class SignalObserver : public ISampleObserver {
  private:
   struct ChannelSample {
     uint64_t ns1970;
+    uint32_t can_id;
     std::any value;
+
+    [[nodiscard]] uint8_t Source() const {
+      return static_cast<uint8_t>(can_id & 0xFF);
+    }
   };
   const Signal& signal_;
   std::vector<ChannelSample> value_list_; ///< Channel values

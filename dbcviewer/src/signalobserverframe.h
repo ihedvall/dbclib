@@ -8,6 +8,8 @@
 #include <memory>
 
 #include "signalobserverlistview.h"
+#include <dbc/network.h>
+
 namespace dbc::viewer {
 
 class SignalObserverFrame : public wxFrame {
@@ -15,7 +17,7 @@ class SignalObserverFrame : public wxFrame {
   SignalObserverFrame(std::unique_ptr<SignalObserverList>& observer_list,
                       wxWindow *parent, wxWindowID id, const wxString& title);
   void BaseTime(uint64_t ns1970);
-
+  void SetNetwork(const Network* network);
  private:
   SignalObserverListView* list_view_ = nullptr;
 };

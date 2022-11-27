@@ -97,14 +97,17 @@ class Signal {
   [[nodiscard]] ExtendedMux& GetExtendedMux();
   [[nodiscard]] std::string GetEnumString(int64_t index) const;
 
-  void ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970);
+  void ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970,
+                    uint32_t can_id);
   void ResetSampleCounter() const {sample_counter_ = 0;}
   void StepSampleCounter() const {++sample_counter_;}
   size_t SampleCounter() const {return sample_counter_;}
 
-  void SampleTime(uint64_t ns1970) {sample_time_ = ns1970;};
-  [[nodiscard]] uint64_t SampleTime() const {return sample_time_;};
+  void SampleTime(uint64_t ns1970) {sample_time_ = ns1970;}
+  [[nodiscard]] uint64_t SampleTime() const {return sample_time_;}
 
+  void SampleCanId(uint32_t can_id) {sample_can_id_ = can_id;}
+  [[nodiscard]] uint64_t SampleCanId() const {return sample_can_id_;}
   void Valid(bool valid) {valid_ = valid;}
   [[nodiscard]] bool Valid() const {return valid_;}
 
@@ -143,7 +146,8 @@ class Signal {
   uint64_t message_id_ = 0;
   mutable size_t sample_counter_ = 0;
   bool valid_ = true;
-  uint64_t sample_time_ = 0; ///< Last sample time
+  uint64_t sample_time_ = 0;    ///< Last sample time
+  uint32_t sample_can_id_ = 0;  ///< Last Can ID
 
   mutable std::vector<ISampleObserver*> observer_list_;
   void FireOnSample();

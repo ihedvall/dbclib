@@ -23,6 +23,7 @@ SignalObserverFrame::SignalObserverFrame(std::unique_ptr<SignalObserverList>&
   list_view_->AppendColumn(wxString::FromUTF8("Sample"));
   list_view_->AppendColumn(wxString::FromUTF8("Absolute Time"));
   list_view_->AppendColumn(wxString::FromUTF8("Relative Time [s]"));
+  list_view_->AppendColumn(wxString::FromUTF8("Node"));
   for ( const auto& obs : *observer_list) {
     if (!obs) {
       continue;
@@ -51,4 +52,9 @@ void SignalObserverFrame::BaseTime(uint64_t ns1970) {
   }
 }
 
+void SignalObserverFrame::SetNetwork(const Network* network) {
+  if (list_view_ != nullptr) {
+    list_view_->SetNetwork(network);
+  }
+}
 }

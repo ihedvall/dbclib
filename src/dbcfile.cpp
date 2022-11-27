@@ -83,6 +83,18 @@ bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
   if (mess == nullptr) {
     return parse;
   }
+  if (mess->Source() <= 253 && mess->Source() != message.Source()) {
+    return parse;
+  }
+
+  // Fix the message to node relation
+  const auto& sender_list = mess->Senders();
+  if (sender_list.size() == 1 && message.Source() <= 253) {
+    auto* node = network_->GetNode(sender_list[0]);
+    if (node != nullptr && node->Source() != message.Source()) {
+      node->Source(message.Source());
+    }
+  }
 
   // Check if fast package message
   if (mess->NofBytes() > 8) {
@@ -97,14 +109,14 @@ bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
     if (seq_no == mess->NextSequenceNumber()) {
       const auto last = mess->UpdateData(message.Data(), offset, data_index);
       if (last) {
-        mess->ParseMessage(message.Time());
+        mess->ParseMessage(message.Time(), message.CanId());
         mess->StepSampleCounter();
         parse = true;
       }
     }
   } else {
     mess->UpdateData(message.Data(),0, 0);
-    mess->ParseMessage(message.Time());
+    mess->ParseMessage(message.Time(), message.CanId());
     mess->StepSampleCounter();
     parse = true;
   }
@@ -120,8 +132,21 @@ bool DbcFile::ParseJ1939(const DbcMessage& message) {
   if (mess == nullptr) {
     return parse;
   }
+  if (mess->Source() <= 253 && mess->Source() != message.Source()) {
+    return parse;
+  }
+
+  // Fix the message to node relation
+  const auto& sender_list = mess->Senders();
+  if (sender_list.size() == 1 && message.Source() <= 253) {
+    auto* node = network_->GetNode(sender_list[0]);
+    if (node != nullptr && node->Source() != message.Source()) {
+      node->Source(message.Source());
+    }
+  }
+
   mess->UpdateData(message.Data(),0, 0);
-  mess->ParseMessage(message.Time());
+  mess->ParseMessage(message.Time(), message.CanId());
   mess->StepSampleCounter();
   parse = true;
   return parse;
@@ -135,7 +160,7 @@ bool DbcFile::ParseStandardCAN(const DbcMessage& message) {
   auto* mess = network_->GetMessageByCanId(message.CanId());
   if (mess != nullptr) {
     mess->UpdateData(message.Data());
-    mess->ParseMessage(message.Time());
+    mess->ParseMessage(message.Time(), message.CanId());
     mess->StepSampleCounter();
     parse = true;
   }

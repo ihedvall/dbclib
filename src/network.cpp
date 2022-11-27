@@ -41,6 +41,13 @@ const Node* Network::GetNode(const std::string& name) const {
   return itr != node_list_.cend() ? &itr->second : nullptr;
 }
 
+const Node* Network::GetNodeBySource(uint8_t source) const {
+  const auto itr = std::ranges::find_if(node_list_, [&] (const auto& itr) {
+    return itr.second.Source() == source;
+  });
+  return itr != node_list_.cend() ? &itr->second : nullptr;
+}
+
 Message* Network::GetMessage(uint64_t message_id) {
   auto itr = message_list_.find(message_id);
   return itr != message_list_.end() ? &itr->second : nullptr;
@@ -75,6 +82,13 @@ const Message* Network::GetMessageByName(const std::string& name) const {
 Message* Network::GetMessageByPgn(uint32_t pgn) {
   auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
     return mess.second.Pgn() == pgn;
+  });
+  return itr != message_list_.end() ? &itr->second : nullptr;
+}
+
+Message* Network::GetMessageByPgnAndSource(uint32_t pgn, uint8_t source) {
+  auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+    return mess.second.Pgn() == pgn && mess.second.Source() == source;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
 }

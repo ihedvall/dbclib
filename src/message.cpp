@@ -50,7 +50,7 @@ Signal& Message::CreateSignal(const std::string& name) {
   return itr->second;
 }
 
-void Message::ParseMessage(uint64_t ns1970) {
+void Message::ParseMessage(uint64_t ns1970, uint32_t can_id) {
   // First fix signals without any multiplexed, so we get a channel
   // value for the multiplexor signal first.
   const bool j1939 = IsJ1939(); // Make extra valid check if all bits are set
@@ -65,7 +65,7 @@ void Message::ParseMessage(uint64_t ns1970) {
     const auto valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
                                            signal.BitLength(), data_.data());
     signal.Valid(valid);
-    signal.ParseMessage(data_, ns1970);
+    signal.ParseMessage(data_, ns1970, can_id);
     signal.StepSampleCounter();
   }
 
@@ -98,7 +98,7 @@ void Message::ParseMessage(uint64_t ns1970) {
       valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
                                              signal.BitLength(), data_.data());
       signal.Valid(valid);
-      signal.ParseMessage(data_,ns1970);
+      signal.ParseMessage(data_,ns1970, can_id);
       signal.StepSampleCounter();
     }
   }
@@ -120,7 +120,7 @@ void Message::ParseMessage(uint64_t ns1970) {
       valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
                                              signal.BitLength(), data_.data());
       signal.Valid(valid);
-      signal.ParseMessage(data_,ns1970);
+      signal.ParseMessage(data_,ns1970, can_id);
       signal.StepSampleCounter();
     }
   }

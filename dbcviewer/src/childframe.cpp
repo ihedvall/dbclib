@@ -218,7 +218,9 @@ wxTreeItemId FindTreeItem(const wxTreeCtrl &list, //NOLINT
     const auto index = observer->SampleToIndex(sample);
     uint64_t sample_time = 0;
     std::string value;
-    const bool valid  = observer->EngValue(index, sample_time, value);
+    const bool valid  = signal.EnumList().empty() ?
+               observer->EngValue(index, sample_time, value)
+               : observer->ChannelValue(index, sample_time, value);
     if (sample == 0) {
       base_time = sample_time;
     }
@@ -362,6 +364,7 @@ ChildFrame::ChildFrame(wxDocument *doc,
                                 wxDefaultPosition, wxDefaultSize,
                                 wxLC_REPORT | wxLC_SINGLE_SEL);
   node_view_->AppendColumn("Name", wxLIST_FORMAT_LEFT, 150);
+  node_view_->AppendColumn("Source", wxLIST_FORMAT_LEFT, 75);
   node_view_->AppendColumn("Comment", wxLIST_FORMAT_LEFT, 250);
   node_view_->Hide();
 
@@ -1153,7 +1156,11 @@ void ChildFrame::RedrawNodeListView(const Network& network) {
   for (const auto& itr : list) {
     const auto& node = itr.second;
     node_view_->InsertItem(line, wxString::From8BitData(node.Name().c_str()));
-    node_view_->SetItem(line, 1,
+
+    node_view_->SetItem(line, 1, node.Source() < 254 ?
+                        std::to_string(static_cast<int>(node.Source()))
+                        : std::string() );
+    node_view_->SetItem(line, 2,
                         wxString::From8BitData(node.Comment().c_str()));
     ++line;
   }
@@ -1242,6 +1249,7 @@ void ChildFrame::OnShowMessageData(wxCommandEvent &event) {
   auto data_frame = new SignalObserverFrame(observer_list, this, wxID_ANY,
                                             title.str());
   data_frame->BaseTime(file->BaseTime());
+  data_frame->SetNetwork(network);
   data_frame->Show();
 }
 
@@ -1311,6 +1319,7 @@ void ChildFrame::OnShowSignalData(wxCommandEvent &event) {
   auto data_frame = new SignalObserverFrame(observer_list, this, wxID_ANY,
                                             title.str());
   data_frame->BaseTime(file->BaseTime());
+  data_frame->SetNetwork(network);
   data_frame->Show();
 }
 
@@ -1380,6 +1389,11 @@ void ChildFrame::OnPlotSignalData(wxCommandEvent &event) {
   auto observer = std::make_unique<SignalObserver>(*signal);
   observer_list->push_back(std::move(observer));
   file->ReparseMessageList();
+  const auto* obs = observer_list->front().get();
+  if (obs == nullptr || obs->NofValidSamples() < 2) {
+    wxMessageBox("There is not enough valid samples to plot");
+    return;
+  }
   // Produce a CSV file with the data for later use with the gnuplot script
   auto csv_file = CreateCsvFile(*observer_list);
   auto gp_file = CreateGnuPlotFile(*observer_list, csv_file, title.str());
@@ -1397,7 +1411,32 @@ void ChildFrame::OnPlotSignalData(wxCommandEvent &event) {
 }
 
 void ChildFrame::OnUpdatePlotSignalData(wxUpdateUIEvent &event) {
-  OnUpdateShowSignalData(event);
+
+    event.Enable(false);
+    const auto* doc = GetDoc();
+    const auto* file = doc != nullptr ? doc->GetFile() : nullptr;
+    const auto* network = file != nullptr ? file->GetNetwork() : nullptr;
+    if (network == nullptr || left_ == nullptr) {
+      return;
+    }
+    const auto selected = left_->GetSelection();
+    if (!selected.IsOk()) {
+      return;
+    }
+
+    const auto* data = dynamic_cast<TreeItemData*>(left_->GetItemData(selected));
+    if (data == nullptr ) {
+      return;
+    }
+    const Signal *signal = nullptr;
+    if (data->Type() == ItemTreeType::SignalItem) {
+      signal = network->GetSignal(data->Ident(), data->Name());
+    }
+    if (signal == nullptr || signal->BitLength() > sizeof(uint64_t) * 8) {
+      // Cannot plot text values but enumerate is OK
+      return;
+    }
+    event.Enable(signal->SampleCounter() > 0);
 }
 
 }

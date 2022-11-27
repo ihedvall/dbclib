@@ -27,21 +27,21 @@ void SignalObserverListView::ObserverList(
   if (!observer_list_ || observer_list_->empty()) {
     return;
   }
-  std::set<uint64_t> time_list; // ns1970->msgid
+  std::map<uint64_t, uint32_t> time_list; // ns1970->Can ID
   for ( const auto& observer : *observer_list_) {
     if (!observer) {
       continue;
     }
     for (size_t sample = 0; sample < observer->NofSamples(); ++sample) {
       const auto index = observer->SampleToIndex(sample);
-      time_list.insert(observer->Time(index));
+      time_list.insert({observer->Time(index), observer->CanId(index)});
     }
   }
-  for( const auto time : time_list) {
-    sample_time_list_.push_back(time);
+  for( const auto& itr : time_list) {
+    sample_time_list_.emplace_back(itr.first, itr.second);
   }
   if (base_time_ == 0 && !sample_time_list_.empty()) {
-    base_time_ = sample_time_list_[0];
+    base_time_ = sample_time_list_[0].first;
   }
 
 }
@@ -63,9 +63,7 @@ wxString SignalObserverListView::OnGetItemText(long item, long column) const {
   if (sample >= sample_time_list_.size() || sample_time_list_.empty()) {
     return "?";
   }
-
-  const auto abs_time = sample_time_list_[sample];
-  const auto rel_time = sample_time_list_[sample] - base_time_;
+  const auto abs_time = sample_time_list_[sample].first;
 
   switch (column) {
     case 0:
@@ -79,16 +77,28 @@ wxString SignalObserverListView::OnGetItemText(long item, long column) const {
     }
 
     case 2: {
+      const auto rel_time = abs_time - base_time_;
       auto temp = static_cast<double>(rel_time);
       temp /= 1'000'000'000;
       return wxString::Format("%g", temp);
+    }
+
+    case 3: {
+      const auto source =
+          static_cast<int>(sample_time_list_[sample].second & 0xFF);
+      const auto* node = network_ != nullptr ?
+                               network_->GetNodeBySource(source) : nullptr;
+      if (node != nullptr)  {
+        return node->Name();
+      }
+      return source <= 253 ? wxString::Format("%d", source) : wxString();
     }
 
     default: {
       break;
     }
   }
-  const auto value_index = static_cast<size_t>(column - 3) ;
+  const auto value_index = static_cast<size_t>(column - 4) ;
   if (value_index >= observer_list_->size()) {
     return "?";
   }

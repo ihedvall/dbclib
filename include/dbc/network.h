@@ -54,6 +54,7 @@ class Network {
 
   [[nodiscard]] Node* GetNode(const std::string& name);
   [[nodiscard]] const Node* GetNode(const std::string& name) const;
+  [[nodiscard]] const Node* GetNodeBySource(uint8_t source) const;
 
   void J1939(bool j1939) {j1939_ = j1939;}
   [[nodiscard]] bool J1939() const {return j1939_;}
@@ -64,7 +65,7 @@ class Network {
   [[nodiscard]] const Message* GetMessageByCanId(uint64_t can_id) const;
   [[nodiscard]] const Message* GetMessageByName(const std::string &name) const;
   [[nodiscard]] Message* GetMessageByPgn(uint32_t pgn);
-
+  [[nodiscard]] Message* GetMessageByPgnAndSource(uint32_t pgn, uint8_t source);
   [[nodiscard]] Signal* GetSignal(uint64_t message_id,
                                   const std::string& signal_name);
 

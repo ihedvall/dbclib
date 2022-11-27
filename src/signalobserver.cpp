@@ -62,6 +62,7 @@ void SignalObserver::OnSample() {
 
   ChannelSample sample;
   sample.ns1970 = signal_.SampleTime();
+  sample.can_id = signal_.SampleCanId();
   signal_.ChannelValue(sample.value);
 
   value_list_[sample_index_] = sample;
@@ -88,6 +89,10 @@ uint64_t SignalObserver::Time(size_t index) const {
     return index < value_list_.size() ? value_list_[index].ns1970 : 0;
 }
 
+uint32_t SignalObserver::CanId(size_t index) const {
+  return index < value_list_.size() ? value_list_[index].can_id : 0;
+}
+
 std::optional<size_t> SignalObserver::TimeToIndex(uint64_t time) const {
   size_t index;
   for (index = 0; index < value_list_.size(); ++index) {
@@ -97,6 +102,12 @@ std::optional<size_t> SignalObserver::TimeToIndex(uint64_t time) const {
   }
   return index < value_list_.size() ? std::optional<size_t>(index)
       : std::optional<size_t>();
+}
+
+size_t SignalObserver::NofValidSamples() const {
+  return std::ranges::count_if(value_list_, [] (const auto& sample) {
+    return sample.value.has_value();
+  });
 }
 
 template <>

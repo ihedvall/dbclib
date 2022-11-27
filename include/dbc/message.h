@@ -76,7 +76,7 @@ class Message {
    [[nodiscard]] const std::vector<uint8_t>& Data() const {return data_;}
    bool UpdateData(const std::vector<uint8_t>& message,
                    size_t offset = 0, size_t data_index = 0);
-   void ParseMessage(uint64_t ns1970);
+   void ParseMessage(uint64_t ns1970, uint32_t can_id);
    void ResetSequenceNumber() {sequence_number_ = 0;}
    uint8_t NextSequenceNumber() const {return sequence_number_;}
 

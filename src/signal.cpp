@@ -47,7 +47,9 @@ bool Signal::IsMultiplexed() const {
   return /*!mux_list_.empty() || */ mux_type_ == MuxType::Multiplexed;
 }
 
-void Signal::ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970) {
+void Signal::ParseMessage(const std::vector<uint8_t>& message,
+                          uint64_t ns1970, uint32_t can_id) {
+  SampleCanId(can_id);
   SampleTime(ns1970);
   if (!Valid()) {
     channel_value_.reset();
