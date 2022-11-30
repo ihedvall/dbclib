@@ -109,7 +109,11 @@ void Message::ParseMessage(uint64_t ns1970, uint32_t can_id) {
     if (signal.Mux() != MuxType::Multiplexed) {
       continue;
     }
-    Signal* multiplexor = GetMultiplexor();
+    const auto& extended_mux = signal.GetExtendedMux();
+    const auto is_extended_mux = !extended_mux.multiplexor.empty();
+
+    Signal* multiplexor = is_extended_mux ? GetSignal(extended_mux.multiplexor)
+                                          : GetMultiplexor();
     if (multiplexor == nullptr) {
       // Might be considered as an error
       continue;
