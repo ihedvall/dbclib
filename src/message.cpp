@@ -144,9 +144,17 @@ bool Message::IsNodeSender(const std::string& node_name) const {
   if (node_name == node_) {
     return true;
   }
+#if __cplusplus > 202003L
   return std::ranges::any_of(sender_list_, [&] (const auto& sender) {
     return node_name == sender;
   });
+#else
+  for (const auto& sender: sender_list_) {
+    if (sender == node_name)
+        return true;
+  }
+  return false;
+#endif
 }
 
 uint8_t Message::Priority() const {
@@ -180,11 +188,19 @@ bool Message::IsJ1939() const {
 }
 
 const Attribute* Message::GetAttribute(const std::string& name) const {
+#if __cplusplus > 202003L
   const auto itr = std::ranges::find_if(attribute_list_,
                                         [&] (const auto& attribute) {
     return name == attribute.Name();
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;
+#else
+    for (const auto& attr: attribute_list_) {
+        if (name == attr.Name())
+            return &attr;
+    }
+    return nullptr;
+#endif
 }
 
 bool Message::ExtendedDataPage() const {

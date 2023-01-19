@@ -25,11 +25,19 @@ uint8_t Node::Source() const {
 }
 
 const Attribute* Node::GetAttribute(const std::string& name) const {
+#if __cplusplus > 202003L
   const auto itr = std::ranges::find_if(attribute_list_,
                                         [&] (const auto& attr) {
     return attr.Name() == name;
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;
+#else
+    for (const auto& attr: attribute_list_) {
+        if (attr.Name() == name)
+            return &attr;
+    }
+    return nullptr;
+#endif
 }
 
 }  // namespace dbc
