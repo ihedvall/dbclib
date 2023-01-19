@@ -6,5 +6,8 @@ project(dbcLibExample
 
 find_package(dbclib REQUIRED)
 
-add_executable(TestMDFCMake ../../docs/dbclibexample.cpp)
-target_link_libraries(TestMDFCMake Upstream::dbclib)
+set(EXAMPLE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../docs)
+
+add_executable(TestdbcCMake ${EXAMPLE_PATH}/dbclibexample.cpp)
+target_compile_definitions(TestdbcCMake ${EXAMPLE_PATH}/example.dbc)
+target_link_libraries(TestdbcCMake Upstream::dbclib)
