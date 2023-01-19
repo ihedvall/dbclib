@@ -19,6 +19,7 @@
 %code  {
     #include <sstream>
     #include "dbcscanner.h"
+    #include <limits>
 
     #undef yylex
     #define yylex scanner.ddlex
