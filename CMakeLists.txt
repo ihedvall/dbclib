@@ -109,23 +109,32 @@ if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") AND DBC_DOC)
 #            COMMENT "DBC Library generating API documentation with Doxygen")
 endif ()
 
-# install(TARGETS dbc
-#        EXPORT DbclLibTargets
-#        LIBRARY DESTINATION util/lib
-#        ARCHIVE DESTINATION util/lib
-#        RUNTIME DESTINATION util/bin
-#        PUBLIC_HEADER DESTINATION util/include/util)
+if (WIN32)
+ install(TARGETS dbc
+        EXPORT DbclLibTargets
+        LIBRARY DESTINATION util/lib
+        ARCHIVE DESTINATION util/lib
+        RUNTIME DESTINATION util/bin
+        PUBLIC_HEADER DESTINATION util/include/util)
+else()
+     install(TARGETS dbc
+            EXPORT MdfLibTargets
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION bin
+            PUBLIC_HEADER DESTINATION include/dbclib)
+endif()
 
-#include(CMakePackageConfigHelpers)
-#write_basic_package_version_file(
-#        UtilLibConfigVersion.cmake
-#        VERSION ${PACKAGE_VERSION}
-#        COMPATIBILITY AnyNewerVersion)
-#
-#install(EXPORT UtilLibTargets
-#        FILE UtilLibTargets.cmake
-#        NAMESPACE UtilLib::
-#        DESTINATION lib/cmake/UtilLib
-#        )
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+        UtilLibConfigVersion.cmake
+        VERSION ${PACKAGE_VERSION}
+        COMPATIBILITY AnyNewerVersion)
 
-#export(TARGETS util NAMESPACE UtilLib:: FILE UtilLibTargets.cmake)
+install(EXPORT UtilLibTargets
+        FILE UtilLibTargets.cmake
+        NAMESPACE UtilLib::
+        DESTINATION lib/cmake/UtilLib
+        )
+
+export(TARGETS util NAMESPACE UtilLib:: FILE UtilLibTargets.cmake)
