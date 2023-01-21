@@ -109,23 +109,79 @@ if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") AND DBC_DOC)
 #            COMMENT "DBC Library generating API documentation with Doxygen")
 endif ()
 
-# install(TARGETS dbc
-#        EXPORT DbclLibTargets
-#        LIBRARY DESTINATION util/lib
-#        ARCHIVE DESTINATION util/lib
-#        RUNTIME DESTINATION util/bin
-#        PUBLIC_HEADER DESTINATION util/include/util)
 
-#include(CMakePackageConfigHelpers)
-#write_basic_package_version_file(
-#        UtilLibConfigVersion.cmake
-#        VERSION ${PACKAGE_VERSION}
-#        COMPATIBILITY AnyNewerVersion)
-#
-#install(EXPORT UtilLibTargets
-#        FILE UtilLibTargets.cmake
-#        NAMESPACE UtilLib::
-#        DESTINATION lib/cmake/UtilLib
-#        )
+##################################################################################
+#####  Packaging and installation  ###############################################
+##################################################################################
+# install headers
+if (${CMAKE_MINOR_VERSION} GREATER_EQUAL 23)
+    install(TARGETS dbc
+                    FILE_SET HEADERS
+                    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+else()
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dbc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+endif()
 
-#export(TARGETS util NAMESPACE UtilLib:: FILE UtilLibTargets.cmake)
+if (WIN32)
+    install(TARGETS dbc
+            EXPORT dbcTargets
+            LIBRARY DESTINATION dbc/lib
+            ARCHIVE DESTINATION dbc/lib
+            RUNTIME DESTINATION dbc/bin
+            PUBLIC_HEADER DESTINATION dbc/include)
+else()
+    install(TARGETS dbc
+            EXPORT dbcTargets
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION bin
+            PUBLIC_HEADER DESTINATION include/dbclib)
+endif()
+
+include(CMakePackageConfigHelpers)
+
+set(CONFIG_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/dbc/dbcConfigVersion.cmake")
+# generate *Version.cmake
+write_basic_package_version_file(
+        ${CONFIG_VERSION_FILE}
+        VERSION ${PACKAGE_VERSION}
+        COMPATIBILITY AnyNewerVersion)
+
+# Export dbcTargets to file *Targets.cmake
+export(EXPORT dbcTargets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/libdbc/dbcTargets.cmake"
+  NAMESPACE Upstream::
+)
+
+set(ConfigPackageLocation lib/cmake/dbc)
+set(CONFIG_CMAKE "${CMAKE_CURRENT_BINARY_DIR}/dbc/dbcConfig.cmake")
+# create final dbc *Config.make file
+# https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dbcConfig.cmake.in"
+  ${CONFIG_CMAKE}
+  INSTALL_DESTINATION ${ConfigPackageLocation}
+)
+
+# install *Targets.cmake
+install(EXPORT dbcTargets
+  FILE
+    dbcTargets.cmake
+  NAMESPACE
+    Upstream::
+  DESTINATION
+    ${ConfigPackageLocation}
+)
+
+# Install *Version.cmake and *Config.cmake
+install(
+  FILES
+    ${CONFIG_VERSION_FILE}
+    ${CONFIG_CMAKE}
+  DESTINATION
+    ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)

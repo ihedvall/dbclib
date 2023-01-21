@@ -41,8 +41,11 @@ endif()
 
 target_link_libraries(dbcview PRIVATE dbc)
 target_link_libraries(dbcview PRIVATE util)
-target_link_libraries(dbcview PRIVATE mdf)
-target_link_libraries(dbcview PRIVATE expat)
+if (MDFLIB_LOCAL_FETCH)
+    target_link_libraries(dbcview PRIVATE mdf)
+else()
+    target_link_libraries(dbcview PRIVATE Upstream::mdf)
+endif()
 target_link_libraries(dbcview PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(dbcview PRIVATE ${Boost_LIBRARIES})
 

@@ -4,6 +4,7 @@
 
 #include "dbc/network.h"
 #include <filesystem>
+#include <algorithm>
 namespace dbc {
 
 EnvVar& Network::GetEnvVar(const std::string& name) {
