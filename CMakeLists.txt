@@ -115,7 +115,7 @@ endif ()
 ##################################################################################
 # install headers
 if (${CMAKE_MINOR_VERSION} GREATER_EQUAL 23)
-    install(TARGETS ${PROJECT_NAME}
+    install(TARGETS dbc
                     FILE_SET HEADERS
                     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
                     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
