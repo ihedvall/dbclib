@@ -32,7 +32,7 @@
 
 
 /**
- ** \file D:/projects/dbclib/src/dbcparser.hpp
+ ** \file /home/ihedvall/CLionProjects/dbclib/src/dbcparser.hpp
  ** Define the dbc::parser class.
  */
 
@@ -42,10 +42,10 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
-# define YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+#ifndef YY_DD_HOME_IHEDVALL_CLIONPROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+# define YY_DD_HOME_IHEDVALL_CLIONPROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
 // "%code requires" blocks.
-#line 9 "D:/projects/dbclib/src/dbcparser.y"
+#line 9 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.y"
 
     #include "dbc/attribute.h"
     #include "dbc/signal.h"
@@ -53,7 +53,7 @@
         class DbcScanner;
     }
 
-#line 57 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 57 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.hpp"
 
 
 # include <cstdlib> // std::abort
@@ -195,9 +195,9 @@
 # endif /* ! defined YYDEBUG */
 #endif  /* ! defined DDDEBUG */
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 5 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.y"
 namespace dbc {
-#line 201 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 201 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.hpp"
 
 
 
@@ -2345,11 +2345,11 @@ switch (yykind)
   };
 
 
-#line 5 "D:/projects/dbclib/src/dbcparser.y"
+#line 5 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.y"
 } // dbc
-#line 2351 "D:/projects/dbclib/src/dbcparser.hpp"
+#line 2351 "/home/ihedvall/CLionProjects/dbclib/src/dbcparser.hpp"
 
 
 
 
-#endif // !YY_DD_D_PROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED
+#endif // !YY_DD_HOME_IHEDVALL_CLIONPROJECTS_DBCLIB_SRC_DBCPARSER_HPP_INCLUDED

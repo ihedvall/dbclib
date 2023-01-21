@@ -24,8 +24,9 @@ uint8_t Node::Source() const {
 }
 
 const Attribute* Node::GetAttribute(const std::string& name) const {
-  const auto itr = std::find_if(attribute_list_.cbegin(),attribute_list_.cend(),
-                                        [&] (const auto& attr) {
+  const auto itr = std::find_if(attribute_list_.cbegin(),
+                                attribute_list_.cend(),
+                                        [&] (const Attribute& attr) {
     return attr.Name() == name;
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;

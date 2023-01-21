@@ -105,7 +105,7 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
 
 bool ExtendedMux::InRange(size_t value) const {
   return std::any_of(range_list.cbegin(), range_list.cend(),
-                     [&] (const auto& range) {
+                     [&] (const RangePair &range) {
     return value >= range.first && value <= range.second;  });
 }
 

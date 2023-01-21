@@ -145,7 +145,7 @@ bool Message::IsNodeSender(const std::string& node_name) const {
     return true;
   }
   return std::any_of(sender_list_.cbegin(),sender_list_.cend(),
-                     [&] (const auto& sender) {
+                     [&] (const std::string& sender) {
     return node_name == sender;
   });
 }
@@ -183,7 +183,7 @@ bool Message::IsJ1939() const {
 const Attribute* Message::GetAttribute(const std::string& name) const {
   const auto itr = std::find_if(attribute_list_.cbegin(),
                                 attribute_list_.cend(),
-                                 [&] (const auto& attribute) {
+                                 [&] (const Attribute& attribute) {
     return name == attribute.Name();
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;

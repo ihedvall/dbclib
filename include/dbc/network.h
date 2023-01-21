@@ -28,6 +28,8 @@ enum class BusType : int {
   CAN = 0
 };
 
+using MessageList = std::map<uint64_t, Message>;
+
 class Network {
  public:
   [[nodiscard]] std::string Name() const;
@@ -89,7 +91,7 @@ class Network {
     return env_var_list_;
   }
 
-  [[nodiscard]] const std::map<uint64_t, Message>& Messages() const {
+  [[nodiscard]] const MessageList& Messages() const {
     return message_list_;
   }
 
@@ -133,8 +135,13 @@ class Network {
   // Only define the name and type of value
   std::map<std::string, Attribute> definition_list_;
   std::vector<Attribute> attribute_list_;
-  std::map<std::string, Node> node_list_;
-  std::map<uint64_t, Message> message_list_;
+
+  using NodeList = std::map<std::string, Node>;
+  NodeList node_list_;
+
+
+  MessageList message_list_;
+
   std::map<std::string, EnumMap> value_table_list_;
   std::vector<SignalGroup> signal_group_list_;
 };

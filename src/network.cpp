@@ -5,6 +5,7 @@
 
 #include "dbc/network.h"
 #include "dbchelper.h"
+#include <algorithm>
 namespace dbc {
 
 EnvVar& Network::GetEnvVar(const std::string& name) {
@@ -44,8 +45,8 @@ const Node* Network::GetNode(const std::string& name) const {
 
 const Node* Network::GetNodeBySource(uint8_t source) const {
   const auto itr = std::find_if(node_list_.cbegin(), node_list_.cend(),
-                                [&] (const auto& itr) {
-    return itr.second.Source() == source;
+                                [&] (const NodeList::value_type& itr1) {
+    return itr1.second.Source() == source;
   });
   return itr != node_list_.cend() ? &itr->second : nullptr;
 }
@@ -61,16 +62,18 @@ const Message* Network::GetMessage(uint64_t message_id) const {
 }
 
 Message* Network::GetMessageByCanId(uint64_t can_id) {
-  auto itr = std::find_if(message_list_.begin(), message_list_.end(),
-                          [&] (const auto& mess) {
+  auto itr = std::find_if(message_list_.begin(),
+                          message_list_.end(),
+                          [&] (const MessageList ::value_type &mess) {
     return mess.second.CanId() == can_id;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
 }
 
 const Message* Network::GetMessageByCanId(uint64_t can_id) const {
-  const auto itr = std::find_if(message_list_.cbegin(), message_list_.cend(),
-                                [&] (const auto& mess) {
+  const auto itr = std::find_if(message_list_.cbegin(),
+                                message_list_.cend(),
+                              [&] (const MessageList ::value_type &mess) {
       return mess.second.CanId() == can_id;
     });
   return itr != message_list_.cend() ? &itr->second : nullptr;
@@ -78,7 +81,7 @@ const Message* Network::GetMessageByCanId(uint64_t can_id) const {
 
 const Message* Network::GetMessageByName(const std::string& name) const {
   const auto itr = std::find_if(message_list_.cbegin(), message_list_.cend(),
-                                [&] (const auto& mess) {
+                                [&] (const MessageList::value_type &mess) {
     return mess.second.Name() == name;
   });
   return itr != message_list_.cend() ? &itr->second : nullptr;
@@ -86,7 +89,7 @@ const Message* Network::GetMessageByName(const std::string& name) const {
 
 Message* Network::GetMessageByPgn(uint32_t pgn) {
   auto itr = std::find_if(message_list_.begin(), message_list_.end(),
-                          [&] (const auto& mess) {
+                          [&] (const MessageList::value_type &mess) {
     return mess.second.Pgn() == pgn;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
@@ -94,7 +97,7 @@ Message* Network::GetMessageByPgn(uint32_t pgn) {
 
 Message* Network::GetMessageByPgnAndSource(uint32_t pgn, uint8_t source) {
   auto itr = std::find_if(message_list_.begin(), message_list_.end(),
-                          [&] (const auto& mess) {
+                          [&] (const MessageList::value_type& mess) {
     return mess.second.Pgn() == pgn && mess.second.Source() == source;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
@@ -133,7 +136,7 @@ const SignalGroup* Network::GetSignalGroup(uint64_t message_id,
                            const std::string& name) const {
   const auto itr = std::find_if(signal_group_list_.cbegin(),
                                 signal_group_list_.cend(),
-                                        [&] (const auto& group) {
+                                        [&] (const SignalGroup& group) {
     return group.MessageId() == message_id &&
            group.Name() == name;
   });
@@ -144,7 +147,7 @@ const SignalGroup* Network::GetSignalGroupByName(
     const std::string& name) const {
   const auto itr = std::find_if(signal_group_list_.cbegin(),
                                 signal_group_list_.cend(),
-                                        [&] (const auto& group) {
+                                        [&] (const SignalGroup& group) {
     return group.Name() == name;
   });
   return itr != signal_group_list_.cend() ? &(*itr) : nullptr;
@@ -200,7 +203,7 @@ std::string Network::Name() const {
 
 Attribute* Network::GetAttribute(const std::string& name) {
   auto itr = std::find_if(attribute_list_.begin(), attribute_list_.end(),
-                          [&] (const auto& attribute) {
+                          [&] (const Attribute& attribute) {
     return attribute.Name() == name;
   });
   return itr != attribute_list_.end() ? &(*itr) : nullptr;
@@ -209,7 +212,7 @@ Attribute* Network::GetAttribute(const std::string& name) {
 const Attribute* Network::GetAttribute(const std::string& name) const {
   const auto itr = std::find_if(attribute_list_.cbegin(),
                                 attribute_list_.cend(),
-                                        [&] (const auto& attribute) {
+                                        [&] (const Attribute& attribute) {
     return attribute.Name() == name;
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;

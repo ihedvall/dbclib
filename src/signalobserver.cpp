@@ -105,7 +105,7 @@ std::pair<size_t, bool> SignalObserver::TimeToIndex(uint64_t time) const {
 
 size_t SignalObserver::NofValidSamples() const {
   return std::count_if(value_list_.cbegin(), value_list_.cend(),
-                       [] (const auto& sample) {
+                       [] (const ChannelSample& sample) {
     return sample.value.valid;
   });
 }

@@ -42,9 +42,10 @@ enum class MuxType : int {
   ExtendedMultiplexor
 };
 
+using RangePair = std::pair<size_t, size_t>;
 struct ExtendedMux {
   std::string multiplexor;
-  std::vector<std::pair<size_t, size_t>> range_list;
+  std::vector<RangePair> range_list;
   [[nodiscard]] bool InRange(size_t value) const;
 };
 

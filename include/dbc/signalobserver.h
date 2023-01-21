@@ -7,6 +7,7 @@
 #include "dbc/isampleobserver.h"
 #include "dbc/signal.h"
 #include <utility>
+#include <memory>
 
 namespace dbc {
 

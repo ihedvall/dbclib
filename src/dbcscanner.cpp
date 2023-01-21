@@ -4,6 +4,7 @@
  */
 
 #include "dbcscanner.h"
+#include <memory>
 namespace dbc {
 
 DbcScanner::DbcScanner(std::ifstream& message)
@@ -13,7 +14,7 @@ DbcScanner::DbcScanner(std::ifstream& message)
 
 Network& DbcScanner::GetNetwork() {
   if (!network_) {
-    network_ = std::make_unique<Network>();
+    network_ .reset(new Network);
   }
   return *network_;
 }

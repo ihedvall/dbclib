@@ -43,7 +43,7 @@ bool DbcFile::ParseFile() {
   if (network_) {
     const auto& message_list = network_->Messages();
     const bool j1939 = std::any_of(message_list.cbegin(), message_list.cend(),
-                                   [&](const auto& mess) {
+                                   [&](const MessageList::value_type& mess) {
                                      return mess.second.IsJ1939();
                                    });
     network_->J1939(j1939);
