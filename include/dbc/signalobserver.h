@@ -6,8 +6,7 @@
 #pragma once
 #include "dbc/isampleobserver.h"
 #include "dbc/signal.h"
-#include <optional>
-#include <memory>
+#include <utility>
 
 namespace dbc {
 
@@ -36,7 +35,7 @@ class SignalObserver : public ISampleObserver {
   [[nodiscard]] size_t NofValidSamples() const;
 
   [[nodiscard]] size_t SampleToIndex(size_t sample) const;
-  [[nodiscard]] std::optional<size_t> TimeToIndex(uint64_t time) const;
+  [[nodiscard]] std::pair<size_t, bool> TimeToIndex(uint64_t time) const;
   void DetachObserver() override;
   void OnSample() override;
 
@@ -45,7 +44,7 @@ class SignalObserver : public ISampleObserver {
   struct ChannelSample {
     uint64_t ns1970;
     uint32_t can_id;
-    std::any value;
+    SignalValue value;
 
     [[nodiscard]] uint8_t Source() const {
       return static_cast<uint8_t>(can_id & 0xFF);
@@ -66,7 +65,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
     return false;
   }
   const auto& sample = value_list_[index];
-  bool valid = sample.value.has_value();
+  bool valid = sample.value.valid;
   ns1970 = sample.ns1970;
 
   value = {};
@@ -74,7 +73,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
   switch (signal_.DataType()) {
     case SignalDataType::SignedData: {
       try {
-        const auto temp = std::any_cast<int64_t>(sample.value);
+        const auto temp = sample.value.signed_value;
         value = static_cast<V>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -91,7 +90,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
         valid = false;
       } else {
         try {
-          const auto temp = std::any_cast<uint64_t>(sample.value);
+          const auto temp = sample.value.unsigned_value;
           value = static_cast<V>(temp);
         } catch (const std::exception&) {
           valid = false;
@@ -100,19 +99,10 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
       break;
     }
 
+    case SignalDataType::DoubleData:
     case SignalDataType::FloatData: {
       try {
-        const auto temp = std::any_cast<float>(sample.value);
-        value = static_cast<V>(temp);
-      } catch (const std::exception&) {
-        valid = false;
-      }
-      break;
-    }
-
-    case SignalDataType::DoubleData: {
-      try {
-        const auto temp = std::any_cast<double>(sample.value);
+        const auto temp = sample.value.float_value;
         value = static_cast<V>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -137,7 +127,7 @@ bool SignalObserver::EngValue(size_t index, uint64_t& ns1970,
     return false;
   }
   const auto& sample = value_list_[index];
-  bool valid = sample.value.has_value();
+  bool valid = sample.value.valid;
   ns1970 = sample.ns1970;
 
   value = {};

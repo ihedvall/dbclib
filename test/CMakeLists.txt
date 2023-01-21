@@ -5,6 +5,7 @@ project(TestDbc
         VERSION 1.0
         DESCRIPTION "Google unit tests for the DBC library"
         LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(test_dbc
         testread.cpp testread.h

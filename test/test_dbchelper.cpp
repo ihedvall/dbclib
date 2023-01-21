@@ -139,4 +139,31 @@ TEST(DbcHelper, TestUnsigned) {
   EXPECT_EQ(little64, orig64);
 }
 
+TEST(DbcHelper, TestGetStem) {
+  {
+    const auto stem = DbcHelper::GetStem("");
+    EXPECT_TRUE(stem.empty());
+  }
+
+  {
+    const auto stem = DbcHelper::GetStem("olle.txt");
+    EXPECT_STREQ(stem.c_str(), "olle");
+  }
+
+  {
+    const auto stem = DbcHelper::GetStem("c:\\olle.txt");
+    EXPECT_STREQ(stem.c_str(), "olle");
+  }
+
+  {
+    const auto stem = DbcHelper::GetStem("c:\\daddy.cool/olle.txt");
+    EXPECT_STREQ(stem.c_str(), "olle");
+  }
+
+  {
+    const auto stem = DbcHelper::GetStem("//daddy.cool/olle.txt");
+    EXPECT_STREQ(stem.c_str(), "olle");
+  }
+}
+
 }

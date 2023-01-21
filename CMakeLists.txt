@@ -11,7 +11,7 @@ option(DBC_DOC "If doxygen is installed, then build documentation in Release mod
 option(DBC_TOOLS "Building applications" ON)
 option(DBC_TEST "Building unit test" ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_DEBUG_POSTFIX d)
 
 include(CMakePrintHelpers)

@@ -41,6 +41,12 @@ class DbcHelper {
   static void SetAllBits(size_t start, size_t length, uint8_t* raw);
 
   static bool IsAllBitsSet(size_t start, size_t length, const uint8_t* raw);
+
+  static std::string GetStem(const std::string& path);
+
+  static bool FileExist(const std::string& path);
+
+  static bool IsLittleEndian();
 };
 
 } // end namespace

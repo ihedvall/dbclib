@@ -52,19 +52,20 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
   SampleCanId(can_id);
   SampleTime(ns1970);
   if (!Valid()) {
-    channel_value_.reset();
+    channel_value_.Clear();
     FireOnSample();
     return;
   }
+  channel_value_.valid = true;
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
       const int64_t temp = DbcHelper::RawToSigned(little_endian_, bit_start_,
                                             bit_length_, message.data());
-      channel_value_ = temp;
+      channel_value_.signed_value = temp;
       break;
     }
-
+    channel_value_.valid = true;
     case SignalDataType::UnsignedData: {
       size_t bytes = bit_length_ / 8;
       if ((bit_length_ % 8) != 0) {
@@ -73,11 +74,11 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
       if (bytes > 8) {
         auto temp = DbcHelper::RawToByteArray(bit_start_, bit_length_,
                                               message.data());
-        channel_value_ = temp;
+        channel_value_.array_value = temp;
       } else {
         const uint64_t temp = DbcHelper::RawToUnsigned(
             little_endian_, bit_start_, bit_length_, message.data());
-        channel_value_ = temp;
+        channel_value_.unsigned_value = temp;
       }
       break;
     }
@@ -85,26 +86,27 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
     case SignalDataType::FloatData: {
       const float temp = DbcHelper::RawToFloat(little_endian_, bit_start_,
                                                      bit_length_, message.data());
-      channel_value_ = temp;
+      channel_value_.float_value = temp;
       break;
     }
 
     case SignalDataType::DoubleData: {
       const double temp = DbcHelper::RawToDouble(little_endian_, bit_start_,
                                                bit_length_, message.data());
-      channel_value_ = temp;
+      channel_value_.float_value = temp;
       break;
     }
 
     default:
-      channel_value_.reset();
+      channel_value_.Clear();
       break;
   }
   FireOnSample();
 }
 
 bool ExtendedMux::InRange(size_t value) const {
-  return std::ranges::any_of(range_list, [&] (const auto& range) {
+  return std::any_of(range_list.cbegin(), range_list.cend(),
+                     [&] (const auto& range) {
     return value >= range.first && value <= range.second;  });
 }
 
@@ -121,8 +123,8 @@ bool Signal::ChannelValue(std::string& value) const {
   switch (data_type_) {
     case SignalDataType::SignedData: {
       try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<int64_t>(channel_value_);
+        valid = channel_value_.valid && Valid();
+        const auto temp = channel_value_.signed_value;
         value = std::to_string(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -137,8 +139,8 @@ bool Signal::ChannelValue(std::string& value) const {
       }
       if (bytes > 8) {
         try {
-          valid = channel_value_.has_value() && Valid();
-          const auto temp = std::any_cast<std::vector<uint8_t>>(channel_value_);
+          valid = channel_value_.valid && Valid();
+          const auto temp = channel_value_.array_value;
           std::ostringstream out;
           for (const auto input : temp) {
             if (input == 0 || input == 0xFF) {
@@ -152,8 +154,8 @@ bool Signal::ChannelValue(std::string& value) const {
         }
       } else {
         try {
-          valid = channel_value_.has_value() && Valid();
-          const auto temp = std::any_cast<uint64_t>(channel_value_);
+          valid = channel_value_.valid && Valid();
+          const auto temp = channel_value_.unsigned_value;
           value = std::to_string(temp);
         } catch (const std::exception&) {
           valid = false;
@@ -162,23 +164,11 @@ bool Signal::ChannelValue(std::string& value) const {
       break;
     }
 
+    case SignalDataType::DoubleData:
     case SignalDataType::FloatData: {
       try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<float>(channel_value_);
-        std::ostringstream temp_text;
-        temp_text << temp;
-        value =temp_text.str();
-      } catch (const std::exception&) {
-        valid = false;
-      }
-      break;
-    }
-
-    case SignalDataType::DoubleData: {
-      try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<double>(channel_value_);
+        valid = channel_value_.valid && Valid();
+        const auto temp = channel_value_.float_value;
         std::ostringstream temp_text;
         temp_text << temp;
         value =temp_text.str();
@@ -198,13 +188,8 @@ bool Signal::ChannelValue(std::string& value) const {
 }
 
 template <>
-bool Signal::ChannelValue(std::any& value) const {
-  bool valid = channel_value_.has_value() && Valid();
-  if (valid) {
-    value = channel_value_;
-  } else {
-    value.reset();
-  }
+bool Signal::ChannelValue(SignalValue& value) const {
+  bool valid = channel_value_.valid && Valid();
   value = channel_value_;
   return valid;
 }

@@ -14,6 +14,8 @@
 
 namespace dbc {
 
+using SignalList = std::map<std::string, Signal>;
+
 class Message {
  public:
    void Ident(uint64_t ident) {
@@ -61,7 +63,7 @@ class Message {
    [[nodiscard]] Signal* GetMultiplexor();
    [[nodiscard]] const Attribute* GetAttribute(const std::string& name) const;
 
-   [[nodiscard]] const std::map<std::string, Signal>& Signals() const {
+   [[nodiscard]] const SignalList& Signals() const {
      return signal_list_;
    }
    [[nodiscard]] const std::vector<std::string>& Senders() const {
@@ -95,7 +97,8 @@ class Message {
    std::vector<std::string> sender_list_; ///< Also holds the node name
 
    std::vector<Attribute> attribute_list_;
-   std::map<std::string, Signal> signal_list_;
+
+   SignalList signal_list_;
 
    mutable size_t sample_counter_ = 0;
    std::vector<uint8_t> data_; ///< Store last message and solve >8 byte data

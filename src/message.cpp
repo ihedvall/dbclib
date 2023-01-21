@@ -4,7 +4,6 @@
  */
 
 #include "dbc/message.h"
-#include <ranges>
 #include <algorithm>
 #include "dbchelper.h"
 namespace {
@@ -45,7 +44,8 @@ Signal& Message::CreateSignal(const std::string& name) {
   if (itr == signal_list_.end()) {
     Signal temp;
     temp.Name(name);
-    itr = signal_list_.insert({name, temp}).first;
+    const auto value = SignalList::value_type(name, temp);
+    itr = signal_list_.insert(value).first;
   }
   return itr->second;
 }
@@ -144,7 +144,8 @@ bool Message::IsNodeSender(const std::string& node_name) const {
   if (node_name == node_) {
     return true;
   }
-  return std::ranges::any_of(sender_list_, [&] (const auto& sender) {
+  return std::any_of(sender_list_.cbegin(),sender_list_.cend(),
+                     [&] (const auto& sender) {
     return node_name == sender;
   });
 }
@@ -180,8 +181,9 @@ bool Message::IsJ1939() const {
 }
 
 const Attribute* Message::GetAttribute(const std::string& name) const {
-  const auto itr = std::ranges::find_if(attribute_list_,
-                                        [&] (const auto& attribute) {
+  const auto itr = std::find_if(attribute_list_.cbegin(),
+                                attribute_list_.cend(),
+                                 [&] (const auto& attribute) {
     return name == attribute.Name();
   });
   return itr != attribute_list_.cend() ? &(*itr) : nullptr;

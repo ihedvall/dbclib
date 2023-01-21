@@ -4,30 +4,22 @@
  */
 
 #include "dbc/dbcfile.h"
-#include <filesystem>
 #include <fstream>
-#include <ranges>
 #include <algorithm>
 #include "dbcscanner.h"
-
-using namespace std::filesystem;
+#include "dbchelper.h"
 
 namespace dbc {
 
 std::string DbcFile::Name() const {
-  try {
-    const path filename(filename_);
-    return filename.stem().string();
-  } catch (const std::exception& err) {
-    last_error_ = err.what();
-  }
-  return {};
+  return DbcHelper::GetStem(filename_);
 }
+
 bool DbcFile::ParseFile() {
   int ret;
   try {
-    const path filename(filename_);
-    if (!exists(filename)) {
+    const std::string filename(filename_);
+    if (!DbcHelper::FileExist(filename)) {
       std::ostringstream error;
       error << "The file doesn't exist. File: " << filename_;
       return false;
@@ -47,13 +39,30 @@ bool DbcFile::ParseFile() {
     last_error_ = error.str();
     ret = -1;
   }
-  // Set the J1939 Flag
+  // Set the J1939 Flag and protocol
   if (network_) {
     const auto& message_list = network_->Messages();
-    const bool j1939 = std::ranges::any_of(
-        message_list, [&](const auto& mess) { return mess.second.IsJ1939(); });
+    const bool j1939 = std::any_of(message_list.cbegin(), message_list.cend(),
+                                   [&](const auto& mess) {
+                                     return mess.second.IsJ1939();
+                                   });
     network_->J1939(j1939);
+
+    const auto* protocol_type = network_->GetAttribute("ProtocolType");
+    if (protocol_type != nullptr) {
+      const auto type = protocol_type->Value<std::string>();
+      if (type == "OBD2") {
+        network_->Protocol(ProtocolType::OBD2);
+      } else if (type.substr(0, 6) == "J1939") {
+        network_->Protocol(ProtocolType::J1939);
+      } else if (type.substr(0, 1) == "N") {
+        network_->Protocol(ProtocolType::NMEA2000);
+      } else  {
+        network_->Protocol(ProtocolType::StandardCAN);
+      }
+    }
   }
+
   return ret == 0;
 }
 
@@ -182,7 +191,7 @@ bool DbcFile::ParseMessage(const DbcMessage& message) {
     return false;
   }
   const auto protocol = network_->Protocol();
-  bool parse = false;
+  bool parse;
   switch (protocol) {
     case ProtocolType::NMEA2000:
       parse = ParseNMEA2000(message);

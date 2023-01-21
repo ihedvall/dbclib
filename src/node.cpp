@@ -4,7 +4,6 @@
  */
 
 #include "dbc/node.h"
-#include <ranges>
 #include <algorithm>
 namespace dbc {
 
@@ -25,7 +24,7 @@ uint8_t Node::Source() const {
 }
 
 const Attribute* Node::GetAttribute(const std::string& name) const {
-  const auto itr = std::ranges::find_if(attribute_list_,
+  const auto itr = std::find_if(attribute_list_.cbegin(),attribute_list_.cend(),
                                         [&] (const auto& attr) {
     return attr.Name() == name;
   });

@@ -1,10 +1,10 @@
-//
-// Created by ihedv on 2022-11-04.
-//
+/*
+* Copyright 2022 Ingemar Hedvall
+* SPDX-License-Identifier: MIT
+ */
 
 #include "dbc/network.h"
-#include <filesystem>
-#include <algorithm>
+#include "dbchelper.h"
 namespace dbc {
 
 EnvVar& Network::GetEnvVar(const std::string& name) {
@@ -43,7 +43,8 @@ const Node* Network::GetNode(const std::string& name) const {
 }
 
 const Node* Network::GetNodeBySource(uint8_t source) const {
-  const auto itr = std::ranges::find_if(node_list_, [&] (const auto& itr) {
+  const auto itr = std::find_if(node_list_.cbegin(), node_list_.cend(),
+                                [&] (const auto& itr) {
     return itr.second.Source() == source;
   });
   return itr != node_list_.cend() ? &itr->second : nullptr;
@@ -60,35 +61,40 @@ const Message* Network::GetMessage(uint64_t message_id) const {
 }
 
 Message* Network::GetMessageByCanId(uint64_t can_id) {
-  auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+  auto itr = std::find_if(message_list_.begin(), message_list_.end(),
+                          [&] (const auto& mess) {
     return mess.second.CanId() == can_id;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
 }
 
 const Message* Network::GetMessageByCanId(uint64_t can_id) const {
-  const auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+  const auto itr = std::find_if(message_list_.cbegin(), message_list_.cend(),
+                                [&] (const auto& mess) {
       return mess.second.CanId() == can_id;
     });
   return itr != message_list_.cend() ? &itr->second : nullptr;
 }
 
 const Message* Network::GetMessageByName(const std::string& name) const {
-  const auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+  const auto itr = std::find_if(message_list_.cbegin(), message_list_.cend(),
+                                [&] (const auto& mess) {
     return mess.second.Name() == name;
   });
   return itr != message_list_.cend() ? &itr->second : nullptr;
 }
 
 Message* Network::GetMessageByPgn(uint32_t pgn) {
-  auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+  auto itr = std::find_if(message_list_.begin(), message_list_.end(),
+                          [&] (const auto& mess) {
     return mess.second.Pgn() == pgn;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
 }
 
 Message* Network::GetMessageByPgnAndSource(uint32_t pgn, uint8_t source) {
-  auto itr = std::ranges::find_if(message_list_, [&] (const auto& mess) {
+  auto itr = std::find_if(message_list_.begin(), message_list_.end(),
+                          [&] (const auto& mess) {
     return mess.second.Pgn() == pgn && mess.second.Source() == source;
   });
   return itr != message_list_.end() ? &itr->second : nullptr;
@@ -125,7 +131,8 @@ const Signal* Network::GetSignalByName( const std::string& signal_name) const {
 
 const SignalGroup* Network::GetSignalGroup(uint64_t message_id,
                            const std::string& name) const {
-  const auto itr = std::ranges::find_if(signal_group_list_,
+  const auto itr = std::find_if(signal_group_list_.cbegin(),
+                                signal_group_list_.cend(),
                                         [&] (const auto& group) {
     return group.MessageId() == message_id &&
            group.Name() == name;
@@ -135,7 +142,8 @@ const SignalGroup* Network::GetSignalGroup(uint64_t message_id,
 
 const SignalGroup* Network::GetSignalGroupByName(
     const std::string& name) const {
-  const auto itr = std::ranges::find_if(signal_group_list_,
+  const auto itr = std::find_if(signal_group_list_.cbegin(),
+                                signal_group_list_.cend(),
                                         [&] (const auto& group) {
     return group.Name() == name;
   });
@@ -187,23 +195,20 @@ std::string Network::Name() const {
   if (db_name != nullptr) {
     return db_name->Value<std::string>();
   }
-  try {
-    std::filesystem::path filename(filename_);
-    return filename.stem().string();
-  } catch (const std::exception& ) {
-  }
-  return {};
+  return DbcHelper::GetStem(filename_);
 }
 
 Attribute* Network::GetAttribute(const std::string& name) {
-  auto itr = std::ranges::find_if(attribute_list_, [&] (const auto& attribute) {
+  auto itr = std::find_if(attribute_list_.begin(), attribute_list_.end(),
+                          [&] (const auto& attribute) {
     return attribute.Name() == name;
   });
   return itr != attribute_list_.end() ? &(*itr) : nullptr;
 }
 
 const Attribute* Network::GetAttribute(const std::string& name) const {
-  const auto itr = std::ranges::find_if(attribute_list_,
+  const auto itr = std::find_if(attribute_list_.cbegin(),
+                                attribute_list_.cend(),
                                         [&] (const auto& attribute) {
     return attribute.Name() == name;
   });
@@ -228,6 +233,10 @@ void Network::Protocol(ProtocolType type) {
       protocol->Value(std::string("NMEA2000"));
       break;
 
+    case ProtocolType::OBD2:
+      protocol->Value(std::string("OBD2"));
+      break;
+
     default:
       protocol->Value(std::string("StandardCAN"));
       break;
@@ -238,6 +247,10 @@ ProtocolType Network::Protocol() const {
   const auto* temp = GetAttribute("ProtocolType");
   if (temp != nullptr && temp->Value<std::string>() == "J1939") {
     return ProtocolType::J1939;
+  } else if (temp != nullptr && temp->Value<std::string>() == "J1939PG") {
+      return ProtocolType::J1939;
+  } else if (temp != nullptr && temp->Value<std::string>() == "OBD2") {
+      return ProtocolType::OBD2;
   } else if (temp != nullptr && temp->Value<std::string>() == "NMEA2000") {
       return ProtocolType::NMEA2000;
   }
@@ -248,8 +261,13 @@ std::string Network::ProtocolAsString() const {
   switch (Protocol()) {
     case ProtocolType::J1939:
       return "J1939";
+
     case ProtocolType::NMEA2000:
       return "NMEA 2000";
+
+    case ProtocolType::OBD2:
+      return "OBD2";
+
     default:
       break;
   }

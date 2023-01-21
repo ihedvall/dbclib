@@ -5,7 +5,7 @@
 
 #include "dbchelper.h"
 #include <cstring>
-
+#include <fstream>
 namespace {
 constexpr uint8_t kMask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 using signed64 = union {
@@ -620,6 +620,52 @@ bool DbcHelper::IsAllBitsSet(size_t start, size_t length, const uint8_t* raw) {
     }
   }
   return true;
+}
+
+std::string DbcHelper::GetStem(const std::string& path) {
+  // First parse out the file name
+  const auto last_back_pos = path.find_last_of('\\');
+  const auto back_pos = last_back_pos != std::string::npos;
+
+  const auto last_forward_pos = path.find_last_of('/');
+  const auto forward_pos = last_forward_pos != std::string::npos;
+
+  std::string filename;
+  if (back_pos && forward_pos) {
+    if ( last_back_pos > last_forward_pos) {
+      // Use backward slash position
+      filename = path.substr(last_back_pos + 1);
+    } else {
+      // Use forward slash position
+      filename = path.substr(last_forward_pos + 1);
+    }
+  } else if (back_pos) {
+    filename = path.substr(last_back_pos + 1);
+  } else if (forward_pos) {
+    filename = path.substr(last_forward_pos + 1);
+  } else {
+    filename = path;
+  }
+  // Strip out the extension
+  std::string stem;
+  const auto last_dot_pos = filename.find_last_of('.');
+  if (last_dot_pos != std::string::npos) {
+    stem = filename.substr(0,last_dot_pos);
+  } else {
+    stem = filename;
+  }
+
+  return stem;
+}
+
+bool DbcHelper::FileExist(const std::string& path) {
+  std::ifstream temp(path);
+  return temp.good();
+}
+
+bool DbcHelper::IsLittleEndian() {
+  constexpr int temp = 1;
+  return *((const int8_t*) &temp) == 1;
 }
 
 }

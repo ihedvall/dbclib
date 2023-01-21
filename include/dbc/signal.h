@@ -8,11 +8,25 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <any>
 #include "dbc/attribute.h"
 #include "dbc/isampleobserver.h"
 
 namespace dbc {
+
+struct SignalValue {
+  bool valid = false;
+  int64_t signed_value = 0;
+  uint64_t unsigned_value = 0;
+  double float_value = 0;
+  std::vector<uint8_t> array_value;
+  void Clear() {
+    valid = false;
+    signed_value = 0;
+    unsigned_value = 0;
+    float_value = 0;
+    array_value.clear();
+  }
+};
 
 enum class SignalDataType : int {
   SignedData,
@@ -141,7 +155,7 @@ class Signal {
   std::vector<Attribute> attribute_list_;
   std::map<int64_t, std::string> enum_list_;
 
-  std::any channel_value_; ///< Unscaled value (last reported value)
+  SignalValue channel_value_; ///< Unscaled value (last reported value)
 
   uint64_t message_id_ = 0;
   mutable size_t sample_counter_ = 0;
@@ -156,15 +170,13 @@ class Signal {
 
 template <typename T>
 bool Signal::ChannelValue(T& value) const {
-  bool valid = false;
-
+  bool valid = channel_value_.valid && Valid();
   value = {};
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
       try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<int64_t>(channel_value_);
+        const auto temp = channel_value_.signed_value;
         value = static_cast<T>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -181,8 +193,7 @@ bool Signal::ChannelValue(T& value) const {
         valid = false;
       } else {
         try {
-          valid = channel_value_.has_value() && Valid();
-          const auto temp = std::any_cast<uint64_t>(channel_value_);
+          const auto temp = channel_value_.unsigned_value;
           value = static_cast<T>(temp);
         } catch (const std::exception&) {
           valid = false;
@@ -191,21 +202,10 @@ bool Signal::ChannelValue(T& value) const {
       break;
     }
 
+    case SignalDataType::DoubleData:
     case SignalDataType::FloatData: {
       try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<float>(channel_value_);
-        value = static_cast<T>(temp);
-      } catch (const std::exception&) {
-        valid = false;
-      }
-      break;
-    }
-
-    case SignalDataType::DoubleData: {
-      try {
-        valid = channel_value_.has_value() && Valid();
-        const auto temp = std::any_cast<double>(channel_value_);
+        const auto temp = channel_value_.float_value;
         value = static_cast<T>(temp);
       } catch (const std::exception&) {
         valid = false;
@@ -214,6 +214,7 @@ bool Signal::ChannelValue(T& value) const {
     }
 
     default:
+      valid = false;
       break;
    }
    return valid;
@@ -223,7 +224,7 @@ template <>
 bool Signal::ChannelValue(std::string& value) const;
 
 template <>
-bool Signal::ChannelValue(std::any& value) const;
+bool Signal::ChannelValue(SignalValue& value) const;
 
 template <typename T>
 bool Signal::EngValue(T& value) const {

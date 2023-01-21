@@ -5,7 +5,7 @@ project(MdfViewer
         VERSION 1.0
         DESCRIPTION "Simple DBC file browser"
         LANGUAGES CXX)
-
+set(CMAKE_CXX_STANDARD 20)
 include("../script/boost.cmake")
 include("../script/utillib.cmake")
 include("../script/mdflib.cmake")

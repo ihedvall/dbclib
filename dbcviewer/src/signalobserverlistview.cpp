@@ -108,12 +108,12 @@ wxString SignalObserverListView::OnGetItemText(long item, long column) const {
   }
 
   const auto sample_index = obs->TimeToIndex(abs_time);
-  if (!sample_index.has_value()) {
+  if (!sample_index.second) {
     return {};
   }
   uint64_t ns1970 = 0;
   std::string value_text;
-  obs->EngValue(sample_index.value(), ns1970, value_text);
+  obs->EngValue(sample_index.first, ns1970, value_text);
   return wxString::From8BitData(value_text.c_str());
 }
 

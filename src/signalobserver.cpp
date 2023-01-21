@@ -93,20 +93,21 @@ uint32_t SignalObserver::CanId(size_t index) const {
   return index < value_list_.size() ? value_list_[index].can_id : 0;
 }
 
-std::optional<size_t> SignalObserver::TimeToIndex(uint64_t time) const {
+std::pair<size_t, bool> SignalObserver::TimeToIndex(uint64_t time) const {
   size_t index;
   for (index = 0; index < value_list_.size(); ++index) {
       if (time == value_list_[index].ns1970) {
         break;
       }
   }
-  return index < value_list_.size() ? std::optional<size_t>(index)
-      : std::optional<size_t>();
+  return index < value_list_.size() ? std::pair<size_t, bool>{index, true}
+      : std::pair<size_t, bool>(0, false);
 }
 
 size_t SignalObserver::NofValidSamples() const {
-  return std::ranges::count_if(value_list_, [] (const auto& sample) {
-    return sample.value.has_value();
+  return std::count_if(value_list_.cbegin(), value_list_.cend(),
+                       [] (const auto& sample) {
+    return sample.value.valid;
   });
 }
 
@@ -117,7 +118,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
     return false;
   }
   const auto& sample = value_list_[index];
-  bool valid = sample.value.has_value();
+  bool valid = sample.value.valid;
   ns1970 = sample.ns1970;
 
   value.clear();
@@ -125,7 +126,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
     switch (signal_.DataType()) {
       case SignalDataType::SignedData: {
         try {
-          const auto temp = std::any_cast<int64_t>(sample.value);
+          const auto temp = sample.value.signed_value;
           value = std::to_string(temp);
         } catch (const std::exception&) {
           valid = false;
@@ -140,7 +141,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
         }
         if (bytes > 8) {
           try {
-            const auto temp = std::any_cast<std::vector<uint8_t>>(sample.value);
+            const auto& temp = sample.value.array_value;
             std::ostringstream out;
             for (const auto input : temp) {
               if (input == 0 || input == 0xFF) {
@@ -154,7 +155,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
           }
         } else {
           try {
-            const auto temp = std::any_cast<uint64_t>(sample.value);
+            const auto temp = sample.value.unsigned_value;
             value = std::to_string(temp);
           } catch (const std::exception&) {
             valid = false;
@@ -162,22 +163,10 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
         }
         break;
       }
-
+      case SignalDataType::DoubleData:
       case SignalDataType::FloatData: {
         try {
-          const auto temp = std::any_cast<float>(sample.value);
-          std::ostringstream temp_text;
-          temp_text << temp;
-          value =temp_text.str();
-        } catch (const std::exception&) {
-          valid = false;
-        }
-        break;
-      }
-
-      case SignalDataType::DoubleData: {
-        try {
-          const auto temp = std::any_cast<double>(sample.value);
+          const auto temp = sample.value.float_value;
           std::ostringstream temp_text;
           temp_text << temp;
           value =temp_text.str();
@@ -188,6 +177,7 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
       }
 
       default:
+        valid = false;
         break;
     }
     if (!valid) {
@@ -203,7 +193,7 @@ bool SignalObserver::EngValue(size_t index, uint64_t& ns1970,
     return false;
   }
   const auto& sample = value_list_[index];
-  bool valid = sample.value.has_value();
+  bool valid = sample.value.valid;
   ns1970 = sample.ns1970;
 
   value.clear();

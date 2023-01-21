@@ -20,7 +20,8 @@ using EnumMap = std::map<int64_t, std::string>;
 enum class ProtocolType : int {
   StandardCAN = 0,
   J1939 = 1,
-  NMEA2000 = 2
+  NMEA2000 = 2,
+  OBD2 = 3
 };
 
 enum class BusType : int {
