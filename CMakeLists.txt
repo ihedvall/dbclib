@@ -53,19 +53,30 @@ if (FLEX_FOUND)
 endif ()
 
 ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
+set(DBCL_HEADERS
+    include/dbc/attribute.h
+    include/dbc/network.h
+    include/dbc/envvar.h
+    include/dbc/node.h
+    include/dbc/message.h
+    include/dbc/signal.h
+    include/dbc/signalgroup.h
+    include/dbc/dbcfile.h
+)
 
 add_library(dbc STATIC
         ${BISON_DBC_PARSER_OUTPUTS}
         ${FLEX_DBC_SCANNER_OUTPUTS}
-        src/attribute.cpp include/dbc/attribute.h
-        src/network.cpp include/dbc/network.h
-        src/envvar.cpp include/dbc/envvar.h
-        src/node.cpp include/dbc/node.h
-        src/message.cpp include/dbc/message.h
-        src/signal.cpp include/dbc/signal.h
-        src/signalgroup.cpp include/dbc/signalgroup.h
+        ${DBCL_HEADERS}
+        src/attribute.cpp
+        src/network.cpp
+        src/envvar.cpp
+        src/node.cpp
+        src/message.cpp
+        src/signal.cpp
+        src/signalgroup.cpp
         src/dbcscanner.cpp src/dbcscanner.h
-        src/dbcfile.cpp include/dbc/dbcfile.h
+        src/dbcfile.cpp
         src/dbchelper.cpp src/dbchelper.h src/dbcmessage.cpp include/dbc/dbcmessage.h include/dbc/isampleobserver.h src/signalobserver.cpp include/dbc/signalobserver.h)
 
 target_include_directories(dbc PUBLIC
@@ -74,7 +85,7 @@ target_include_directories(dbc PUBLIC
         )
 target_include_directories(dbc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # target_include_directories(dbc PRIVATE ${Boost_INCLUDE_DIRS})
-target_include_directories(dbc PRIVATE ${FLEX_INCLUDE_DIRS})
+#target_include_directories(dbc PRIVATE ${FLEX_INCLUDE_DIRS})
 
 cmake_print_properties(TARGETS dbc PROPERTIES INCLUDE_DIRECTORIES)
 
@@ -82,11 +93,6 @@ if (MSVC)
     target_compile_definitions(dbc PRIVATE _WIN32_WINNT=0x0A00)
 endif ()
 
-# set(DBC_PUBLIC_HEADERS *** )
-
-# set_target_properties(dbc PROPERTIES PUBLIC_HEADER "${DBCL_PUBLIC_HEADERS}")
-# get_target_property(PH dbc PUBLIC_HEADER)
-# message(STATUS "DBC Target Includes: " "${PH}")
 if (DBC_TOOLS)
 #    add_subdirectory(listend)
 endif ()
@@ -116,15 +122,20 @@ endif ()
 #####  Packaging and installation  ###############################################
 ##################################################################################
 # install headers
-if (${CMAKE_MINOR_VERSION} GREATER_EQUAL 23)
-    install(TARGETS dbc
-                    FILE_SET HEADERS
-                    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-                    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-else()
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dbc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-endif()
+# FILE_SET makes problems with GTest
+#if (${CMAKE_MINOR_VERSION} GREATER_EQUAL 23)
+#    target_sources(dbc PUBLIC
+#                        FILE_SET HEADERS
+#                        TYPE HEADERS
+#                        BASE_DIRS include/dbc
+#                        FILES ${HEADERS})
+#else()
+    if (WIN32)
+        install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dbc DESTINATION dbc/include)
+    else()
+        install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dbc DESTINATION include)
+    endif()
+#endif()
 
 if (WIN32)
     install(TARGETS dbc
@@ -132,14 +143,17 @@ if (WIN32)
             LIBRARY DESTINATION dbc/lib
             ARCHIVE DESTINATION dbc/lib
             RUNTIME DESTINATION dbc/bin
-            PUBLIC_HEADER DESTINATION dbc/include)
+#            FILE_SET HEADERS DESTINATION dbc/include
+    )
 else()
     install(TARGETS dbc
             EXPORT dbcTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
             RUNTIME DESTINATION bin
-            PUBLIC_HEADER DESTINATION include/dbclib)
+#            PUBLIC_HEADER
+#            FILE_SET HEADERS DESTINATION include/dbc
+        )
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -172,7 +186,7 @@ install(EXPORT dbcTargets
   FILE
     dbcTargets.cmake
   NAMESPACE
-    Upstream::
+    Dbc::
   DESTINATION
     ${ConfigPackageLocation}
 )

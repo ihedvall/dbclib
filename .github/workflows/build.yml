@@ -132,7 +132,7 @@ jobs:
       # test if cmake finds the dbcLib automatically
       - name: TestInstall
         run: |
-          cd test/TestDBCLibCmake
+          cd test/TestdbclibCMake
           mkdir -p build
           cd build
           cmake -G Ninja ..
