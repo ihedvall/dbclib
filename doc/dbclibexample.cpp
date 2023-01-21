@@ -5,7 +5,7 @@
 int main() {
     dbc::DbcFile file;
 
-    file.Filename(DBC_FILE_PATH);
+    file.Filename(DBC_FILE_PATH); // File path to the dbc file
     const auto success = file.ParseFile();
 
     auto* network = file.GetNetwork();
