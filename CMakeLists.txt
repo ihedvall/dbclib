@@ -141,13 +141,12 @@ export(EXPORT dbcTargets
 )
 
 set(ConfigPackageLocation lib/cmake/dbc)
+set(CONFIG_CMAKE "${CMAKE_CURRENT_BINARY_DIR}/dbc/dbcConfig.cmake")
 # create final dbc *Config.make file
 # https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html
-# it creates also the install command to install this file so it is not needed
-# to install it manually
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dbcConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/dbc/dbcConfig.cmake"
+  ${CONFIG_CMAKE}
   INSTALL_DESTINATION ${ConfigPackageLocation}
 )
 
@@ -160,9 +159,12 @@ install(EXPORT dbcTargets
   DESTINATION
     ${ConfigPackageLocation}
 )
+
+# Install *Version.cmake and *Config.cmake
 install(
   FILES
     ${CONFIG_VERSION_FILE}
+    ${CONFIG_CMAKE}
   DESTINATION
     ${ConfigPackageLocation}
   COMPONENT
