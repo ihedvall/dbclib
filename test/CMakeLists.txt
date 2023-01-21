@@ -12,8 +12,7 @@ add_executable(test_dbc
         test_dbchelper.cpp)
 
 target_include_directories(test_dbc PRIVATE
-        ../include
-        ../src
+        ../src  # dbchelper.h
         ${GTEST_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS})
 target_include_directories(test_dbc PRIVATE ${FLEX_INCLUDE_DIRS})
