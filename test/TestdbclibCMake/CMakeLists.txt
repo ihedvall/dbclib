@@ -4,7 +4,7 @@ project(dbcLibExample
         DESCRIPTION "Test find_package dbclib"
         LANGUAGES CXX)
 
-find_package(dbclib REQUIRED)
+find_package(dbc REQUIRED)
 
 set(EXAMPLE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../docs)
 
