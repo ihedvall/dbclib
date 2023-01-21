@@ -4,6 +4,8 @@ project(dbcLibExample
         DESCRIPTION "Test find_package dbclib"
         LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+
 find_package(dbc REQUIRED)
 
 add_executable(TestdbcCMake ${CMAKE_CURRENT_SOURCE_DIR}/../../doc/dbclibexample.cpp)
