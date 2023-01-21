@@ -73,10 +73,9 @@ jobs:
         if: matrix.env.ninja_platform == 'linux'
         run: |
           sudo apt-get update 
-          sudo apt-get upgrade
           # flex-old contains FlexLexer.h which is needed by util
           # For some reason, flex does not contain this header
-          sudo apt-get install --yes git cmake libboost-all-dev expat zlib1g
+          sudo apt-get install --yes git cmake libboost-all-dev expat zlib1g libfl-dev
 
       - name: Setup MSVC environment
         if: matrix.env.ninja_platform == 'win'
