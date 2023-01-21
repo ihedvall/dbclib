@@ -109,6 +109,21 @@ if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") AND DBC_DOC)
 #            COMMENT "DBC Library generating API documentation with Doxygen")
 endif ()
 
+
+##################################################################################
+#####  Packaging and installation  ###############################################
+##################################################################################
+# install headers
+if (${CMAKE_MINOR_VERSION} GREATER_EQUAL 23)
+    install(TARGETS ${PROJECT_NAME}
+                    FILE_SET HEADERS
+                    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+else()
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dbc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+endif()
+
 if (WIN32)
     install(TARGETS dbc
             EXPORT dbcTargets
