@@ -81,7 +81,7 @@ TEST_F(TestRead, CheckMessage)  // NOLINT
                 << (message.IsExtended() ? "E" : "S")
                 << ", Name: " << message.Name()
                 << ", Bytes: " << message.NofBytes()
-                //<< ", Node: " << message.Node()
+                << ", Node: " << message.Node()
                 << ". Comment: " << message.Comment()
                 << std::endl;
     }
