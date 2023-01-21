@@ -17,7 +17,7 @@ int main() {
                 << (message.IsExtended() ? "E" : "S")
                 << ", Name: " << message.Name()
                 << ", Bytes: " << message.NofBytes()
-                //<< ", Node: " << message.Node()
+                << ", Node: " << message.NodeName()
                 << ". Comment: " << message.Comment()
                 << std::endl;
 
