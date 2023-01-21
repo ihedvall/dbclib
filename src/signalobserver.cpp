@@ -4,7 +4,6 @@
  */
 
 #include "dbc/signalobserver.h"
-#include <ranges>
 #include <algorithm>
 
 namespace dbc {

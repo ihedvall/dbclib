@@ -5,7 +5,6 @@
 
 #include "dbc/signal.h"
 #include "dbchelper.h"
-#include <ranges>
 #include <algorithm>
 
 namespace dbc {

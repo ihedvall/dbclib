@@ -53,7 +53,7 @@
     #undef yylex
     #define yylex scanner.ddlex
 
-#line 56 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 57 "D:/projects/dbclib/src/dbcparser.cpp"
 
 
 #ifndef YY_
@@ -127,7 +127,7 @@
 
 #line 5 "D:/projects/dbclib/src/dbcparser.y"
 namespace dbc {
-#line 130 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 131 "D:/projects/dbclib/src/dbcparser.cpp"
 
   /// Build a parser object.
   DbcParser::DbcParser (dbc::DbcScanner &scanner_yyarg)
@@ -880,17 +880,17 @@ namespace dbc {
           switch (yyn)
             {
   case 25: // version: TAG_VERSION STRING_VAL
-#line 133 "D:/projects/dbclib/src/dbcparser.y"
+#line 134 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 		network.Version(yystack_[0].value.as < std::string > ());
 		scanner.ResetTempList();
 	}
-#line 889 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 890 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 58: // envvar: TAG_EV ID_VAL TAG_COLON INT_VAL TAG_BOX_OPEN double_val TAG_SEP double_val TAG_BOX_CLOSE STRING_VAL double_val INT_VAL TAG_DUMMY_NODE_VECTOR comma_identifier_list TAG_SEMICOLON
-#line 192 "D:/projects/dbclib/src/dbcparser.y"
+#line 193 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         auto& env_var = network.GetEnvVar(yystack_[13].value.as < std::string > ());
@@ -905,38 +905,38 @@ namespace dbc {
         env_var.NodeList(list);
         scanner.ResetTempList();
     }
-#line 908 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 909 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 59: // envvar_data: TAG_ENVVAR_DATA ID_VAL TAG_COLON INT_VAL TAG_SEMICOLON
-#line 211 "D:/projects/dbclib/src/dbcparser.y"
+#line 212 "D:/projects/dbclib/src/dbcparser.y"
           {
 		/* To be defined what to do here */
 		scanner.ResetTempList();
 	  }
-#line 917 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 918 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 63: // attribute_value: INT_VAL
-#line 225 "D:/projects/dbclib/src/dbcparser.y"
+#line 226 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < std::string > () = std::to_string(yystack_[0].value.as < int64_t > ()); }
-#line 923 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 924 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 64: // attribute_value: STRING_VAL
-#line 226 "D:/projects/dbclib/src/dbcparser.y"
+#line 227 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 929 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 930 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 65: // attribute_value: DOUBLE_VAL
-#line 227 "D:/projects/dbclib/src/dbcparser.y"
+#line 228 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < std::string > () = std::to_string(yystack_[0].value.as < double > ()); }
-#line 935 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 936 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 66: // attribute: TAG_BA STRING_VAL attribute_value TAG_SEMICOLON
-#line 235 "D:/projects/dbclib/src/dbcparser.y"
+#line 236 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.CreateDefinition(yystack_[2].value.as < std::string > ());
@@ -944,11 +944,11 @@ namespace dbc {
 		attribute.Value(yystack_[1].value.as < std::string > ());
 		scanner.ResetTempList();
 	  }
-#line 947 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 948 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 67: // attribute: TAG_BA STRING_VAL TAG_BU ID_VAL attribute_value TAG_SEMICOLON
-#line 248 "D:/projects/dbclib/src/dbcparser.y"
+#line 249 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.CreateDefinition(yystack_[4].value.as < std::string > ());
@@ -959,11 +959,11 @@ namespace dbc {
 		}
 		scanner.ResetTempList();
 	  }
-#line 962 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 963 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 68: // attribute: TAG_BA STRING_VAL TAG_BO INT_VAL attribute_value TAG_SEMICOLON
-#line 264 "D:/projects/dbclib/src/dbcparser.y"
+#line 265 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.CreateDefinition(yystack_[4].value.as < std::string > ());
@@ -974,11 +974,11 @@ namespace dbc {
 		}
 		scanner.ResetTempList();
 	  }
-#line 977 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 978 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 69: // attribute: TAG_BA STRING_VAL TAG_SG INT_VAL ID_VAL attribute_value TAG_SEMICOLON
-#line 281 "D:/projects/dbclib/src/dbcparser.y"
+#line 282 "D:/projects/dbclib/src/dbcparser.y"
           {
 		 auto& network = scanner.GetNetwork();
 		 auto& definition = network.CreateDefinition(yystack_[5].value.as < std::string > ());
@@ -989,54 +989,54 @@ namespace dbc {
 	     }
 	     scanner.ResetTempList();
 	  }
-#line 992 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 993 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 70: // attribute_rel: TAG_BA_REL STRING_VAL TAG_BU_SG_REL ID_VAL TAG_SG INT_VAL ID_VAL attribute_value TAG_SEMICOLON
-#line 303 "D:/projects/dbclib/src/dbcparser.y"
+#line 304 "D:/projects/dbclib/src/dbcparser.y"
           {
 		/* To be defined */
 		scanner.ResetTempList();
 	  }
-#line 1001 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1002 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 71: // attribute_definition_default: attribute_definition_object_or_relation STRING_VAL double_val TAG_SEMICOLON
-#line 311 "D:/projects/dbclib/src/dbcparser.y"
+#line 312 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.CreateDefinition( yystack_[2].value.as < std::string > () );
 		definition.Value( yystack_[1].value.as < double > () );
 		scanner.ResetTempList();
 	  }
-#line 1012 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1013 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 72: // attribute_definition_default: attribute_definition_object_or_relation STRING_VAL STRING_VAL TAG_SEMICOLON
-#line 318 "D:/projects/dbclib/src/dbcparser.y"
+#line 319 "D:/projects/dbclib/src/dbcparser.y"
           {
 		auto& network = scanner.GetNetwork();
 		auto& definition = network.CreateDefinition( yystack_[2].value.as < std::string > () );
 		definition.Value( yystack_[1].value.as < std::string > () );
 		scanner.ResetTempList();
 	  }
-#line 1023 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1024 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 73: // attribute_definition_object_or_relation: TAG_BA_DEF_DEF
-#line 326 "D:/projects/dbclib/src/dbcparser.y"
+#line 327 "D:/projects/dbclib/src/dbcparser.y"
                       { yylhs.value.as < bool > () = false; }
-#line 1029 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1030 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 74: // attribute_definition_object_or_relation: TAG_BA_DEF_DEF_REL
-#line 327 "D:/projects/dbclib/src/dbcparser.y"
+#line 328 "D:/projects/dbclib/src/dbcparser.y"
                          { yylhs.value.as < bool > () = true; }
-#line 1035 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1036 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 75: // attribute_definition: attribute_object_type STRING_VAL TAG_INT INT_VAL INT_VAL TAG_SEMICOLON
-#line 332 "D:/projects/dbclib/src/dbcparser.y"
+#line 333 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.CreateDefinition( yystack_[4].value.as < std::string > () );
@@ -1046,11 +1046,11 @@ namespace dbc {
 		definition.Max(static_cast<double>( yystack_[1].value.as < int64_t > () ));
 		scanner.ResetTempList();
 	  }
-#line 1049 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1050 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 76: // attribute_definition: attribute_object_type STRING_VAL TAG_FLOAT double_val double_val TAG_SEMICOLON
-#line 342 "D:/projects/dbclib/src/dbcparser.y"
+#line 343 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.CreateDefinition( yystack_[4].value.as < std::string > () );
@@ -1060,11 +1060,11 @@ namespace dbc {
 		definition.Max( yystack_[1].value.as < double > () );
 		scanner.ResetTempList();
 	  }
-#line 1063 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1064 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 77: // attribute_definition: attribute_object_type STRING_VAL TAG_STRING TAG_SEMICOLON
-#line 352 "D:/projects/dbclib/src/dbcparser.y"
+#line 353 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.CreateDefinition( yystack_[2].value.as < std::string > () );
@@ -1072,11 +1072,11 @@ namespace dbc {
        	definition.ValueType( AttributeValueType::StringValue);
        	scanner.ResetTempList();
 	  }
-#line 1075 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1076 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 78: // attribute_definition: attribute_object_type STRING_VAL TAG_ENUM comma_string_list TAG_SEMICOLON
-#line 360 "D:/projects/dbclib/src/dbcparser.y"
+#line 361 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.CreateDefinition( yystack_[3].value.as < std::string > () );
@@ -1086,11 +1086,11 @@ namespace dbc {
         definition.EnumList(list);
 		scanner.ResetTempList();
 	  }
-#line 1089 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1090 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 79: // attribute_definition: attribute_object_type STRING_VAL TAG_HEX INT_VAL INT_VAL TAG_SEMICOLON
-#line 370 "D:/projects/dbclib/src/dbcparser.y"
+#line 371 "D:/projects/dbclib/src/dbcparser.y"
           {
 	    auto& network = scanner.GetNetwork();
        	auto& definition = network.CreateDefinition( yystack_[4].value.as < std::string > () );
@@ -1100,65 +1100,65 @@ namespace dbc {
 		definition.Max(static_cast<double>( yystack_[1].value.as < int64_t > () ));
 		scanner.ResetTempList();
 	  }
-#line 1103 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1104 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 80: // attribute_object_type: TAG_BA_DEF object_type
-#line 381 "D:/projects/dbclib/src/dbcparser.y"
+#line 382 "D:/projects/dbclib/src/dbcparser.y"
                            {yylhs.value.as < AttributeType > () = yystack_[1].value.as< AttributeType > ();}
-#line 1109 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1110 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 81: // attribute_object_type: TAG_BA_DEF_REL object_rel_type
-#line 382 "D:/projects/dbclib/src/dbcparser.y"
+#line 383 "D:/projects/dbclib/src/dbcparser.y"
                                      {yylhs.value.as < AttributeType > () = yystack_[1].value.as< AttributeType > ();}
-#line 1115 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1116 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 82: // object_type: %empty
-#line 385 "D:/projects/dbclib/src/dbcparser.y"
+#line 386 "D:/projects/dbclib/src/dbcparser.y"
            { yylhs.value.as < AttributeType > () = AttributeType::DbcNetwork; }
-#line 1121 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1122 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 83: // object_type: TAG_BU
-#line 386 "D:/projects/dbclib/src/dbcparser.y"
+#line 387 "D:/projects/dbclib/src/dbcparser.y"
                { yylhs.value.as < AttributeType > () = AttributeType::DbcNode; }
-#line 1127 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1128 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 84: // object_type: TAG_BO
-#line 387 "D:/projects/dbclib/src/dbcparser.y"
+#line 388 "D:/projects/dbclib/src/dbcparser.y"
                { yylhs.value.as < AttributeType > () = AttributeType::DbcMessage; }
-#line 1133 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1134 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 85: // object_type: TAG_SG
-#line 388 "D:/projects/dbclib/src/dbcparser.y"
+#line 389 "D:/projects/dbclib/src/dbcparser.y"
                { yylhs.value.as < AttributeType > () = AttributeType::DbcSignal; }
-#line 1139 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1140 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 86: // object_type: TAG_EV
-#line 389 "D:/projects/dbclib/src/dbcparser.y"
+#line 390 "D:/projects/dbclib/src/dbcparser.y"
                { yylhs.value.as < AttributeType > () = AttributeType::EnvironmentVariable; }
-#line 1145 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1146 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 87: // object_rel_type: TAG_BU_SG_REL
-#line 392 "D:/projects/dbclib/src/dbcparser.y"
+#line 393 "D:/projects/dbclib/src/dbcparser.y"
                   { yylhs.value.as < AttributeType > () = AttributeType::NodeSignalRelation; }
-#line 1151 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1152 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 88: // object_rel_type: TAG_BU_BO_REL
-#line 393 "D:/projects/dbclib/src/dbcparser.y"
+#line 394 "D:/projects/dbclib/src/dbcparser.y"
                     { yylhs.value.as < AttributeType > () = AttributeType::NodeMessageRelation; }
-#line 1157 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1158 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 89: // val: TAG_VAL INT_VAL ID_VAL val_map TAG_SEMICOLON
-#line 397 "D:/projects/dbclib/src/dbcparser.y"
+#line 398 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto* signal = network.GetSignal(static_cast<uint64_t>( yystack_[3].value.as < int64_t > () ), yystack_[2].value.as < std::string > ());
@@ -1168,11 +1168,11 @@ namespace dbc {
 	    }
 	    scanner.ResetTempList();
 	}
-#line 1171 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1172 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 90: // val: TAG_VAL ID_VAL val_map TAG_SEMICOLON
-#line 408 "D:/projects/dbclib/src/dbcparser.y"
+#line 409 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto& env_var = network.GetEnvVar( yystack_[2].value.as < std::string > () );
@@ -1180,19 +1180,19 @@ namespace dbc {
 	    env_var.EnumList(list);
 	    scanner.ResetTempList();
 	}
-#line 1183 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1184 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 93: // val_map_entry: INT_VAL STRING_VAL
-#line 423 "D:/projects/dbclib/src/dbcparser.y"
+#line 424 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    scanner.AddToEnumList(yystack_[1].value.as < int64_t > (), yystack_[0].value.as < std::string > () ); /* Temp storage on network */
 	}
-#line 1191 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1192 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 94: // sig_valtype: TAG_SIG_VALTYPE INT_VAL ID_VAL TAG_COLON INT_VAL TAG_SEMICOLON
-#line 438 "D:/projects/dbclib/src/dbcparser.y"
+#line 439 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& network = scanner.GetNetwork();
 	    auto* signal = network.GetSignal(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()), yystack_[3].value.as < std::string > ());
@@ -1212,21 +1212,21 @@ namespace dbc {
 	        }
 	    }
 	}
-#line 1215 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1216 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 100: // comment_network: TAG_CM STRING_VAL TAG_SEMICOLON
-#line 467 "D:/projects/dbclib/src/dbcparser.y"
+#line 468 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  network.Comment( yystack_[1].value.as < std::string > () );
 	  scanner.ResetTempList();
     }
-#line 1225 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1226 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 101: // comment_node: TAG_CM TAG_BU ID_VAL STRING_VAL TAG_SEMICOLON
-#line 475 "D:/projects/dbclib/src/dbcparser.y"
+#line 476 "D:/projects/dbclib/src/dbcparser.y"
     {
   	  auto& network = scanner.GetNetwork();
   	  auto* node = network.GetNode( yystack_[2].value.as < std::string > () );
@@ -1235,11 +1235,11 @@ namespace dbc {
   	  }
   	  scanner.ResetTempList();
     }
-#line 1238 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1239 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 102: // comment_message: TAG_CM TAG_BO INT_VAL STRING_VAL TAG_SEMICOLON
-#line 486 "D:/projects/dbclib/src/dbcparser.y"
+#line 487 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto* message = network.GetMessage( static_cast<uint64_t>(yystack_[2].value.as < int64_t > ()));
@@ -1248,11 +1248,11 @@ namespace dbc {
 	  }
 	  scanner.ResetTempList();
     }
-#line 1251 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1252 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 103: // comment_signal: TAG_CM TAG_SG INT_VAL ID_VAL STRING_VAL TAG_SEMICOLON
-#line 497 "D:/projects/dbclib/src/dbcparser.y"
+#line 498 "D:/projects/dbclib/src/dbcparser.y"
     {
  	  auto& network = scanner.GetNetwork();
  	  auto* signal = network.GetSignal( static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()), yystack_[2].value.as < std::string > ());
@@ -1261,22 +1261,22 @@ namespace dbc {
  	  }
  	  scanner.ResetTempList();
     }
-#line 1264 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1265 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 104: // comment_env_var: TAG_CM TAG_EV ID_VAL STRING_VAL TAG_SEMICOLON
-#line 508 "D:/projects/dbclib/src/dbcparser.y"
+#line 509 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto& env_var = network.GetEnvVar(yystack_[2].value.as < std::string > ());
 	  env_var.Comment(yystack_[1].value.as < std::string > ());
 	  scanner.ResetTempList();
     }
-#line 1275 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1276 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 106: // message: TAG_BO INT_VAL ID_VAL TAG_COLON INT_VAL ID_VAL
-#line 520 "D:/projects/dbclib/src/dbcparser.y"
+#line 521 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  auto& network = scanner.GetNetwork();
 	  auto& message = network.CreateMessage(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()));
@@ -1285,11 +1285,11 @@ namespace dbc {
 	  message.Node(yystack_[0].value.as < std::string > ());
 	  scanner.ResetTempList();
     }
-#line 1288 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1289 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 109: // signal: TAG_SG ID_VAL mux_info TAG_COLON INT_VAL TAG_SEP INT_VAL TAG_AT little_endian signedness TAG_PAR_OPEN double_val TAG_COMMA double_val TAG_PAR_CLOSE TAG_BOX_OPEN double_val TAG_SEP double_val TAG_BOX_CLOSE STRING_VAL comma_identifier_list
-#line 557 "D:/projects/dbclib/src/dbcparser.y"
+#line 558 "D:/projects/dbclib/src/dbcparser.y"
         {
 		auto& network = scanner.GetNetwork();
 		auto* message = network.LastMessage();
@@ -1326,111 +1326,111 @@ namespace dbc {
 		}
 		scanner.ResetTempList();
 	}
-#line 1329 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1330 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 110: // mux_info: %empty
-#line 598 "D:/projects/dbclib/src/dbcparser.y"
+#line 599 "D:/projects/dbclib/src/dbcparser.y"
     {
 	  yylhs.value.as < std::string > () = "";
     }
-#line 1337 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1338 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 111: // mux_info: ID_VAL
-#line 602 "D:/projects/dbclib/src/dbcparser.y"
+#line 603 "D:/projects/dbclib/src/dbcparser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
-#line 1345 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1346 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 114: // space_identifier_list: space_identifier_list ID_VAL
-#line 611 "D:/projects/dbclib/src/dbcparser.y"
+#line 612 "D:/projects/dbclib/src/dbcparser.y"
          {
 		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
 	 }
-#line 1353 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1354 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 116: // comma_identifier_list: ID_VAL
-#line 618 "D:/projects/dbclib/src/dbcparser.y"
+#line 619 "D:/projects/dbclib/src/dbcparser.y"
     {
 		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1361 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1362 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 117: // comma_identifier_list: comma_identifier_list TAG_COMMA ID_VAL
-#line 622 "D:/projects/dbclib/src/dbcparser.y"
+#line 623 "D:/projects/dbclib/src/dbcparser.y"
     {
 		scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1369 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1370 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 118: // comma_string_list: STRING_VAL
-#line 628 "D:/projects/dbclib/src/dbcparser.y"
+#line 629 "D:/projects/dbclib/src/dbcparser.y"
     {
         scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1377 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1378 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 119: // comma_string_list: comma_string_list TAG_COMMA STRING_VAL
-#line 632 "D:/projects/dbclib/src/dbcparser.y"
+#line 633 "D:/projects/dbclib/src/dbcparser.y"
         {
     	scanner.AddToStringList( yystack_[0].value.as < std::string > () );
     }
-#line 1385 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1386 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 120: // double_val: DOUBLE_VAL
-#line 640 "D:/projects/dbclib/src/dbcparser.y"
+#line 641 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1391 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1392 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 121: // double_val: TAG_NAN
-#line 641 "D:/projects/dbclib/src/dbcparser.y"
+#line 642 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < double > () = std::numeric_limits<double>::quiet_NaN(); }
-#line 1397 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1398 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 122: // double_val: INT_VAL
-#line 642 "D:/projects/dbclib/src/dbcparser.y"
+#line 643 "D:/projects/dbclib/src/dbcparser.y"
                  { yylhs.value.as < double > () = static_cast<double>(yystack_[0].value.as < int64_t > ()); }
-#line 1403 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1404 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 123: // little_endian: INT_VAL
-#line 645 "D:/projects/dbclib/src/dbcparser.y"
+#line 646 "D:/projects/dbclib/src/dbcparser.y"
                        { yylhs.value.as < bool > () = yystack_[0].value.as < int64_t > () == 1; }
-#line 1409 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1410 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 124: // signedness: TAG_PLUS
-#line 648 "D:/projects/dbclib/src/dbcparser.y"
+#line 649 "D:/projects/dbclib/src/dbcparser.y"
                { yylhs.value.as < SignalDataType > () = SignalDataType::UnsignedData; }
-#line 1415 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1416 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 125: // signedness: TAG_MINUS
-#line 649 "D:/projects/dbclib/src/dbcparser.y"
+#line 650 "D:/projects/dbclib/src/dbcparser.y"
                 { yylhs.value.as < SignalDataType > () = SignalDataType::SignedData; }
-#line 1421 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1422 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 127: // space_node_list: space_node_list ID_VAL
-#line 657 "D:/projects/dbclib/src/dbcparser.y"
+#line 658 "D:/projects/dbclib/src/dbcparser.y"
 {
 	scanner.AddToStringList( yystack_[0].value.as < std::string > () );
 }
-#line 1429 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1430 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 128: // node: TAG_BU TAG_COLON space_node_list
-#line 663 "D:/projects/dbclib/src/dbcparser.y"
+#line 664 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         const auto& list = scanner.StringList();
@@ -1442,22 +1442,22 @@ namespace dbc {
        }
        scanner.ResetTempList();
     }
-#line 1445 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1446 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 129: // valtable: TAG_VAL_TABLE ID_VAL val_map TAG_SEMICOLON
-#line 679 "D:/projects/dbclib/src/dbcparser.y"
+#line 680 "D:/projects/dbclib/src/dbcparser.y"
         {
 	    auto& list = scanner.EnumList();
 		auto& network = scanner.GetNetwork();
 		network.AddValueTable(yystack_[2].value.as < std::string > (), list );
 		scanner.ResetTempList();
 	}
-#line 1456 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1457 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 132: // signal_group: TAG_SIG_GROUP INT_VAL ID_VAL INT_VAL TAG_COLON signal_name_list TAG_SEMICOLON
-#line 694 "D:/projects/dbclib/src/dbcparser.y"
+#line 695 "D:/projects/dbclib/src/dbcparser.y"
   {
     auto& network = scanner.GetNetwork();
     SignalGroup temp;
@@ -1469,11 +1469,11 @@ namespace dbc {
     network.AddSignalGroup(temp);
     scanner.ResetTempList();
   }
-#line 1472 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1473 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 133: // extended_mux: TAG_SG_MUL_VAL INT_VAL ID_VAL ID_VAL value_range_list TAG_SEMICOLON
-#line 713 "D:/projects/dbclib/src/dbcparser.y"
+#line 714 "D:/projects/dbclib/src/dbcparser.y"
     {
         auto& network = scanner.GetNetwork();
         auto* signal = network.GetSignal(static_cast<uint64_t>(yystack_[4].value.as < int64_t > ()), yystack_[3].value.as < std::string > ());
@@ -1485,21 +1485,21 @@ namespace dbc {
         }
         scanner.ResetTempList();
     }
-#line 1488 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1489 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 136: // value_range: INT_VAL INT_VAL
-#line 732 "D:/projects/dbclib/src/dbcparser.y"
+#line 733 "D:/projects/dbclib/src/dbcparser.y"
     {
         const auto low = static_cast<size_t>(yystack_[1].value.as < int64_t > ());
         const auto high = static_cast<size_t>(-yystack_[0].value.as < int64_t > ()); /* Solves the integer problem) */
         scanner.AddToRangeList(low, high);
     }
-#line 1498 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1499 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
   case 137: // message_transmitters: TAG_BO_TX_BU INT_VAL TAG_COLON comma_identifier_list TAG_SEMICOLON
-#line 740 "D:/projects/dbclib/src/dbcparser.y"
+#line 741 "D:/projects/dbclib/src/dbcparser.y"
         {
 		auto& network = scanner.GetNetwork();
 		auto* message = network.GetMessage(static_cast<uint64_t>(yystack_[3].value.as < int64_t > ()));
@@ -1511,11 +1511,11 @@ namespace dbc {
 		}
 		scanner.ResetTempList();
 	}
-#line 1514 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1515 "D:/projects/dbclib/src/dbcparser.cpp"
     break;
 
 
-#line 1518 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 1519 "D:/projects/dbclib/src/dbcparser.cpp"
 
             default:
               break;
@@ -1972,20 +1972,20 @@ namespace dbc {
   const short
   DbcParser::yyrline_[] =
   {
-       0,   104,   104,   106,   107,   110,   111,   112,   113,   114,
-     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
-     125,   126,   127,   128,   129,   132,   140,   142,   143,   145,
-     146,   147,   148,   149,   150,   151,   152,   153,   154,   155,
-     156,   157,   158,   159,   160,   161,   162,   163,   164,   165,
-     166,   167,   168,   169,   170,   171,   172,   173,   177,   208,
-     217,   220,   221,   225,   226,   227,   231,   242,   258,   274,
-     294,   310,   317,   326,   327,   331,   341,   351,   359,   369,
-     381,   382,   385,   386,   387,   388,   389,   392,   393,   396,
-     407,   417,   418,   422,   437,   459,   460,   461,   462,   463,
-     466,   474,   485,   496,   507,   516,   519,   530,   531,   535,
-     597,   601,   606,   609,   610,   616,   617,   621,   627,   631,
-     640,   641,   642,   645,   648,   649,   655,   656,   662,   678,
-     688,   689,   693,   707,   726,   727,   730,   738
+       0,   105,   105,   107,   108,   111,   112,   113,   114,   115,
+     116,   117,   118,   119,   120,   121,   122,   123,   124,   125,
+     126,   127,   128,   129,   130,   133,   141,   143,   144,   146,
+     147,   148,   149,   150,   151,   152,   153,   154,   155,   156,
+     157,   158,   159,   160,   161,   162,   163,   164,   165,   166,
+     167,   168,   169,   170,   171,   172,   173,   174,   178,   209,
+     218,   221,   222,   226,   227,   228,   232,   243,   259,   275,
+     295,   311,   318,   327,   328,   332,   342,   352,   360,   370,
+     382,   383,   386,   387,   388,   389,   390,   393,   394,   397,
+     408,   418,   419,   423,   438,   460,   461,   462,   463,   464,
+     467,   475,   486,   497,   508,   517,   520,   531,   532,   536,
+     598,   602,   607,   610,   611,   617,   618,   622,   628,   632,
+     641,   642,   643,   646,   649,   650,   656,   657,   663,   679,
+     689,   690,   694,   708,   727,   728,   731,   739
   };
 
   void
@@ -2070,9 +2070,9 @@ namespace dbc {
 
 #line 5 "D:/projects/dbclib/src/dbcparser.y"
 } // dbc
-#line 2073 "D:/projects/dbclib/src/dbcparser.cpp"
+#line 2074 "D:/projects/dbclib/src/dbcparser.cpp"
 
-#line 752 "D:/projects/dbclib/src/dbcparser.y"
+#line 753 "D:/projects/dbclib/src/dbcparser.y"
 
 
 
