@@ -6,7 +6,7 @@ int main() {
     dbc::DbcFile file;
 
     file.Filename(DBC_FILE_PATH); // File path to the dbc file
-    const auto success = file.ParseFile();
+    bool success = file.ParseFile();
 
     auto* network = file.GetNetwork();
     const auto& message_list = network->Messages();
@@ -49,7 +49,7 @@ int main() {
               std::cout << signal.Receivers().at(i) << ",";
           }
           if (!signal.Receivers().empty())
-            std::cout << signal.Receivers().at(signal.Receivers().size() - 1) << "\n";
+            std::cout << signal.Receivers().at(signal.Receivers().size() - 1) << std::endl;
       }
     }
 
@@ -57,10 +57,18 @@ int main() {
     // Parsing a message
     // ##################################################################################
 
-    std::vector<uint8_t> data{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
-    const dbc::Message* message = network->GetMessage(234);
+    dbc::DbcMessage msg(0, 234, {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8});
+    success = file.ParseMessage(msg);
+    dbc::Message* message = network->GetMessage(234);
     if (message) {
-        //message.ParseMessage()
+        for (const auto& signalPair: message->Signals()) {
+            double value;
+            const dbc::Signal& signal = signalPair.second;
+            signalPair.second.EngValue(value);
+
+            std::cout << "Signal: " << signal.Name()
+                      << ", Value: " << value << std::endl;
+        }
     }
 
 }
