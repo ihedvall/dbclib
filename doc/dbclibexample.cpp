@@ -67,7 +67,8 @@ int main() {
             signalPair.second.EngValue(value);
 
             std::cout << "Signal: " << signal.Name()
-                      << ", Value: " << value << std::endl;
+                      << ", Value: " << value << " " << signal.Unit()
+                      << std::endl;
         }
     }
 
