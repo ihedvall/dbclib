@@ -10,6 +10,7 @@ option(CMAKE_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
 option(DBC_TOOLS "Building applications" ON)
 option(DBC_TEST "Building unit test" ON)
+option(DBC_YACC "Building Flex and Bison dependent files" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_DEBUG_POSTFIX d)
@@ -31,7 +32,7 @@ endif()
 include(script/flex.cmake)
 include(script/bison.cmake)
 
-if (BISON_FOUND)
+if (DBC_YACC AND BISON_FOUND)
     BISON_TARGET(DBC_PARSER src/dbcparser.y ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcparser.cpp
             COMPILE_FLAGS "")
     cmake_print_variables(BISON_DBC_PARSER_DEFINED
@@ -43,7 +44,7 @@ if (BISON_FOUND)
             BISON_INCLUDE_DIRS)
 endif ()
 
-if (FLEX_FOUND)
+if (DBC_YACC AND FLEX_FOUND)
     FLEX_TARGET(DBC_SCANNER src/dbcflexer.l ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcflexer.cpp)
     cmake_print_variables(FLEX_DBC_SCANNER_DEFINED
             FLEX_DBC_SCANNER_OUTPUTS
@@ -52,7 +53,10 @@ if (FLEX_FOUND)
             FLEX_INCLUDE_DIRS)
 endif ()
 
-ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
+if (DBC_YACC AND FLEX_FOUND AND BISON_FOUND)
+    ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
+endif()
+
 set(DBCL_HEADERS
     include/dbc/attribute.h
     include/dbc/network.h
@@ -65,8 +69,8 @@ set(DBCL_HEADERS
 )
 
 add_library(dbc STATIC
-        ${BISON_DBC_PARSER_OUTPUTS}
-        ${FLEX_DBC_SCANNER_OUTPUTS}
+        src/dbcparser.cpp src/dbcparser.hpp
+        src/dbcflexer.cpp
         ${DBCL_HEADERS}
         src/attribute.cpp
         src/network.cpp
@@ -77,12 +81,15 @@ add_library(dbc STATIC
         src/signalgroup.cpp
         src/dbcscanner.cpp src/dbcscanner.h
         src/dbcfile.cpp
-        src/dbchelper.cpp src/dbchelper.h src/dbcmessage.cpp include/dbc/dbcmessage.h include/dbc/isampleobserver.h src/signalobserver.cpp include/dbc/signalobserver.h)
+        src/dbchelper.cpp src/dbchelper.h
+        src/dbcmessage.cpp include/dbc/dbcmessage.h
+        include/dbc/isampleobserver.h
+        src/signalobserver.cpp include/dbc/signalobserver.h)
 
 target_include_directories(dbc PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        )
+        ${FLEX_INCLUDE_DIRS} )
 target_include_directories(dbc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # target_include_directories(dbc PRIVATE ${Boost_INCLUDE_DIRS})
 #target_include_directories(dbc PRIVATE ${FLEX_INCLUDE_DIRS})
