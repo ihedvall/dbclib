@@ -59,13 +59,16 @@ endif()
 
 set(DBCL_HEADERS
     include/dbc/attribute.h
-    include/dbc/network.h
+    include/dbc/dbcfile.h
+    include/dbc/dbcmessage.h
     include/dbc/envvar.h
-    include/dbc/node.h
+    include/dbc/isampleobserver.h
     include/dbc/message.h
+    include/dbc/network.h
+    include/dbc/node.h
     include/dbc/signal.h
     include/dbc/signalgroup.h
-    include/dbc/dbcfile.h
+    include/dbc/signalobserver.h
 )
 
 add_library(dbc STATIC
@@ -91,8 +94,6 @@ target_include_directories(dbc PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         ${FLEX_INCLUDE_DIRS} )
 target_include_directories(dbc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-# target_include_directories(dbc PRIVATE ${Boost_INCLUDE_DIRS})
-#target_include_directories(dbc PRIVATE ${FLEX_INCLUDE_DIRS})
 
 cmake_print_properties(TARGETS dbc PROPERTIES INCLUDE_DIRECTORIES)
 
@@ -119,9 +120,9 @@ if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") AND DBC_DOC)
     set(DOXYGEN_PROJECT_NAME "DbcLib")
     set(DOXYGEN_HTML_EXTRA_STYLESHEET doxygen/dbclib.css)
     set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs/manual)
-#    doxygen_add_docs(doc_libdbc ALL
-#            include/dbc doxygen
-#            COMMENT "DBC Library generating API documentation with Doxygen")
+    doxygen_add_docs(doc_libdbc ALL
+            include/dbc doxygen
+            COMMENT "DBC Library generating API documentation with Doxygen")
 endif ()
 
 

@@ -45,8 +45,8 @@ bool DbcViewer::OnInit() {
   std::locale::global(gen(""));
 
     // Setup system basic configuration
-  SetVendorDisplayName("Measurement Data Reporting Server");
-  SetVendorName("ReportServer");
+  SetVendorDisplayName("DbcLib");
+  SetVendorName("DbcLib");
   SetAppName("DbcViewer");
   SetAppDisplayName("DBC File Viewer");
 
@@ -54,8 +54,8 @@ bool DbcViewer::OnInit() {
   // The log file will be in %TEMP%/report_server/mdf_viewer.log
   auto& log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
-  log_config.SubDir("report_server");
-  log_config.BaseName("dbc_viewer");
+  log_config.SubDir("dbclib/log");
+  log_config.BaseName("dbcviewer");
   log_config.CreateDefaultLogger();
   LOG_INFO() << "Log File created. Path: " << log_config.GetLogFile();
 
@@ -126,7 +126,7 @@ int DbcViewer::OnExit() {
   return wxApp::OnExit();
 }
 
-void DbcViewer::OnOpenLogFile(wxCommandEvent& event) {
+void DbcViewer::OnOpenLogFile(wxCommandEvent& ) {
   auto& log_config = LogConfig::Instance();
   std::string logfile = log_config.GetLogFile();
   OpenFile(logfile);
