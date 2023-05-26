@@ -1,0 +1,8 @@
+<map id="include/dbc/isampleobserver.h" name="include/dbc/isampleobserver.h">
+<area shape="rect" id="node1" title="Internal object that define an observer interface that handle samples." alt="" coords="167,5,363,31"/>
+<area shape="rect" id="node2" href="$signal_8h.html" title="Interface against a DBC signal configuration." alt="" coords="143,79,280,104"/>
+<area shape="rect" id="node6" href="$signalobserver_8h.html" title="The sample observer holds sample values for a signal." alt="" coords="237,152,423,177"/>
+<area shape="rect" id="node3" href="$message_8h.html" title="DBC message configuration object." alt="" coords="5,152,161,177"/>
+<area shape="rect" id="node4" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="67,225,215,251"/>
+<area shape="rect" id="node5" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="71,299,211,324"/>
+</map>

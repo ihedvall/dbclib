@@ -1,13 +1,13 @@
 /*
- * Copyright 2022 Ingemar Hedvall
+ * Copyright 2023 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
 
-/** \brief Main namespace for the MDF library.
+/** \brief Main namespace for the DBC library.
  *
- * Main namespace for all MDF library classes and functions.
+ * Main namespace for the DBC C++ library classes and functions.
  */
-namespace mdf {
+namespace dbc {
 }
 
 

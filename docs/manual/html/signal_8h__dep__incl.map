@@ -1,0 +1,7 @@
+<map id="include/dbc/signal.h" name="include/dbc/signal.h">
+<area shape="rect" id="node1" title="Interface against a DBC signal configuration." alt="" coords="131,5,268,31"/>
+<area shape="rect" id="node2" href="$message_8h.html" title="DBC message configuration object." alt="" coords="5,79,161,104"/>
+<area shape="rect" id="node3" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="67,152,215,177"/>
+<area shape="rect" id="node5" href="$signalobserver_8h.html" title="The sample observer holds sample values for a signal." alt="" coords="237,79,423,104"/>
+<area shape="rect" id="node4" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="71,225,211,251"/>
+</map>

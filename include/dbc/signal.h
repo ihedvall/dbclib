@@ -2,7 +2,9 @@
 * Copyright 2022 Ingemar Hedvall
 * SPDX-License-Identifier: MIT
  */
-
+/** \file signal.h
+ * \brief Interface against a DBC signal configuration.
+ */
 #pragma once
 #include <cstdint>
 #include <string>
@@ -12,13 +14,14 @@
 #include "dbc/isampleobserver.h"
 
 namespace dbc {
-
+/** \brief Support function that holds the channel value for a signal. */
 struct SignalValue {
-  bool valid = false;
-  int64_t signed_value = 0;
-  uint64_t unsigned_value = 0;
-  double float_value = 0;
-  std::vector<uint8_t> array_value;
+  bool valid = false; ///< True if the value is valid.
+  int64_t signed_value = 0; ///< Integer value.
+  uint64_t unsigned_value = 0; ///< Unsigned value.
+  double float_value = 0; ///< Float value.
+  std::vector<uint8_t> array_value; ///< Array or string value.
+  /** \brief Resets the value. */
   void Clear() {
     valid = false;
     signed_value = 0;
@@ -28,144 +31,200 @@ struct SignalValue {
   }
 };
 
+/** \brief Signal data type. */
 enum class SignalDataType : int {
-  SignedData,
-  UnsignedData,
-  FloatData,
-  DoubleData
+  SignedData, ///< Signed integer.
+  UnsignedData, ///< Unsigned integer.
+  FloatData, ///< Float value.
+  DoubleData ///< Double value
 };
 
+/** \brief Multiplexer type.
+ *
+ * A signal may be multiplexed i.e. have different value depending on
+ * another multiplexor signal.Then someone invented the extended multiplexed
+ * value which makes every thing confusing.
+ */
 enum class MuxType : int {
-  NotMultiplexed,
-  Multiplexor,
-  Multiplexed,
-  ExtendedMultiplexor
+  NotMultiplexed, ///< Normal signal
+  Multiplexor, ///< Multiplexor signal.
+  Multiplexed, ///< Multiplexed signal.
+  ExtendedMultiplexor ///< Extended multiplexor signal.
 };
 
+/** \brief Min and Max range definition. */
 using RangePair = std::pair<size_t, size_t>;
+
+/** \brief Support function for the extended multiplexor functionality. */
 struct ExtendedMux {
-  std::string multiplexor;
-  std::vector<RangePair> range_list;
-  [[nodiscard]] bool InRange(size_t value) const;
+  std::string multiplexor; ///< Signal name of the multiplexor.
+  std::vector<RangePair> range_list; ///< Active range for the multiplexor.
+  [[nodiscard]] bool InRange(size_t value) const; ///< True if value is active.
 };
 
+/** \brief Interface against a DBC signal configuration.
+ *
+ */
 class Signal {
  public:
-  virtual ~Signal();
+  virtual ~Signal(); ///< Destructor
+
+  /** \brief Sets the signal name. */
   void Name(const std::string& name) { name_ = name; }
+  /** \brief Returns the signal name. */
   [[nodiscard]] const std::string& Name() const { return name_; }
 
+  /** \brief Sets the unit of measure. */
   void Unit(const std::string& unit) { unit_ = unit; }
+  /** \brief Returns the unit of measure. */
   [[nodiscard]] const std::string& Unit() const { return unit_; }
 
+  /** \brief Sets the descriptive text. */
   void Comment(const std::string& comment) { comment_ = comment; }
+  /** \brief Returns the descriptive text. */
   [[nodiscard]] const std::string& Comment() const { return comment_; }
 
+  /** \brief Sets the data type. */
   void DataType(SignalDataType type) { data_type_ = type; }
+  /** \brief Returns the data type. */
   [[nodiscard]] SignalDataType DataType() const { return data_type_; }
+  /** \brief Returns the data type as text. */
   [[nodiscard]] std::string DataTypeAsString() const;
 
+  /** \brief Sets the multiplexer type. */
   void Mux(MuxType type) { mux_type_ = type; }
+  /** \brief Returns the multiplexer type. */
   [[nodiscard]] MuxType Mux() const { return mux_type_; }
+  /** \brief Returns the multiplexer type as text. */
   [[nodiscard]] std::string MuxAsString() const;
-
+  /** \brief Sets the multiplexor value. */
   void MuxValue(int value) { mux_value_ = value; }
+  /** \brief Returns the multiplexor value. */
   [[nodiscard]] int MuxValue() const { return mux_value_; }
 
+  /** \brief Sets the start bit. */
   void BitStart(size_t start) { bit_start_ = start; }
+  /** \brief Returns the start bit. */
   [[nodiscard]] size_t BitStart() const { return bit_start_; }
 
+  /** \brief Sets the bit length. */
   void BitLength(size_t length) { bit_length_ = length; }
+  /** \brief Returns the bit length. */
   [[nodiscard]] size_t BitLength() const { return bit_length_; }
 
+  /** \brief Set true if little endian byte order. */
   void LittleEndian(bool endian) { little_endian_ = endian; }
+  /** \brief Return true if little endian byte order. */
   [[nodiscard]] bool LittleEndian() const { return little_endian_; }
 
-  void Scale(double scale) { scale_ = scale; }
-  [[nodiscard]] double Scale() const { return scale_; }
+  void Scale(double scale) { scale_ = scale; } ///< Sets the scaling constant.
+  [[nodiscard]] double Scale() const { return scale_; } ///< Scaling constant.
 
-  void Offset(double offset) { offset_ = offset; }
-  [[nodiscard]] double Offset() const { return offset_; }
+  void Offset(double offset) { offset_ = offset; } ///< Sets the offset
+  [[nodiscard]] double Offset() const { return offset_; } ///< Return offset.
 
-  void Min(double min) { min_ = min; }
-  [[nodiscard]] double Min() const { return min_; }
+  void Min(double min) { min_ = min; } ///< Sets min range.
+  [[nodiscard]] double Min() const { return min_; } ///< Min range.
 
-  void Max(double max) { max_ = max; }
-  [[nodiscard]] double Max() const { return max_; }
+  void Max(double max) { max_ = max; } ///< Sets the max range.
+  [[nodiscard]] double Max() const { return max_; } ///< Max range.
 
+  /** \brief Sets the enumeration. */
   void EnumList(const std::map<int64_t, std::string>& enum_list);
+  /** \brief Returns the enumeration. */
   [[nodiscard]] const std::map<int64_t, std::string>& EnumList() const;
 
+  /** \brief Sets the receiver list. */
   void Receivers(const std::vector<std::string>& receiver_list);
+  /** \brief Return the receiver list. */
   [[nodiscard]] const std::vector<std::string>& Receivers() const;
 
+  /** \brief Returns the attribute list. */
   [[nodiscard]] const std::vector<Attribute>& Attributes() const {
     return attribute_list_;
   }
 
+  /** \brief Sets the signals message ID. */
   void MessageId(uint64_t message_id) { message_id_ = message_id;}
+  /** \brief Returns the message ID that the signal belongs to. */
   [[nodiscard]] uint64_t MessageId() const { return message_id_; }
 
-  [[nodiscard]] bool IsMultiplexed() const;
-
+  [[nodiscard]] bool IsMultiplexed() const; ///< True if multiplexed signal.
+  /** \brief Creates an attribute. */
   [[nodiscard]] Attribute& CreateAttribute(const Attribute& definition);
+  /** \brief Creates an extended multiplexor struct. */
   [[nodiscard]] ExtendedMux& GetExtendedMux();
+
+  /** \brief Returns the enumerate text for an index. */
   [[nodiscard]] std::string GetEnumString(int64_t index) const;
 
+  /** \brief Parse out the signal value from a message data buffer. */
   void ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970,
                     uint32_t can_id);
+  /** \brief Resets the sample counter. */
   void ResetSampleCounter() const {sample_counter_ = 0;}
+  /** \brief Steps the sample counter. */
   void StepSampleCounter() const {++sample_counter_;}
+  /** \brief Returns the sample counter. */
   size_t SampleCounter() const {return sample_counter_;}
 
+  /** \brief Sets the sample time. */
   void SampleTime(uint64_t ns1970) {sample_time_ = ns1970;}
+  /** \brief Returns the sample time. */
   [[nodiscard]] uint64_t SampleTime() const {return sample_time_;}
 
+  /** \brief Sets the CAN ID for the sample. */
   void SampleCanId(uint32_t can_id) {sample_can_id_ = can_id;}
+  /** \brief Returns the CAN ID for latest sample. */
   [[nodiscard]] uint64_t SampleCanId() const {return sample_can_id_;}
-  void Valid(bool valid) {valid_ = valid;}
-  [[nodiscard]] bool Valid() const {return valid_;}
 
+  void Valid(bool valid) {valid_ = valid;} ///< Set to true if valid value.
+  [[nodiscard]] bool Valid() const {return valid_;} ///< Trie if value is valid.
+
+  /** \brief Returns the channel value. */
   template <typename T>
   bool ChannelValue( T& value ) const;
 
+  /** \brief Returns the scaled engineering value. */
   template <typename T>
   bool EngValue( T& value ) const;
 
+  /** \brief Attach a sample observer. */
   void AttachObserver(ISampleObserver* observer) const;
+  /** \brief Detach a sample observer. */
   void DetachObserver(const ISampleObserver* observer) const;
  private:
-  std::string name_;
-  std::string comment_;
-  std::string unit_;
+  std::string name_; ///< Signal nsame.
+  std::string comment_; ///< Signal description.
+  std::string unit_; ///< Signal unit.
 
-  std::vector<std::string> receiver_list_;
+  std::vector<std::string> receiver_list_; ///< Receiver list.
 
-  MuxType mux_type_ = MuxType::NotMultiplexed;
-  int mux_value_ = 0;
-  size_t bit_start_ = 0;
-  size_t bit_length_ = 0;
-  bool little_endian_ = true;
-  SignalDataType data_type_ = SignalDataType::SignedData;
-  double scale_ = 1.0;
-  double offset_ = 0.0;
-  double min_ = 0.0;
-  double max_ = 0.0;
-  ExtendedMux extended_mux_;
+  MuxType mux_type_ = MuxType::NotMultiplexed; ///< Multiplexer type.
+  int mux_value_ = 0; ///< Temporary storage of mux value.
+  size_t bit_start_ = 0; ///< Bit start.
+  size_t bit_length_ = 0; ///< Bit length.
+  bool little_endian_ = true; ///< Byte order. True if little endian.
+  SignalDataType data_type_ = SignalDataType::SignedData; ///< Data type.
+  double scale_ = 1.0; ///< Scale
+  double offset_ = 0.0; ///< Offset
+  double min_ = 0.0; ///< Min range
+  double max_ = 0.0; ///< Max range.
+  ExtendedMux extended_mux_; ///< Extended mux support struct.
 
-  std::vector<Attribute> attribute_list_;
-  std::map<int64_t, std::string> enum_list_;
+  std::vector<Attribute> attribute_list_; ///< Attribute list.
+  std::map<int64_t, std::string> enum_list_; ///< Enumeration list.
 
   SignalValue channel_value_; ///< Unscaled value (last reported value)
 
-  uint64_t message_id_ = 0;
-  mutable size_t sample_counter_ = 0;
-  bool valid_ = true;
+  uint64_t message_id_ = 0; ///< Message ID of last message.
+  mutable size_t sample_counter_ = 0; ///< Number of samples received.
+  bool valid_ = true; ///< Trie if valid.
   uint64_t sample_time_ = 0;    ///< Last sample time
   uint32_t sample_can_id_ = 0;  ///< Last Can ID
 
-  mutable std::vector<ISampleObserver*> observer_list_;
-  void FireOnSample();
+  mutable std::vector<ISampleObserver*> observer_list_; ///< Observer list.
+  void FireOnSample(); ///< Fire OnSample event.
 
 };
 
@@ -221,11 +280,14 @@ bool Signal::ChannelValue(T& value) const {
    return valid;
 }
 
+/** \brief Returns the signal value as a string */
 template <>
 bool Signal::ChannelValue(std::string& value) const;
 
+/** \brief Returns the signal value as a signal value */
 template <>
 bool Signal::ChannelValue(SignalValue& value) const;
+
 
 template <typename T>
 bool Signal::EngValue(T& value) const {
@@ -305,7 +367,7 @@ bool Signal::EngValue(T& value) const {
   return valid;
 }
 
-
+/** \brief Returns the engineering value as a string value */
 template <>
 bool Signal::EngValue(std::string& value) const;
 

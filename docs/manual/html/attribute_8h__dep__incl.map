@@ -1,0 +1,9 @@
+<map id="include/dbc/attribute.h" name="include/dbc/attribute.h">
+<area shape="rect" id="node1" title="All DBC network objects may have attributes attached to them." alt="" coords="162,5,313,31"/>
+<area shape="rect" id="node2" href="$message_8h.html" title="DBC message configuration object." alt="" coords="99,152,255,177"/>
+<area shape="rect" id="node3" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="161,225,309,251"/>
+<area shape="rect" id="node5" href="$node_8h.html" title="Interface against a DBC node (Device(ECU)." alt="" coords="5,79,136,104"/>
+<area shape="rect" id="node6" href="$signal_8h.html" title="Interface against a DBC signal configuration." alt="" coords="221,79,358,104"/>
+<area shape="rect" id="node4" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="165,299,305,324"/>
+<area shape="rect" id="node7" href="$signalobserver_8h.html" title="The sample observer holds sample values for a signal." alt="" coords="331,152,517,177"/>
+</map>

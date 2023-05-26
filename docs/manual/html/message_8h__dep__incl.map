@@ -1,0 +1,5 @@
+<map id="include/dbc/message.h" name="include/dbc/message.h">
+<area shape="rect" id="node1" title="DBC message configuration object." alt="" coords="5,5,161,31"/>
+<area shape="rect" id="node2" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="9,79,157,104"/>
+<area shape="rect" id="node3" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="13,152,153,177"/>
+</map>

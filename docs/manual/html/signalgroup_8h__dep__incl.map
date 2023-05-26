@@ -1,0 +1,5 @@
+<map id="include/dbc/signalgroup.h" name="include/dbc/signalgroup.h">
+<area shape="rect" id="node1" title="Defines a signal group." alt="" coords="5,5,175,31"/>
+<area shape="rect" id="node2" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="16,79,164,104"/>
+<area shape="rect" id="node3" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="20,152,160,177"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="dbc::ISampleObserver" name="dbc::ISampleObserver">
+<area shape="rect" id="node1" title="Interface that handles samples. Internal usage." alt="" coords="5,5,155,31"/>
+<area shape="rect" id="node2" href="$classdbc_1_1_signal_observer.html" title="The sample observer hold a number of samples." alt="" coords="11,79,149,104"/>
+</map>

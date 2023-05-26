@@ -1,0 +1,5 @@
+<map id="include/dbc/node.h" name="include/dbc/node.h">
+<area shape="rect" id="node1" title="Interface against a DBC node (Device(ECU)." alt="" coords="14,5,145,31"/>
+<area shape="rect" id="node2" href="$network_8h.html" title="Defines a DBC network configuration object." alt="" coords="5,79,153,104"/>
+<area shape="rect" id="node3" href="$dbcfile_8h.html" title="The DBC file object is the main user object." alt="" coords="9,152,149,177"/>
+</map>

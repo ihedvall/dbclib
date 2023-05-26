@@ -1,0 +1,7 @@
+<map id="include/dbc/node.h" name="include/dbc/node.h">
+<area shape="rect" id="node1" title="Interface against a DBC node (Device(ECU)." alt="" coords="55,5,186,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,152,60,177"/>
+<area shape="rect" id="node3" title=" " alt="" coords="181,152,237,177"/>
+<area shape="rect" id="node4" href="$attribute_8h.html" title="All DBC network objects may have attributes attached to them." alt="" coords="68,79,173,104"/>
+<area shape="rect" id="node5" title=" " alt="" coords="86,152,155,177"/>
+</map>
