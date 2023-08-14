@@ -7,9 +7,10 @@ project(MdfViewer
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 include("../script/boost.cmake")
+include("../script/zlib.cmake")
 include("../script/utillib.cmake")
 include("../script/mdflib.cmake")
-
+message(STATUS "ZLIB Libraries: " ${ZLIB_LIBRARIES})
 add_executable(dbcview
         src/dbcviewer.cpp src/dbcviewer.h
         src/mainframe.cpp src/mainframe.h
@@ -41,6 +42,7 @@ endif()
 
 target_link_libraries(dbcview PRIVATE dbc)
 target_link_libraries(dbcview PRIVATE util)
+
 if (MDFLIB_LOCAL_FETCH)
     target_link_libraries(dbcview PRIVATE mdf)
 else()
@@ -48,6 +50,7 @@ else()
 endif()
 target_link_libraries(dbcview PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(dbcview PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(dbcview PRIVATE ${ZLIB_LIBRARIES})
 
 if (MINGW)
     target_link_libraries(dbcview PRIVATE iconv)

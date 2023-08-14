@@ -15,7 +15,6 @@ target_include_directories(test_dbc PRIVATE
         ../src  # dbchelper.h
         ${GTEST_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS})
-target_include_directories(test_dbc PRIVATE ${FLEX_INCLUDE_DIRS})
 
 if (MINGW)
     target_link_options(test_dbc PRIVATE -static -fstack-protector)

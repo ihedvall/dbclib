@@ -1,16 +1,15 @@
 # Copyright 2023 Ingemar Hedvall
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
-project(dbcLib
+project(dbclib
         VERSION 1.0
         DESCRIPTION "CAN DBC C++ library."
         LANGUAGES CXX)
 
-option(CMAKE_SHARED_LIBS "Static libraries are preferred" OFF)
+option(BUILD_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
 option(DBC_TOOLS "Building applications" ON)
 option(DBC_TEST "Building unit test" ON)
-option(DBC_YACC "Building Flex and Bison dependent files" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_DEBUG_POSTFIX d)
@@ -18,21 +17,21 @@ set(CMAKE_DEBUG_POSTFIX d)
 include(CMakePrintHelpers)
 
 if (DBC_TOOLS)
-include(script/wxwidgets.cmake)
+    include(script/wxwidgets.cmake)
 endif()
 
 if (DBC_TEST)
-include(script/googletest.cmake)
+    include(script/googletest.cmake)
 endif()
 
 if (DBC_DOC)
-include(script/doxygen.cmake)
+    include(script/doxygen.cmake)
 endif()
 
 include(script/flex.cmake)
 include(script/bison.cmake)
 
-if (DBC_YACC AND BISON_FOUND)
+if (BISON_FOUND)
     BISON_TARGET(DBC_PARSER src/dbcparser.y ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcparser.cpp
             COMPILE_FLAGS "")
     cmake_print_variables(BISON_DBC_PARSER_DEFINED
@@ -44,16 +43,18 @@ if (DBC_YACC AND BISON_FOUND)
             BISON_INCLUDE_DIRS)
 endif ()
 
-if (DBC_YACC AND FLEX_FOUND)
+if (FLEX_FOUND)
     FLEX_TARGET(DBC_SCANNER src/dbcflexer.l ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcflexer.cpp)
     cmake_print_variables(FLEX_DBC_SCANNER_DEFINED
             FLEX_DBC_SCANNER_OUTPUTS
             FLEX_DBC_SCANNER_INPUT
             FLEX_DBC_SCANNER_OUTPUT_HEADER
             FLEX_INCLUDE_DIRS)
+    # Copy FlexLexer.h. This is a dirty trick to avoid flex/bison installation in windows build
+    file(COPY_FILE ${FLEX_INCLUDE_DIRS}/FlexLexer.h ${CMAKE_CURRENT_SOURCE_DIR}/src/FlexLexer.h)
 endif ()
 
-if (DBC_YACC AND FLEX_FOUND AND BISON_FOUND)
+if (FLEX_FOUND AND BISON_FOUND)
     ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
 endif()
 
@@ -71,9 +72,9 @@ set(DBCL_HEADERS
     include/dbc/signalobserver.h
 )
 
-add_library(dbc STATIC
+add_library(dbc
         src/dbcparser.cpp src/dbcparser.hpp
-        src/dbcflexer.cpp
+        src/FlexLexer.h src/dbcflexer.cpp
         ${DBCL_HEADERS}
         src/attribute.cpp
         src/network.cpp
@@ -92,7 +93,7 @@ add_library(dbc STATIC
 target_include_directories(dbc PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        ${FLEX_INCLUDE_DIRS} )
+       )
 target_include_directories(dbc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 cmake_print_properties(TARGETS dbc PROPERTIES INCLUDE_DIRECTORIES)
@@ -101,9 +102,6 @@ if (MSVC)
     target_compile_definitions(dbc PRIVATE _WIN32_WINNT=0x0A00)
 endif ()
 
-if (DBC_TOOLS)
-#    add_subdirectory(listend)
-endif ()
 
 if (wxWidgets_FOUND AND DBC_TOOLS)
     add_subdirectory(dbcviewer)
