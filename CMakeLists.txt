@@ -1,20 +1,34 @@
 # Copyright 2023 Ingemar Hedvall
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
-project(dbclib
-        VERSION 1.0
-        DESCRIPTION "CAN DBC C++ library."
-        LANGUAGES CXX)
+include(CMakePrintHelpers)
+
+if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+    set(USE_VCPKG OFF)
+else()
+    set(USE_VCPKG ON)
+endif()
 
 option(BUILD_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
 option(DBC_TOOLS "Building applications" ON)
 option(DBC_TEST "Building unit test" ON)
 
+if(DBC_TOOLS AND USE_VCPKG)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tools")
+endif()
+if(DBC_TEST AND USE_VCPKG)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+endif()
+
+project(dbclib
+        VERSION 1.0
+        DESCRIPTION "CAN DBC C++ library."
+        LANGUAGES CXX)
+
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_DEBUG_POSTFIX d)
-
-include(CMakePrintHelpers)
 
 if (DBC_TOOLS)
     include(script/wxwidgets.cmake)

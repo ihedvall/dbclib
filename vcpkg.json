@@ -9,8 +9,20 @@
     "boost-program-options",
     "boost-interprocess",
     "boost-endian",
-    "expat",
-    "gtest",
-    "wxwidgets"
-    ]
+    "expat"
+    ],
+    "features": {
+      "tools": {
+        "description": "Build GUI and daemons",
+        "dependencies": [
+          "wxwidgets"
+        ]
+      },
+      "tests": {
+        "description": "Build DBC tests",
+        "dependencies": [
+          "gtest"
+        ]
+      }
+  }
 }
