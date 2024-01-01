@@ -10,9 +10,10 @@
 namespace dbc::test {
 
 TEST(DbcHelper, TestDouble) {
-  uint8_t buffer[8] = {};
+  uint8_t buffer[40] = {};
   for (double orig = -122.34; orig < 122.34; orig += 0.1) { //NOLINT
   if (std::endian::native == std::endian::little) {
+      // Convert orig -> buffer
       DbcHelper::DoubleToRaw(true, 0, sizeof(orig)*8, orig, buffer);
       double native = 0;
       memcpy(&native, buffer, sizeof(native));
@@ -20,8 +21,8 @@ TEST(DbcHelper, TestDouble) {
       native = DbcHelper::RawToDouble(true, 0, sizeof(orig)*8, buffer);
       EXPECT_DOUBLE_EQ(native, orig);
 
-      DbcHelper::DoubleToRaw(false, 7, sizeof(orig)*8, orig, buffer);
-      const double big = DbcHelper::RawToDouble(false, 7,
+      DbcHelper::DoubleToRaw(false, 0, sizeof(orig)*8, orig, buffer);
+      const double big = DbcHelper::RawToDouble(false, 0,
                                                 sizeof(orig)*8, buffer);
       EXPECT_DOUBLE_EQ(orig, big);
 
@@ -45,7 +46,7 @@ TEST(DbcHelper, TestDouble) {
 }
 
 TEST(DbcHelper, TestFloat) {
-  uint8_t buffer[8] = {}; // I'm using last 4 bytes only
+  uint8_t buffer[40] = {}; // I'm using last 4 bytes only
   for (float orig = -122.34F; orig < 122.34F; orig += 0.1F) { //NOLINT
 
     if (std::endian::native == std::endian::little) {
@@ -80,7 +81,7 @@ TEST(DbcHelper, TestFloat) {
 }
 
 TEST(DbcHelper, TestSigned) {
-  uint8_t buffer[8] = {};
+  uint8_t buffer[40] = {};
   for (size_t length = 3; length <= 64; ++length) {
     for (int64_t orig = -3; orig <= 3; ++orig ) {
       DbcHelper::SignedToRaw(true, 0, length, orig, buffer);
@@ -110,7 +111,7 @@ TEST(DbcHelper, TestSigned) {
 }
 
 TEST(DbcHelper, TestUnsigned) {
-  uint8_t buffer[8] = {};
+  uint8_t buffer[40] = {};
   for (size_t length = 2; length <= 64; ++length) {
     for (uint64_t orig = 0; orig <= 3; ++orig ) {
       DbcHelper::UnsignedToRaw(true, 0, length, orig, buffer);

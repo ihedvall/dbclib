@@ -32,3 +32,6 @@ odsconfigurator/model/*_?.xml
 # Visual Studio
 /.vs/
 CMakeSettings.json
+
+venv
+

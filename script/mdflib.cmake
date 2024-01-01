@@ -4,9 +4,12 @@ if (NOT MdfLib_FOUND)
     FetchContent_Declare(mdflib
             GIT_REPOSITORY https://github.com/ihedvall/mdflib.git
             GIT_TAG HEAD)
-    set(MDF_DOC OFF)
-    set(MDF_TEST OFF)
-    set(MDF_TOOLS OFF)
+    set(MDF_BUILD_DOC OFF)
+    set(MDF_BUILD_TEST OFF)
+    set(MDF_BUILD_TOOLS OFF)
+    set(MDF_BUILD_SHARED_LIB OFF)
+    set(MDF_BUILD_SHARED_LIB_NET OFF)
+    set(MDF_BUILD_SHARED_LIB_EXAMPLE OFF)
     FetchContent_MakeAvailable(mdflib)
 
     message(STATUS "MDFLIB Populated: " ${mdflib_POPULATED})

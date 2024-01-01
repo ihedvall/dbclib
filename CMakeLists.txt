@@ -11,15 +11,18 @@ endif()
 
 option(BUILD_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
-option(DBC_TOOLS "Building applications" ON)
+option(DBC_TOOLS "Building applications" OFF)
 option(DBC_TEST "Building unit test" ON)
+option(DBC_PYTHON "Building Python module" ON)
 
 if(DBC_TOOLS AND USE_VCPKG)
     list(APPEND VCPKG_MANIFEST_FEATURES "tools")
 endif()
+
 if(DBC_TEST AND USE_VCPKG)
     list(APPEND VCPKG_MANIFEST_FEATURES "tests")
 endif()
+
 
 project(dbclib
         VERSION 1.0
@@ -27,7 +30,7 @@ project(dbclib
         LANGUAGES CXX)
 
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_DEBUG_POSTFIX d)
 
 if (DBC_TOOLS)
@@ -41,6 +44,8 @@ endif()
 if (DBC_DOC)
     include(script/doxygen.cmake)
 endif()
+
+
 
 include(script/flex.cmake)
 include(script/bison.cmake)
@@ -72,7 +77,7 @@ if (FLEX_FOUND AND BISON_FOUND)
     ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
 endif()
 
-set(DBCL_HEADERS
+set(DBC_HEADERS
     include/dbc/attribute.h
     include/dbc/dbcfile.h
     include/dbc/dbcmessage.h
@@ -89,7 +94,7 @@ set(DBCL_HEADERS
 add_library(dbc
         src/dbcparser.cpp src/dbcparser.hpp
         src/FlexLexer.h src/dbcflexer.cpp
-        ${DBCL_HEADERS}
+        ${DBC_HEADERS}
         src/attribute.cpp
         src/network.cpp
         src/envvar.cpp
@@ -116,6 +121,21 @@ if (MSVC)
     target_compile_definitions(dbc PRIVATE _WIN32_WINNT=0x0A00)
 endif ()
 
+if (DBC_PYTHON)
+    find_package(Python3 COMPONENTS Interpreter Development)
+    cmake_print_properties(TARGETS Python3::Python PROPERTIES
+            NAME
+            LOCATION
+            INTERFACE_INCLUDE_DIRECTORIES)
+
+    cmake_print_variables(
+            Python3_FOUND
+            Python3_INCLUDE_DIRS
+            Python3_RUNTIME_LIBRARY_DIRS)
+
+    add_subdirectory(extern/pybind11)
+    add_subdirectory(python)
+endif()
 
 if (wxWidgets_FOUND AND DBC_TOOLS)
     add_subdirectory(dbcviewer)

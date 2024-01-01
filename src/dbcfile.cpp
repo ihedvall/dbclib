@@ -66,12 +66,16 @@ bool DbcFile::ParseFile() {
   return ret == 0;
 }
 
-void DbcFile::SetMessageSize(size_t nof_messages) {
+void DbcFile::MessageSize(size_t nof_messages) {
   message_list_.clear();
   base_time_ = 0;
   if (nof_messages > 0) {
     message_list_.resize(nof_messages);
   }
+}
+
+size_t DbcFile::MessageSize() const {
+  return message_list_.size();
 }
 
 void DbcFile::AddMessage(size_t index, const DbcMessage& message) {

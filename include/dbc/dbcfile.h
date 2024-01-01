@@ -51,8 +51,12 @@ class DbcFile {
   [[nodiscard]] uint64_t BaseTime() const {return base_time_;}
 
   /** \brief Sets the maximum message queue size. */
-  void SetMessageSize(size_t nof_messages);
-  /** \brief Adds q message to the message queue. */
+  void MessageSize(size_t nof_messages);
+
+  /** \brief Sets the maximum message queue size. */
+  [[nodiscard]] size_t MessageSize() const;
+
+  /** \brief Adds a message to the message queue. */
   void AddMessage(size_t index, const DbcMessage& message);
   /** \brief Parses the message into signal values. */
   bool ParseMessage(const DbcMessage& message);

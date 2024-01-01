@@ -107,6 +107,8 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
                 << reader.ShortName();
   }
 
+
+
   if (!file_ok || !read_info || header == nullptr || data_group == nullptr) {
     wxMessageBox(
         "Failed to read information from the file.\nMore information in the log file.",
@@ -114,8 +116,26 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
     return;
   }
 
+  // Search for the master channel name (assuming relative time channel)
+  std::string master_name = "Timestamp";
+  for (const auto* group : data_group->ChannelGroups()) {
+    if (group == nullptr) {
+      continue;
+    }
+    for (const auto* channel : group->Channels()) {
+      if (channel == nullptr) {
+        continue;
+      }
+      if (channel->Type() == mdf::ChannelType::Master) {
+        master_name = channel->Name();
+        break;
+      }
+    }
+  }
+
   const auto base_time = header->StartTime(); // Absolute time reference
-  auto rel_time = mdf::CreateChannelObserver(*data_group, "Timestamp");
+
+  auto rel_time = mdf::CreateChannelObserver(*data_group, master_name);
   if (!rel_time) {
     LOG_ERROR() << "Time channel 'Timestamp' is missing. File: "
                 << reader.ShortName();
