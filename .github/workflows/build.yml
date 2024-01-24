@@ -61,6 +61,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@v3
