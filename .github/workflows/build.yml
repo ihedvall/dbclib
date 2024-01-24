@@ -67,6 +67,9 @@ jobs:
       - name: GTEST Install
         uses: MarkusJx/googletest-installer@master
 
+      - name: PYTEST Install
+        run: pip install pytest
+        
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
         run: cmake -G Ninja -B ${{github.workspace}}/build -D DBC_TEST=ON -D DBC_PYTHON=ON
