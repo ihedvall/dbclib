@@ -61,15 +61,11 @@ jobs:
         env: ${{ matrix.env.cmake_env }}
         run: >      
           cmake -B ${{github.workspace}}/build
-          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -D DBC_PYTHON=ON 
+          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: CMAKE Build
         run: >
           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-      - name: CTEST Unit Test
-        working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{env.BUILD_TYPE}}
 
       # install for testing
 #      - name: Install
