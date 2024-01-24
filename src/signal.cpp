@@ -9,11 +9,7 @@
 
 namespace dbc {
 Signal::~Signal() {
-  for (auto* observer : observer_list_) {
-    if (observer != nullptr) {
-      observer->DetachObserver();
-    }
-  }
+  observer_list_.clear();
 }
 
 Attribute& Signal::CreateAttribute(const Attribute& definition) {
@@ -64,13 +60,9 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
       channel_value_.signed_value = temp;
       break;
     }
-    channel_value_.valid = true;
+
     case SignalDataType::UnsignedData: {
-      size_t bytes = bit_length_ / 8;
-      if ((bit_length_ % 8) != 0) {
-        ++bytes;
-      }
-      if (bytes > 8) {
+      if (IsArrayValue()) {
         auto temp = DbcHelper::RawToByteArray(bit_start_, bit_length_,
                                               message.data());
         channel_value_.array_value = temp;
@@ -132,11 +124,7 @@ bool Signal::ChannelValue(std::string& value) const {
     }
 
     case SignalDataType::UnsignedData: {
-      size_t bytes = bit_length_ / 8;
-      if ((bit_length_ % 8) != 0) {
-        ++bytes;
-      }
-      if (bytes > 8) {
+      if (IsArrayValue()) {
         try {
           valid = channel_value_.valid && Valid();
           const auto temp = channel_value_.array_value;
@@ -183,6 +171,13 @@ bool Signal::ChannelValue(std::string& value) const {
   if (!valid) {
     value = "*";
   }
+  return valid;
+}
+
+template <>
+bool Signal::ChannelValue(std::vector<uint8_t>& value) const {
+  const bool valid = channel_value_.valid && Valid();
+  value = channel_value_.array_value;
   return valid;
 }
 
@@ -362,25 +357,29 @@ std::string Signal::MuxAsString() const {
   return temp.str();
 }
 
-void Signal::AttachObserver(ISampleObserver* observer) const {
-  observer_list_.push_back(observer);
+void Signal::AttachObserver(std::shared_ptr<ISampleObserver>& observer) const {
+  std::shared_ptr<ISampleObserver> temp(observer);
+  observer_list_.push_back(std::move(temp));
 }
 
-void Signal::DetachObserver(const ISampleObserver* observer) const  {
-  for (auto itr = observer_list_.begin(); itr != observer_list_.end(); ) {
-    if ( *itr == observer) {
-      itr = observer_list_.erase(itr);
-    } else {
-      ++itr;
-    }
-  }
+void Signal::ClearObserverList() const {
+  observer_list_.clear();
 }
 
 void Signal::FireOnSample() {
-  for (auto* observer : observer_list_) {
+  for (auto& observer : observer_list_) {
     if (observer != nullptr) {
       observer->OnSample();
     }
   }
 }
+
+bool Signal::IsArrayValue() const {
+  size_t bytes = BitLength() / 8;
+  if ((BitLength() % 8) != 0) {  // This shouldn't happen
+    ++bytes;
+  }
+  return bytes > 8;
+}
+
 }  // namespace dbc

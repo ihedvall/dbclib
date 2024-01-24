@@ -6,24 +6,24 @@
 #include "dbc/signalobserver.h"
 #include <algorithm>
 
+
 namespace dbc {
 
 SignalObserver::SignalObserver(const Signal& signal)
 : signal_(signal) {
-  signal_.AttachObserver(this);
-  attached_ = true;
   MaxSamples(signal.SampleCounter());
 }
 
 SignalObserver::~SignalObserver() {
-  SignalObserver::DetachObserver();
+
 }
 
-void SignalObserver::DetachObserver() {
-  if (attached_) {
-    signal_.DetachObserver(this);
-    attached_ = false;
-  }
+std::shared_ptr<SignalObserver> SignalObserver::CreateSignalObserver(
+    const Signal& signal) {
+  auto observer = std::shared_ptr<SignalObserver>(new SignalObserver(signal));
+  auto temp = std::shared_ptr<ISampleObserver>(observer);
+  signal.AttachObserver(temp);
+  return observer;
 }
 
 void SignalObserver::MaxSamples(size_t max_nof_samples) {
@@ -109,6 +109,8 @@ size_t SignalObserver::NofValidSamples() const {
     return sample.value.valid;
   });
 }
+
+
 
 template <>
 bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,

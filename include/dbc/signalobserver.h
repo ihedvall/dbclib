@@ -22,10 +22,11 @@ namespace dbc {
  */
 class SignalObserver : public ISampleObserver {
  public:
-  explicit SignalObserver(const Signal& signal); ///< Constructor
+
   SignalObserver() = delete; ///< Default constructor.
   ~SignalObserver() override; ///< Default destructor.
 
+  static std::shared_ptr<SignalObserver> CreateSignalObserver(const Signal& signal);
   /** \brief Sets the maximum number of samples. */
   void MaxSamples(size_t max_nof_samples);
   /** \brief Returns the max number of samples. */
@@ -79,10 +80,10 @@ class SignalObserver : public ISampleObserver {
   /** \brief Sample time to internal index. */
   [[nodiscard]] std::pair<size_t, bool> TimeToIndex(uint64_t time) const;
 
-  void DetachObserver() override; ///< Detach an observer.
   void OnSample() override; ///< On sample callback handler.
 
  protected:
+  explicit SignalObserver(const Signal& signal); ///< Constructor
  private:
   /** \brief Sample value. */
   struct ChannelSample {
@@ -100,7 +101,7 @@ class SignalObserver : public ISampleObserver {
 
   size_t sample_index_ = 0; ///< Points on next index
   size_t nof_samples_ = 0; ///< Number of samples.
-  bool attached_ = false; ///< True if the observer is attached.
+
 };
 
 template <typename V>
@@ -160,7 +161,17 @@ bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
   }
   return valid;
 }
-/** \brief Returns the unscaled signal value as a string. */
+
+/**
+ * @brief Returns the unscaled signal value for a specific sample.
+ *
+ * This function retrieves the unscaled signal value for a specific sample at the given index.
+ *
+ * @param index The index of the sample to retrieve the value for.
+ * @param ns1970 Reference to store the sample time in nanoseconds since 1970.
+ * @param value Reference to store the sample value.
+ * @return True if the value is valid, false otherwise.
+ */
 template <>
 bool SignalObserver::ChannelValue(size_t index, uint64_t& ns1970,
                                   std::string& value) const;
@@ -257,6 +268,6 @@ bool SignalObserver::EngValue(size_t index, uint64_t& ns1970,
                               std::string& value) const;
 
 /** \brief List of observer. */
-using SignalObserverList = std::vector<std::unique_ptr<SignalObserver>>;
+using SignalObserverList = std::vector<std::shared_ptr<SignalObserver>>;
 
 }  // namespace dbc

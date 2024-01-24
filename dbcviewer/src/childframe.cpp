@@ -1241,8 +1241,9 @@ void ChildFrame::OnShowMessageData(wxCommandEvent &event) {
   const auto& signal_list = message->Signals();
   for (const auto& itr : signal_list) {
     const auto& signal = itr.second;
-    auto observer = std::make_unique<SignalObserver>(signal);
-    observer_list->push_back(std::move(observer));
+    auto observer = SignalObserver::CreateSignalObserver(signal);
+    observer_list->emplace_back(observer);
+
   }
   file->ReparseMessageList();
 
@@ -1311,8 +1312,8 @@ void ChildFrame::OnShowSignalData(wxCommandEvent &event) {
   title << "/" << file->Name();
 
   auto observer_list = std::make_unique<SignalObserverList>();
-  auto observer = std::make_unique<SignalObserver>(*signal);
-  observer_list->push_back(std::move(observer));
+  auto observer = SignalObserver::CreateSignalObserver(*signal);
+  observer_list->emplace_back(observer);
 
   file->ReparseMessageList();
 
@@ -1385,18 +1386,19 @@ void ChildFrame::OnPlotSignalData(wxCommandEvent &event) {
   }
   auto& app = wxGetApp();
   // Create the observer list
-  auto observer_list = std::make_unique<SignalObserverList>();
-  auto observer = std::make_unique<SignalObserver>(*signal);
-  observer_list->push_back(std::move(observer));
+  SignalObserverList observer_list;
+  auto observer = SignalObserver::CreateSignalObserver(*signal);
+  observer_list.emplace_back(observer);
+
   file->ReparseMessageList();
-  const auto* obs = observer_list->front().get();
+  const auto* obs = observer_list.front().get();
   if (obs == nullptr || obs->NofValidSamples() < 2) {
     wxMessageBox("There is not enough valid samples to plot");
     return;
   }
   // Produce a CSV file with the data for later use with the gnuplot script
-  auto csv_file = CreateCsvFile(*observer_list);
-  auto gp_file = CreateGnuPlotFile(*observer_list, csv_file, title.str());
+  auto csv_file = CreateCsvFile(observer_list);
+  auto gp_file = CreateGnuPlotFile(observer_list, csv_file, title.str());
   if (csv_file.empty() || gp_file.empty()) {
     wxMessageBox("Failed to create CSV or GP files.\nMore information in log file.");
     return;

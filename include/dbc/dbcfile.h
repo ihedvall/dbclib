@@ -71,7 +71,7 @@ class DbcFile {
    *
    */
   void ReparseMessageList();
-
+  void ClearObserverList();
  private:
   /** \brief Parses standard CAN messages. */
   bool ParseStandardCAN(const DbcMessage& message);

@@ -1,11 +1,12 @@
 
 import pydbc
-import pytest
 import logging
 import time
 
 
 def test_dbc_file():
+    logging.info("pydbc::DbcFile TESTING")
+
     dbc = pydbc.DbcFile()
     assert dbc is not None
 
@@ -21,3 +22,7 @@ def test_dbc_file():
     dbc.base_time = base_time
     assert dbc.base_time == base_time
     logging.debug(dbc.base_time)
+
+
+
+

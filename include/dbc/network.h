@@ -72,7 +72,7 @@ class Network {
   void Comment(const std::string& comment) {
     comment_ = comment;
   }
-  /** \brief Returns the desciptive text. */
+  /** \brief Returns the descriptive text. */
   [[nodiscard]] const std::string& Comment() const { return comment_; }
 
   /** \brief Returns the node by its name. */

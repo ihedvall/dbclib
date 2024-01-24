@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include "dbc/attribute.h"
 #include "dbc/isampleobserver.h"
 
@@ -97,6 +98,7 @@ class Signal {
   [[nodiscard]] MuxType Mux() const { return mux_type_; }
   /** \brief Returns the multiplexer type as text. */
   [[nodiscard]] std::string MuxAsString() const;
+
   /** \brief Sets the multiplexor value. */
   void MuxValue(int value) { mux_value_ = value; }
   /** \brief Returns the multiplexor value. */
@@ -139,6 +141,10 @@ class Signal {
   /** \brief Return the receiver list. */
   [[nodiscard]] const std::vector<std::string>& Receivers() const;
 
+  /** \brief Sets the attribute list. */
+  void Attributes(const std::vector<Attribute>& attribute_list) {
+    attribute_list_ = attribute_list;
+  }
   /** \brief Returns the attribute list. */
   [[nodiscard]] const std::vector<Attribute>& Attributes() const {
     return attribute_list_;
@@ -146,12 +152,26 @@ class Signal {
 
   /** \brief Sets the signals message ID. */
   void MessageId(uint64_t message_id) { message_id_ = message_id;}
+
   /** \brief Returns the message ID that the signal belongs to. */
   [[nodiscard]] uint64_t MessageId() const { return message_id_; }
 
   [[nodiscard]] bool IsMultiplexed() const; ///< True if multiplexed signal.
+
+  /**
+   * \brief Return true if this signal should be treated as a string.
+   *
+   * This function checks if this signal may be treated as a string
+   * value. The condition is if nof bytes > 8 i.e. cannot be converted
+   * any CAN data type. In theory, it could be a byte array but this
+   * is not used with any CAN protocols so far.
+   * @return True if this signal should be treated as a text or byte
+   * array value.
+   */
+  [[nodiscard]] bool IsArrayValue() const;
   /** \brief Creates an attribute. */
   [[nodiscard]] Attribute& CreateAttribute(const Attribute& definition);
+
   /** \brief Creates an extended multiplexor struct. */
   [[nodiscard]] ExtendedMux& GetExtendedMux();
 
@@ -181,6 +201,16 @@ class Signal {
   void Valid(bool valid) {valid_ = valid;} ///< Set to true if valid value.
   [[nodiscard]] bool Valid() const {return valid_;} ///< Trie if value is valid.
 
+  /**
+   * \brief Returns a reference to the internal signal value-
+   *
+   * The function returns the internal signal value object which
+   * is the latest channel value.
+   * @return Reference to the internal signal value object.
+   */
+  [[nodiscard]] const SignalValue& GetSignalValue() const {
+    return channel_value_;
+  }
   /** \brief Returns the channel value. */
   template <typename T>
   bool ChannelValue( T& value ) const;
@@ -190,10 +220,11 @@ class Signal {
   bool EngValue( T& value ) const;
 
   /** \brief Attach a sample observer. */
-  void AttachObserver(ISampleObserver* observer) const;
+  void AttachObserver(std::shared_ptr<ISampleObserver>& observer) const;
   /** \brief Detach a sample observer. */
-  void DetachObserver(const ISampleObserver* observer) const;
- private:
+  void ClearObserverList() const;
+
+ protected:
   std::string name_; ///< Signal nsame.
   std::string comment_; ///< Signal description.
   std::string unit_; ///< Signal unit.
@@ -223,7 +254,7 @@ class Signal {
   uint64_t sample_time_ = 0;    ///< Last sample time
   uint32_t sample_can_id_ = 0;  ///< Last Can ID
 
-  mutable std::vector<ISampleObserver*> observer_list_; ///< Observer list.
+  mutable std::vector<std::shared_ptr<ISampleObserver>> observer_list_; ///< Observer list.
   void FireOnSample(); ///< Fire OnSample event.
 
 };
@@ -235,41 +266,25 @@ bool Signal::ChannelValue(T& value) const {
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
-      try {
-        const auto temp = channel_value_.signed_value;
-        value = static_cast<T>(temp);
-      } catch (const std::exception&) {
-        valid = false;
-      }
+      const auto temp = channel_value_.signed_value;
+      value = static_cast<T>(temp);
       break;
     }
 
     case SignalDataType::UnsignedData: {
-      size_t bytes = bit_length_ / 8;
-      if ((bit_length_ % 8) != 0) {
-        ++bytes;
-      }
-      if (bytes > 8) {
+      if (IsArrayValue()) {
         valid = false;
       } else {
-        try {
-          const auto temp = channel_value_.unsigned_value;
-          value = static_cast<T>(temp);
-        } catch (const std::exception&) {
-          valid = false;
-        }
+        const auto temp = channel_value_.unsigned_value;
+        value = static_cast<T>(temp);
       }
       break;
     }
 
     case SignalDataType::DoubleData:
     case SignalDataType::FloatData: {
-      try {
-        const auto temp = channel_value_.float_value;
-        value = static_cast<T>(temp);
-      } catch (const std::exception&) {
-        valid = false;
-      }
+      const auto temp = channel_value_.float_value;
+      value = static_cast<T>(temp);
       break;
     }
 
@@ -280,9 +295,26 @@ bool Signal::ChannelValue(T& value) const {
    return valid;
 }
 
-/** \brief Returns the signal value as a string */
+/**
+ * \brief Returns the value a text string.
+ * @param value Destination string.
+ * @return True if the value is valid.
+ */
 template <>
 bool Signal::ChannelValue(std::string& value) const;
+
+/**
+ * \brief Returns the channel value as a byte array.
+ *
+ * Returns the channel value as a byte array. No meaning if it
+ * is a standard value but if the number of bytes > 8, it
+ * normally indicates that the value id a text value but may also
+ * be a byte array.
+ * @param value Destination byte array.
+ * @return True if the value is valid.
+ */
+template <>
+bool Signal::ChannelValue(std::vector<uint8_t>& value) const;
 
 /** \brief Returns the signal value as a signal value */
 template <>

@@ -11,8 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  IS_RELEASE: ${{ github.event_name == 'push' && github.ref_type == 'tag' && startswith(github.ref_name, 'v') }}
-
+  BUILD_TYPE: Release
 
 jobs:
 
@@ -36,15 +35,11 @@ jobs:
 #              CXX: clang++
 #            pack: 1
 #
-#          - name: win64
-#            os: windows-latest
-#            ninja_platform: win
-#            msvc_arch: x64
-#            cmake_env:
-#              CMAKE_RC_FLAGS: "/C 1252"
-#              CC: clang
-#              CXX: clang++
-#            pack: 1
+          - name: win64
+            os: windows-latest
+            ninja_platform: win
+            cmake_env: {}
+
 #
 #          - name: win32
 #            os: windows-latest
@@ -60,81 +55,43 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v3
+        uses: actions/checkout@master
         with:
-          version: 1.9.0
+          submodules: true
+
+      - name: NINJA Install
+        uses: seanmiddleditch/gha-setup-ninja@master
+        with:
           platform: ${{ matrix.env.ninja_platform }}
-          destination: ninja
 
-      - name: Setup linux environment
-        if: matrix.env.ninja_platform == 'linux'
-        run: |
-          sudo apt-get update 
-          # flex-old contains FlexLexer.h which is needed by util
-          # For some reason, flex does not contain this header
-          sudo apt-get install --yes git cmake libboost-all-dev expat zlib1g libfl-dev
+      - name: GTEST Install
+        uses: MarkusJx/googletest-installer@master
 
-      - name: Setup MSVC environment
-        if: matrix.env.ninja_platform == 'win'
-        uses: seanmiddleditch/gha-setup-vsdevenv@v3
-        with:
-          arch: ${{ matrix.env.msvc_arch }}
-
-      - name: Build expat
-        if: matrix.env.ninja_platform == 'mac'
-        run: |
-          # https://macappstore.org/expat/
-          curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-          brew install expat
-
-      - name: Install llvm
-        if: matrix.env.ninja_platform == 'mac'
-        run: brew install llvm
-
-      # https://stackoverflow.com/questions/23749530/brew-install-zlib-devel-on-mac-os-x-mavericks
-      - name: zlib
-        if: matrix.env.ninja_platform == 'mac'
-        run: |
-          wget https://www.zlib.net/zlib-1.2.12.tar.xz
-          tar -xvf zlib-1.2.12.tar.xz
-          cd zlib-1.2.12
-          ./configure
-          make
-          make install
-
-      - name: Build Information
-        run: |
-          echo "ninja version: $(ninja --version)"
-          cmake --version
-
-      - name: Configure Release
+      - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
-        run: |
-          mkdir -p build/release
-          cd build/release
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
+        run: cmake -G Ninja -B ${{github.workspace}}/build -D DBC_TEST=ON -D DBC_PYTHON=ON
 
-      - name: Build
-        run: |
-          cd build/release
-          ninja
+      - name: CMAKE Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: CTEST Unit Test
+        working-directory: ${{github.workspace}}/build
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ctest -C ${{env.BUILD_TYPE}}
 
       # install for testing
-      - name: Install
-        run: |
-          cd build/release
-          sudo cmake --install .
+#      - name: Install
+#        run: >
+#          cd ${{github.workspace}}/build/release
+#          sudo cmake --install .
 
       # test if cmake finds the dbcLib automatically
-      - name: TestInstall
-        run: |
-          cd test/TestdbclibCMake
-          mkdir -p build
-          cd build
-          cmake -G Ninja ..
-          ninja
+#      - name: TestInstall
+#        run: >
+#          cd test/TestdbclibCMake
+#          mkdir -p build
+#          cd build
+#          cmake -G Ninja ..
+#          ninja
 ...

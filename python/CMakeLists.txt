@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)  # optional, keep compiler extensions off
 set(CMAKE_DEBUG_POSTFIX "") # The import lib function doesn't accept the 'd' pos fix
 
 
+
 cmake_print_properties(TARGETS Pytest::Pytest PROPERTIES
         NAME
         LOCATION)
@@ -27,9 +28,17 @@ project(pydbc_lib
 
 
 pybind11_add_module( pydbc MODULE
-        src/pydbcmessage.cpp src/pydbcmessage.h
-        src/pydbcfile.h
-        src/pydbc.cpp)
+        src/pydbcmessage.cpp
+        src/pyattribute.cpp
+        src/pyenvvar.cpp
+        src/pysignal.cpp
+        src/pymessage.cpp
+        src/pynode.cpp
+        src/pynetwork.cpp
+        src/pysignalgroup.cpp
+        src/pydbcfile.cpp
+        src/pysignalobserver.cpp
+        src/pydbc.cpp src/pydbc.h )
 
 cmake_print_variables(CMAKE_SOURCE_DIR)
 cmake_print_variables(CMAKE_CURRENT_SOURCE_DIR)
@@ -53,14 +62,15 @@ if (DBC_TEST)
     # so the CLION can handle the pytest properly
     file(GLOB module_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/pydbc.* )
 
-    foreach (file ${module_files})
+    foreach (pyfile ${module_files})
         add_custom_command(
                 TARGET pydbc
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                ARGS ${file} "${CMAKE_SOURCE_DIR}/venv/Lib/site-packages"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ARGS ${pyfile} "${CMAKE_SOURCE_DIR}/venv/Lib/site-packages"
         )
     endforeach ()
+
 
     # Add the test to the CTest. The pyd module is in the current binary dir,
     # so the pytest should run.
@@ -68,6 +78,7 @@ if (DBC_TEST)
     add_test(NAME pydbc_test
             COMMAND ${Python3_EXECUTABLE} -m pytest --log-cli-level=0 ${CMAKE_CURRENT_SOURCE_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+
     )
 
 endif()

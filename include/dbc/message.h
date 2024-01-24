@@ -21,7 +21,14 @@ using SignalList = std::map<std::string, Signal>;
 /** \brief DBC message configuration object. */
 class Message {
  public:
-   void Ident(uint64_t ident) { ///< Sets the message ID (29-bit)
+  /**
+   * \brief Sets the message ID.
+   *
+   * Sets the message ID. The extended CAN ID is max 29-bit. to indicate
+   * that the ID is extended, bit 32 should be set.
+   * @param ident Message ID
+   */
+   void Ident(uint64_t ident) {
      ident_ = ident;
    }
    [[nodiscard]] uint64_t Ident() const { ///< Returns the message ID.
@@ -115,7 +122,7 @@ class Message {
    /** \brief Reset the internal sequence counter. */
    void ResetSequenceNumber() {sequence_number_ = 0;}
    /** \brief Returns the next sequence number. */
-   uint8_t NextSequenceNumber() const {return sequence_number_;}
+   [[nodiscard]] uint8_t NextSequenceNumber() const {return sequence_number_;}
 
    void ResetSampleCounter() const; ///< Reset the sample counters.
    /** \brief Increments the internal sample counters. */

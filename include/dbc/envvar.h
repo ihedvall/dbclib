@@ -33,6 +33,8 @@ enum class AccessType : int {
 /** \brief Wrapper around an environment DBC variable. */
 class EnvVar {
   public:
+   EnvVar() = default;
+
    /** \brief Sets the name. */
     void Name(const std::string& name) { name_ = name; }
     /** \brief Retuns the name. */
