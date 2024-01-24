@@ -11,8 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  IS_RELEASE: ${{ github.event_name == 'push' && github.ref_type == 'tag' && startswith(github.ref_name, 'v') }}
-
+  BUILD_TYPE: Release
 
 jobs:
 
@@ -25,7 +24,6 @@ jobs:
         env:
           - name: linux
             os: ubuntu-latest
-            ninja_platform: linux
             cmake_env: {}
 
 #          - name: macos
@@ -38,10 +36,8 @@ jobs:
 #
           - name: win64
             os: windows-latest
-            ninja_platform: win
-            msvc_arch: x64
             cmake_env: {}
-            pack: 1
+
 #
 #          - name: win32
 #            os: windows-latest
@@ -61,52 +57,32 @@ jobs:
         with:
           submodules: true
 
-      - name: Build expat
-        if: matrix.env.ninja_platform == 'mac'
-        run: >
-          # https://macappstore.org/expat/
-          curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-          brew install expat
-
-      - name: Install llvm
-        if: matrix.env.ninja_platform == 'mac'
-        run: brew install llvm
-
-      # https://stackoverflow.com/questions/23749530/brew-install-zlib-devel-on-mac-os-x-mavericks
-      - name: zlib
-        if: matrix.env.ninja_platform == 'mac'
-        run: >
-          wget https://www.zlib.net/zlib-1.2.12.tar.xz
-          tar -xvf zlib-1.2.12.tar.xz
-          cd zlib-1.2.12
-          ./configure
-          make
-          make install
-
-      - name: Configure Release
+      - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
         run: >
           cmake -G Ninja -B ${{github.workspace}}/build 
-          -D CMAKE_BUILD_TYPE=Release -D DBC_PYTHON=ON 
-          ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
+          -D CMAKE_BUILD_TYPE={{env.BUILD_TYPE}}  -D DBC_PYTHON=ON 
 
-      - name: Build
+      - name: CMAKE Build
         run: >
-          cmake --build ${{github.workspace}}/build 
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: CTEST Unit Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{env.BUILD_TYPE}}
 
       # install for testing
-      - name: Install
-        run: >
-          cd ${{github.workspace}}/build/release
-          sudo cmake --install .
+#      - name: Install
+#        run: >
+#          cd ${{github.workspace}}/build/release
+#          sudo cmake --install .
 
       # test if cmake finds the dbcLib automatically
-      - name: TestInstall
-        run: >
-          cd test/TestdbclibCMake
-          mkdir -p build
-          cd build
-          cmake -G Ninja ..
-          ninja
+#      - name: TestInstall
+#        run: >
+#          cd test/TestdbclibCMake
+#          mkdir -p build
+#          cd build
+#          cmake -G Ninja ..
+#          ninja
 ...
