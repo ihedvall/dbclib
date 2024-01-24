@@ -12,10 +12,13 @@ namespace dbc {
  */
 class ISampleObserver {
  public:
-  ISampleObserver() = default; ///< Default constructor.
+
   virtual ~ISampleObserver() = default; ///< Default destructor.
+
   virtual void OnSample() = 0; ///< Handle a sample.
-  virtual void DetachObserver() = 0; ///< Detach the observer object.
+
+ protected:
+  ISampleObserver() = default; ///< Default constructor.
 };
 
 }  // namespace dbc

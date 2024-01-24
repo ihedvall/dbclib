@@ -48,6 +48,8 @@ enum class AttributeValueType : int {
  */
 class Attribute {
  public:
+    Attribute() = default; ///< Default constructor
+
     /** \brief Constructor for an attribute or definition. */
     Attribute( AttributeType type, const std::string& name );
 

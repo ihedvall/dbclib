@@ -22,6 +22,7 @@ bool DbcFile::ParseFile() {
     if (!DbcHelper::FileExist(filename)) {
       std::ostringstream error;
       error << "The file doesn't exist. File: " << filename_;
+      last_error_ = error.str();
       return false;
     }
 
@@ -216,6 +217,19 @@ void DbcFile::ReparseMessageList() {
   ResetSampleCounter();
   for (const auto& message : message_list_) {
     ParseMessage(message);
+  }
+}
+
+void DbcFile::ClearObserverList() {
+  if (!network_) {
+    return;
+  }
+  for (auto& itrMsg : network_->Messages()) {
+    auto& message = itrMsg.second;
+    for (auto& itrSignal : message.Signals()) {
+      auto& signal = itrSignal.second;
+      signal.ClearObserverList();
+    }
   }
 }
 

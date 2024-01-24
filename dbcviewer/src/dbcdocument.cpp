@@ -101,7 +101,7 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
     LOG_ERROR() << "No header block in file. File: "
                 << reader.ShortName();
   }
-  const auto* data_group = reader.GetDataGroup(0);
+  auto* data_group = header->LastDataGroup();
   if (data_group == nullptr) {
     LOG_ERROR() << "No data in file. File: "
                 << reader.ShortName();
@@ -177,8 +177,8 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
     return;
   }
   size_t count_messages = 0;
-  dbc_file_->SetMessageSize(0);
-  dbc_file_->SetMessageSize(nof_messages);
+  dbc_file_->MessageSize(0);
+  dbc_file_->MessageSize(nof_messages);
   for (size_t sample = 0; sample < nof_messages; ++sample) {
     uint64_t time = 0;
     const auto time_valid = rel_time->GetChannelValue(sample, time);

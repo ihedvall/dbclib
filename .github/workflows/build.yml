@@ -36,15 +36,15 @@ jobs:
 #              CXX: clang++
 #            pack: 1
 #
-#          - name: win64
-#            os: windows-latest
-#            ninja_platform: win
-#            msvc_arch: x64
-#            cmake_env:
-#              CMAKE_RC_FLAGS: "/C 1252"
-#              CC: clang
-#              CXX: clang++
-#            pack: 1
+          - name: win64
+            os: windows-latest
+            ninja_platform: win
+            msvc_arch: x64
+            cmake_env:
+              CMAKE_RC_FLAGS: "/C 1252"
+              CC: clang
+              CXX: clang++
+            pack: 1
 #
 #          - name: win32
 #            os: windows-latest
@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@v3
@@ -116,7 +116,7 @@ jobs:
         run: |
           mkdir -p build/release
           cd build/release
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
+          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DDBC_PYTHON=ON ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
 
       - name: Build
         run: |

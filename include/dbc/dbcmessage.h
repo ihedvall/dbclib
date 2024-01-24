@@ -31,7 +31,6 @@ class DbcMessage {
   DbcMessage(uint64_t time, uint32_t can_id, std::vector<uint8_t>  data);
   DbcMessage(const DbcMessage& message) = default; ///< Default destructor.
 
-
   void Time(uint64_t ns1970) {time_ = ns1970;} ///< Sets the time.
   [[nodiscard]] uint64_t Time() const {return time_;} ///< Message time.
 
@@ -39,7 +38,7 @@ class DbcMessage {
   [[nodiscard]] uint32_t CanId() const {return can_id_;} ///< CAN ID.
 
   /** \brief Sets the CAN data bytes. */
-  void Data(const std::vector<uint8_t>& data) {data_ = data;}
+  void Data(const std::vector<uint8_t>& data) { data_ = data;}
   /** \brief Returns the CAN data bytes. */
   [[nodiscard]] const std::vector<uint8_t>& Data() const {return data_;}
 
