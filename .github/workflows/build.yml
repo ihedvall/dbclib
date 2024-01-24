@@ -40,10 +40,7 @@ jobs:
             os: windows-latest
             ninja_platform: win
             msvc_arch: x64
-            cmake_env:
-              CMAKE_RC_FLAGS: "/C 1252"
-              CC: clang
-              CXX: clang++
+            cmake_env: {}
             pack: 1
 #
 #          - name: win32
@@ -64,30 +61,9 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v3
-        with:
-          version: 1.9.0
-          platform: ${{ matrix.env.ninja_platform }}
-          destination: ninja
-
-      - name: Setup linux environment
-        if: matrix.env.ninja_platform == 'linux'
-        run: |
-          sudo apt-get update 
-          # flex-old contains FlexLexer.h which is needed by util
-          # For some reason, flex does not contain this header
-          sudo apt-get install --yes git cmake libboost-all-dev expat zlib1g libfl-dev
-
-      - name: Setup MSVC environment
-        if: matrix.env.ninja_platform == 'win'
-        uses: seanmiddleditch/gha-setup-vsdevenv@v3
-        with:
-          arch: ${{ matrix.env.msvc_arch }}
-
       - name: Build expat
         if: matrix.env.ninja_platform == 'mac'
-        run: |
+        run: >
           # https://macappstore.org/expat/
           curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
           echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
@@ -100,7 +76,7 @@ jobs:
       # https://stackoverflow.com/questions/23749530/brew-install-zlib-devel-on-mac-os-x-mavericks
       - name: zlib
         if: matrix.env.ninja_platform == 'mac'
-        run: |
+        run: >
           wget https://www.zlib.net/zlib-1.2.12.tar.xz
           tar -xvf zlib-1.2.12.tar.xz
           cd zlib-1.2.12
@@ -108,32 +84,26 @@ jobs:
           make
           make install
 
-      - name: Build Information
-        run: |
-          echo "ninja version: $(ninja --version)"
-          cmake --version
-
       - name: Configure Release
         env: ${{ matrix.env.cmake_env }}
-        run: |
-          mkdir -p build/release
-          cd build/release
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DDBC_PYTHON=ON ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
+        run: >
+          cmake -G Ninja -B ${{github.workspace}}/build 
+          -D CMAKE_BUILD_TYPE=Release -D DBC_PYTHON=ON 
+          ${{ env.CMAKE_FLAGS }} ${{ matrix.env.cmake_flags }} ../..
 
       - name: Build
-        run: |
-          cd build/release
-          ninja
+        run: >
+          cmake --build ${{github.workspace}}/build 
 
       # install for testing
       - name: Install
-        run: |
-          cd build/release
+        run: >
+          cd ${{github.workspace}}/build/release
           sudo cmake --install .
 
       # test if cmake finds the dbcLib automatically
       - name: TestInstall
-        run: |
+        run: >
           cd test/TestdbclibCMake
           mkdir -p build
           cd build
