@@ -60,8 +60,7 @@ jobs:
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
         run: >
-          cmake -G Ninja -B ${{github.workspace}}/build 
-          -D CMAKE_BUILD_TYPE={{env.BUILD_TYPE}}  -D DBC_PYTHON=ON 
+          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -D DBC_PYTHON=ON 
 
       - name: CMAKE Build
         run: >
