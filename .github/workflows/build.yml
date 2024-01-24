@@ -60,6 +60,9 @@ jobs:
           platform: ${{ matrix.env.ninja_platform }}
           destination: ninja
 
+      - name: NINJA Set Env
+        run: cmake -E env CMAKE_GENERATOR=Ninja
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -67,7 +70,8 @@ jobs:
 
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
-        run: cmake -G Ninja -B ${{github.workspace}}/build -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: > 
+          cmake -B ${{github.workspace}}/build -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: CMAKE Build
         run:  cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
