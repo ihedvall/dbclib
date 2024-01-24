@@ -14,6 +14,7 @@ option(DBC_DOC "If doxygen is installed, then build documentation in Release mod
 option(DBC_TOOLS "Building applications" OFF)
 option(DBC_TEST "Building unit test" OFF)
 option(DBC_PYTHON "Building Python module" OFF)
+option(DBC_FLEX "Building Flex and Bison source code" OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -52,7 +53,7 @@ endif()
 include(script/flex.cmake)
 include(script/bison.cmake)
 
-if (BISON_FOUND)
+if (BISON_FOUND AND DBC_FLEX)
     BISON_TARGET(DBC_PARSER src/dbcparser.y ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcparser.cpp
             COMPILE_FLAGS "")
     cmake_print_variables(BISON_DBC_PARSER_DEFINED
@@ -64,7 +65,7 @@ if (BISON_FOUND)
             BISON_INCLUDE_DIRS)
 endif ()
 
-if (FLEX_FOUND)
+if (FLEX_FOUND AND DBC_FLEX)
     FLEX_TARGET(DBC_SCANNER src/dbcflexer.l ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcflexer.cpp)
     cmake_print_variables(FLEX_DBC_SCANNER_DEFINED
             FLEX_DBC_SCANNER_OUTPUTS
@@ -75,7 +76,7 @@ if (FLEX_FOUND)
     file(COPY_FILE ${FLEX_INCLUDE_DIRS}/FlexLexer.h ${CMAKE_CURRENT_SOURCE_DIR}/src/FlexLexer.h)
 endif ()
 
-if (FLEX_FOUND AND BISON_FOUND)
+if (FLEX_FOUND AND BISON_FOUND AND DBC_FLEX)
     ADD_FLEX_BISON_DEPENDENCY(DBC_SCANNER DBC_PARSER)
 endif()
 
