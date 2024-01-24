@@ -52,6 +52,9 @@ jobs:
 #            pack: 1
 
     steps:
+      - name: NINJA Install
+        uses: seanmiddleditch/gha-setup-ninja@master
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -59,13 +62,10 @@ jobs:
 
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
-        run: >      
-          cmake -B ${{github.workspace}}/build
-          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -G Ninja -B ${{github.workspace}}/build -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: CMAKE Build
-        run: >
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run:  cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       # install for testing
 #      - name: Install
