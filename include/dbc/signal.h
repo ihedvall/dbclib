@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include "dbc/attribute.h"
 #include "dbc/isampleobserver.h"
 

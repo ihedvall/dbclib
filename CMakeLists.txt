@@ -15,6 +15,8 @@ option(DBC_TOOLS "Building applications" OFF)
 option(DBC_TEST "Building unit test" OFF)
 option(DBC_PYTHON "Building Python module" OFF)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 if(DBC_TOOLS AND USE_VCPKG)
     list(APPEND VCPKG_MANIFEST_FEATURES "tools")
 endif()

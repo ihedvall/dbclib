@@ -3,8 +3,6 @@
 * SPDX-License-Identifier: MIT
  */
 
-#pragma once
-
 #include <dbc/dbcfile.h>
 #include <pybind11/stl.h>
 

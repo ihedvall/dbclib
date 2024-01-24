@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)  # optional, keep compiler extensions off
 set(CMAKE_DEBUG_POSTFIX "") # The import lib function doesn't accept the 'd' pos fix
 
 
+
 cmake_print_properties(TARGETS Pytest::Pytest PROPERTIES
         NAME
         LOCATION)
