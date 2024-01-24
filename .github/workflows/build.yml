@@ -24,6 +24,7 @@ jobs:
         env:
           - name: linux
             os: ubuntu-latest
+            ninja_platform: linux
             cmake_env: {}
 
 #          - name: macos
@@ -36,6 +37,7 @@ jobs:
 #
           - name: win64
             os: windows-latest
+            ninja_platform: win
             cmake_env: {}
 
 #
@@ -54,6 +56,9 @@ jobs:
     steps:
       - name: NINJA Install
         uses: seanmiddleditch/gha-setup-ninja@master
+        with:
+          platform: ${{ matrix.env.ninja_platform }}
+          destination: ninja
 
       - name: Checkout repository
         uses: actions/checkout@v4
