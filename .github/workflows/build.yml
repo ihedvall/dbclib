@@ -66,12 +66,12 @@ jobs:
 
       - name: PYTHON Install
         uses: actions/setup-python@main
-        with:
-          cache: 'pip'
 
       - name: PYTEST Install
-        run: pip install -U pytest
-        
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+          
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
         run: cmake -G Ninja -B ${{github.workspace}}/build -D DBC_TEST=ON -D DBC_PYTHON=ON
