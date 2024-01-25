@@ -64,8 +64,12 @@ jobs:
         with:
           platform: ${{ matrix.env.ninja_platform }}
 
+      - name: MSVC dev
+        uses: ilammy/msvc-dev-cmd@master
+        if: matrix.env.ninja_platform == win
+
       - name: GTEST Install
-        uses: MarkusJx/googletest-installer@master
+        uses: Bacondish2023/setup-googletest@master
 
       - name: PYTEST Install
         run: pip install pytest
@@ -85,13 +89,13 @@ jobs:
 
       # install for testing
 #      - name: Install
-#        run: >
+#        run: |
 #          cd ${{github.workspace}}/build/release
 #          sudo cmake --install .
 
       # test if cmake finds the dbcLib automatically
 #      - name: TestInstall
-#        run: >
+#        run: |
 #          cd test/TestdbclibCMake
 #          mkdir -p build
 #          cd build
