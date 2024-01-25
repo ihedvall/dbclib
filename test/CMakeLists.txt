@@ -12,9 +12,7 @@ add_executable(test_dbc
         test_dbchelper.cpp)
 
 target_include_directories(test_dbc PRIVATE
-        ../src  # dbchelper.h
-        ${GTEST_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS})
+        ../src )
 
 if (MINGW)
     target_link_options(test_dbc PRIVATE -static -fstack-protector)
@@ -23,10 +21,7 @@ elseif (MSVC)
 endif ()
 
 target_link_libraries(test_dbc PRIVATE dbc)
-target_link_libraries(test_dbc PRIVATE ${GTEST_BOTH_LIBRARIES})
-
-if (WIN32)
-endif ()
+target_link_libraries(test_dbc PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(test_dbc)

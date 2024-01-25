@@ -64,12 +64,6 @@ jobs:
         with:
           platform: ${{ matrix.env.ninja_platform }}
 
-      - name: MSVC dev
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: GTEST Install
-        uses: Bacondish2023/setup-googletest@main
-
       - name: PYTEST Install
         run: pip install pytest
         

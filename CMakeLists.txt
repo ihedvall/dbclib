@@ -144,7 +144,7 @@ if (wxWidgets_FOUND AND DBC_TOOLS)
     add_subdirectory(dbcviewer)
 endif ()
 
-if (GTEST_FOUND AND DBC_TEST)
+if (DBC_TEST)
     enable_testing()
     add_subdirectory(test)
 endif ()
