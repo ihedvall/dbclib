@@ -66,8 +66,7 @@ jobs:
 
       - name: MSVC dev
         uses: ilammy/msvc-dev-cmd@master
-        if: matrix.env.ninja_platform == win
-
+  
       - name: GTEST Install
         uses: Bacondish2023/setup-googletest@master
 
