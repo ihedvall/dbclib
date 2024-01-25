@@ -66,9 +66,9 @@ jobs:
 
       - name: MSVC dev
         uses: ilammy/msvc-dev-cmd@master
-  
+
       - name: GTEST Install
-        uses: Bacondish2023/setup-googletest@master
+        uses: Bacondish2023/setup-googletest@main
 
       - name: PYTEST Install
         run: pip install pytest
