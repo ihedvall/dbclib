@@ -12,15 +12,11 @@ endif()
 option(BUILD_SHARED_LIBS "Static libraries are preferred" OFF)
 option(DBC_DOC "If doxygen is installed, then build documentation in Release mode" OFF)
 option(DBC_TOOLS "Building applications" OFF)
-option(DBC_TEST "Building unit test" OFF)
+option(DBC_TEST "Building unit test" ON)
 option(DBC_PYTHON "Building Python module" OFF)
 option(DBC_FLEX "Building Flex and Bison source code" OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-if(DBC_TOOLS AND USE_VCPKG)
-    list(APPEND VCPKG_MANIFEST_FEATURES "tools")
-endif()
 
 if(DBC_TEST AND USE_VCPKG)
     list(APPEND VCPKG_MANIFEST_FEATURES "tests")
@@ -47,8 +43,6 @@ endif()
 if (DBC_DOC)
     include(script/doxygen.cmake)
 endif()
-
-
 
 include(script/flex.cmake)
 include(script/bison.cmake)

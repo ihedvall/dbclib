@@ -34,6 +34,4 @@ odsconfigurator/model/*_?.xml
 CMakeSettings.json
 
 venv
-
-
 python/tests/__pycache__/
