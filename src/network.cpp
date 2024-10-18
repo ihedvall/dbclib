@@ -22,7 +22,7 @@ Attribute& Network::CreateDefinition(const std::string& name) {
   auto itr = definition_list_.find(name);
   if (itr == definition_list_.end()) {
     Attribute temp(AttributeType::DbcNetwork, name);
-    itr = definition_list_.insert({name, temp}).first;
+    itr = definition_list_.emplace(name, temp).first;
   }
   return itr->second;
 }
@@ -181,7 +181,7 @@ Node& Network::CreateNode(const std::string& name) {
 void Network::AddValueTable(const std::string& name, const EnumMap& list) {
   auto itr = value_table_list_.find(name);
   if (itr == value_table_list_.end()) {
-    itr = value_table_list_.insert({name, list}).first;
+    value_table_list_.emplace(name, list);
   } else {
     itr->second = list;
   }
@@ -286,14 +286,38 @@ void Network::Bus(BusType type) {
     auto& temp = CreateAttribute(definition);
     bus = &temp;
   }
-  bus->Value(std::string("CAN"));
+  switch (type) {
+    case BusType::CAN_FD:
+      bus->Value<std::string>("CAN FD");
+      break;
+
+    case BusType::CAN:
+    default:
+      bus->Value<std::string>("CAN");
+      break;
+  }
 }
 
 BusType Network::Bus() const {
-  return BusType::CAN;
+  BusType type = BusType::CAN;
+  const Attribute* bus = GetAttribute("BusType");
+  if (bus != nullptr) {
+    const std::string bus_type = bus->Value<std::string>();
+    if (bus_type == "CAN") {
+      type = BusType::CAN;
+    } else if (bus_type == "CAN FD" || bus_type == "CANFD" ||
+               bus_type == "CAN_FD" || bus_type == "CAN-FD") {
+      type = BusType::CAN_FD;
+    }
+  }
+  return type;
 }
 
 std::string Network::BusAsString() const {
+  const auto type = Bus();
+  if (type == BusType::CAN_FD) {
+    return "CAN FD";
+  }
   return "CAN";
 }
 

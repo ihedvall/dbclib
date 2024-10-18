@@ -1,5 +1,6 @@
 %top {
     #include <cstdint>
+    #include <charconv>
 }
 %{
     #include "dbcscanner.h"
@@ -175,7 +176,7 @@ nl              [\n\r]
 {double_val}     {
                    double temp = 0.0;
                    try {
-                     temp = std::stod(yytext);
+                     std::from_chars(yytext, yytext + strlen(yytext), temp);
                    } catch (const std::exception&) {
 
                    }

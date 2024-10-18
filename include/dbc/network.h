@@ -29,7 +29,8 @@ enum class ProtocolType : int {
 
 /** \brief Type of bus. */
 enum class BusType : int {
-  CAN = 0 ///< CAN bus
+  CAN = 0, ///< CAN bus
+  CAN_FD   ///< CAN FD bus
 };
 
 /** \brief Sorted message of messages. Message ID is the key. */

@@ -1,7 +1,8 @@
-#line 2 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 1 "D:/projects/dbclib/src/dbcflexer.cpp"
     #include <cstdint>
+    #include <charconv>
 
-#line 5 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 5 "D:/projects/dbclib/src/dbcflexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -405,7 +406,7 @@ typedef flex_uint8_t YY_CHAR;
 
 #include <FlexLexer.h>
 
-int yyFlexLexer::yywrap() { return 1; }
+inline int yyFlexLexer::yywrap() { return 1; }
 int yyFlexLexer::yylex()
 	{
 	LexerError( "yyFlexLexer::yylex invoked but %option yyclass used" );
@@ -693,13 +694,13 @@ static const flex_int32_t yy_rule_can_match_eol[64] =
 
 static const flex_int16_t yy_rule_linenum[63] =
     {   0,
-       39,   40,   41,   42,   43,   44,   45,   46,   47,   48,
-       49,   50,   51,   52,   53,   55,   56,   57,   58,   59,
-       60,   61,   63,   65,   66,   67,   68,   69,   70,   71,
-       72,   73,   74,   75,   76,   77,   78,   79,   80,   81,
-       82,   83,   85,   95,   96,   97,  102,  103,  104,  115,
-      128,  176,  187,  188,  189,  190,  191,  193,  194,  195,
-      196,  199
+       40,   41,   42,   43,   44,   45,   46,   47,   48,   49,
+       50,   51,   52,   53,   54,   56,   57,   58,   59,   60,
+       61,   62,   64,   66,   67,   68,   69,   70,   71,   72,
+       73,   74,   75,   76,   77,   78,   79,   80,   81,   82,
+       83,   84,   86,   96,   97,   98,  103,  104,  105,  116,
+      129,  177,  188,  189,  190,  191,  192,  194,  195,  196,
+      197,  200
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -709,18 +710,18 @@ static const flex_int16_t yy_rule_linenum[63] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 1 "D:/projects/dbclib/src/dbcflexer.l"
 
-#line 5 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 6 "D:/projects/dbclib/src/dbcflexer.l"
     #include "dbcscanner.h"
     #undef  YY_DECL
     #define YY_DECL int dbc::DbcScanner::ddlex(dbc::DbcParser::value_type* yy_value)
     using token = dbc::DbcParser::token;
-#line 720 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 720 "D:/projects/dbclib/src/dbcflexer.cpp"
 #define YY_NO_UNISTD_H 1
 #define YY_NO_INPUT 1
 
-#line 724 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 724 "D:/projects/dbclib/src/dbcflexer.cpp"
 
 #define INITIAL 0
 #define PRI 1
@@ -747,7 +748,7 @@ static const flex_int16_t yy_rule_linenum[63] =
 #include <unistd.h>
 /* %endif */
 #endif
-
+    
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
@@ -924,13 +925,13 @@ YY_DECL
 
 	{
 /* %% [7.0] user's declarations go here */
-#line 34 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 35 "D:/projects/dbclib/src/dbcflexer.l"
 
 
-#line 37 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 38 "D:/projects/dbclib/src/dbcflexer.l"
             yylval = yy_value;
 
-#line 934 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 934 "D:/projects/dbclib/src/dbcflexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1017,217 +1018,217 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 39 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 40 "D:/projects/dbclib/src/dbcflexer.l"
 { } /* Remove comments */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 40 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 41 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_VERSION; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 41 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 42 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BO; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 43 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BS; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 44 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BU; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 44 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 45 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SG; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 46 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_EV; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 47 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SIG_VALTYPE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 48 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_NS;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 49 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_INT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 50 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_FLOAT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 50 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 51 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_NAN; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 51 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 52 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_STRING; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 52 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 53 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_ENUM; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 53 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 54 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_HEX; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 55 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 56 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_NS_DESC; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 56 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 57 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_CM; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 57 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 58 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_DEF; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 58 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 59 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 59 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 60 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_VAL; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 60 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 61 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_CAT_DEF; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 61 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 62 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_CAT;  }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 63 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 64 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_FILTER; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 65 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 66 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_DEF_DEF;      }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 66 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 67 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_EV_DATA;         }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 67 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 68 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_ENVVAR_DATA;     }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 68 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 69 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SGTYPE;          }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 69 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 70 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SGTYPE_VAL;      }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 70 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 71 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_DEF_SGTYPE;   }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 71 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 72 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_SGTYPE;       }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 72 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 73 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SIG_TYPE_REF;    }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 73 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 74 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_VAL_TABLE;       }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 74 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 75 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SIG_GROUP;       }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 75 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 76 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SIGTYPE_VALTYPE; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 76 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 77 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BO_TX_BU;        }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 77 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 78 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_DEF_REL;      }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 78 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 79 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_REL;          }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 79 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 80 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BA_DEF_DEF_REL;  }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 80 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 81 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BU_SG_REL;       }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 81 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 82 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BU_EV_REL;       }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 82 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 83 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BU_BO_REL;       }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 83 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 84 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SG_MUL_VAL;      }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 85 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 86 "D:/projects/dbclib/src/dbcflexer.l"
 {
    try {
       const auto index = std::stoi(yytext + 17);
@@ -1241,17 +1242,17 @@ YY_RULE_SETUP
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 95 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 96 "D:/projects/dbclib/src/dbcflexer.l"
 {}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 96 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 97 "D:/projects/dbclib/src/dbcflexer.l"
 {}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 97 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 98 "D:/projects/dbclib/src/dbcflexer.l"
 {
                    const std::string temp(yytext);
                    yylval->build(temp);
@@ -1260,18 +1261,18 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 102 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 103 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_PLUS; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 103 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 104 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_MINUS; }
 	YY_BREAK
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 104 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 105 "D:/projects/dbclib/src/dbcflexer.l"
 {
                    const size_t len = strlen(yytext);
                    std::string temp;
@@ -1285,7 +1286,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 115 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 116 "D:/projects/dbclib/src/dbcflexer.l"
 {
                    int64_t temp = 0;
                    try {
@@ -1299,7 +1300,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 128 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 129 "D:/projects/dbclib/src/dbcflexer.l"
 {
 		uint64_t address = 0;
 		for ( size_t index = 0; yytext[ index ] != '\0'; ++index ) {
@@ -1351,11 +1352,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 176 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 177 "D:/projects/dbclib/src/dbcflexer.l"
 {
                    double temp = 0.0;
                    try {
-                     temp = std::stod(yytext);
+                     std::from_chars(yytext, yytext + strlen(yytext), temp);
                    } catch (const std::exception&) {
 
                    }
@@ -1365,60 +1366,60 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 187 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 188 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_COLON; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 188 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 189 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SEMICOLON; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 189 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 190 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_SEP; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 190 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 191 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_COMMA; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 191 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 192 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_AT; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 193 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 194 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BOX_OPEN; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 194 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 195 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_BOX_CLOSE; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 195 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 196 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_PAR_OPEN; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 196 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 197 "D:/projects/dbclib/src/dbcflexer.l"
 { return token::TAG_PAR_CLOSE; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 199 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 200 "D:/projects/dbclib/src/dbcflexer.l"
 {}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 200 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 201 "D:/projects/dbclib/src/dbcflexer.l"
 ECHO;
 	YY_BREAK
-#line 1422 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.cpp"
+#line 1422 "D:/projects/dbclib/src/dbcflexer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(PRI):
 case YY_STATE_EOF(VERSION):
@@ -2557,7 +2558,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 200 "/home/ihedvall/CLionProjects/dbclib/src/dbcflexer.l"
+#line 201 "D:/projects/dbclib/src/dbcflexer.l"
 
 
 

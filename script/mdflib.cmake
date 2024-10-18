@@ -1,15 +1,17 @@
-find_package(MdfLib)
+# Copyright 2024 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
+include (FetchContent)
 if (NOT MdfLib_FOUND)
-    include (FetchContent)
     FetchContent_Declare(mdflib
             GIT_REPOSITORY https://github.com/ihedvall/mdflib.git
             GIT_TAG HEAD)
-    set(MDF_BUILD_DOC OFF)
-    set(MDF_BUILD_TEST OFF)
-    set(MDF_BUILD_TOOLS OFF)
-    set(MDF_BUILD_SHARED_LIB OFF)
-    set(MDF_BUILD_SHARED_LIB_NET OFF)
-    set(MDF_BUILD_SHARED_LIB_EXAMPLE OFF)
+    set(MDF_BUILD_DOC OFF CACHE  BOOL "" FORCE)
+    set(MDF_BUILD_TEST OFF CACHE  BOOL "" FORCE)
+    set(MDF_BUILD_TOOLS OFF CACHE  BOOL "" FORCE)
+    set(MDF_BUILD_SHARED_LIB OFF CACHE  BOOL "" FORCE)
+    set(MDF_BUILD_SHARED_LIB_NET OFF CACHE  BOOL "" FORCE)
+    set(MDF_BUILD_SHARED_LIB_EXAMPLE OFF CACHE  BOOL "" FORCE)
+
     FetchContent_MakeAvailable(mdflib)
 
     message(STATUS "MDFLIB Populated: " ${mdflib_POPULATED})
