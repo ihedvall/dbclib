@@ -25,7 +25,7 @@ class Message {
    * \brief Sets the message ID.
    *
    * Sets the message ID. The extended CAN ID is max 29-bit. to indicate
-   * that the ID is extended, bit 32 should be set.
+   * that the ID is extended, bit 31 should be set.
    * @param ident Message ID
    */
    void Ident(uint64_t ident) {

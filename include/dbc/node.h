@@ -37,9 +37,9 @@ class Node {
     return attribute_list_;
   }
   /** \brief Creates an attribute. Parser function. */
-  Attribute& CreateAttribute(const Attribute& definition);
+  [[nodiscard]] Attribute& CreateAttribute(const Attribute& definition);
   /** \brief Returns an attribute by its name. */
-  const Attribute* GetAttribute(const std::string& name) const;
+  [[nodiscard]] const Attribute* GetAttribute(const std::string& name) const;
 
  private:
   std::string name_; ///< Node name.

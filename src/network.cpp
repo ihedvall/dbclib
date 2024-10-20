@@ -6,6 +6,11 @@
 #include "dbc/network.h"
 #include "dbchelper.h"
 #include <algorithm>
+
+namespace {
+constexpr uint64_t kMaxExtendedId = 0x1FFFFFFFULL; ///< Max Extended CAN ID
+}
+
 namespace dbc {
 
 EnvVar& Network::GetEnvVar(const std::string& name) {
@@ -62,6 +67,7 @@ const Message* Network::GetMessage(uint64_t message_id) const {
 }
 
 Message* Network::GetMessageByCanId(uint64_t can_id) {
+  can_id &= kMaxExtendedId;
   auto itr = std::find_if(message_list_.begin(),
                           message_list_.end(),
                           [&] (const MessageList ::value_type &mess) {
@@ -71,6 +77,7 @@ Message* Network::GetMessageByCanId(uint64_t can_id) {
 }
 
 const Message* Network::GetMessageByCanId(uint64_t can_id) const {
+  can_id &= kMaxExtendedId;
   const auto itr = std::find_if(message_list_.cbegin(),
                                 message_list_.cend(),
                               [&] (const MessageList ::value_type &mess) {
@@ -117,6 +124,7 @@ const Signal* Network::GetSignal(uint64_t message_id,
 
 const Signal* Network::GetSignalByCanId(uint64_t can_id,
                                  const std::string& signal_name) const {
+  can_id &= kMaxExtendedId;
   const auto* message = GetMessageByCanId(can_id);
   return message != nullptr ? message->GetSignal(signal_name) : nullptr;
 }
