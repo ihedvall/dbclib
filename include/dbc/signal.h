@@ -6,11 +6,14 @@
  * \brief Interface against a DBC signal configuration.
  */
 #pragma once
+
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
+#include <utility>
+
 #include "dbc/attribute.h"
 #include "dbc/isampleobserver.h"
 

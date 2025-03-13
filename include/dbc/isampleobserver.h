@@ -5,8 +5,9 @@
 /** \file isampleobserver.h
  * \brief Internal object that define an observer interface that handle samples.
  */
+
 #pragma once
-#include <cstdint>
+
 namespace dbc {
 /** \brief Interface that handles samples. Internal usage.
  */

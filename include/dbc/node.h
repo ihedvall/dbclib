@@ -6,8 +6,11 @@
  * \brief Interface against a DBC node (Device(ECU).
  */
 #pragma once
+
+#include <cstdint>
 #include <string>
 #include <vector>
+
 #include "dbc/attribute.h"
 namespace dbc {
 /** \brief Interface against a DBC node which normally is an ECU.

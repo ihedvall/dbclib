@@ -6,9 +6,11 @@
  * \brief Defines a signal group.
  */
 #pragma once
+
 #include <cstdint>
 #include <string>
 #include <vector>
+
 namespace dbc {
 
 /** \brief Interface against a signal group. */

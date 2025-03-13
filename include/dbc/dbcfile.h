@@ -6,8 +6,11 @@
  * \brief The DBC file object is the main user object.
  */
 #pragma once
+#include <cstdint>
 #include <string>
 #include <memory>
+#include <vector>
+
 #include "dbc/network.h"
 #include "dbc/dbcmessage.h"
 

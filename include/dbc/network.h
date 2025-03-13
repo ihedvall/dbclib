@@ -6,8 +6,12 @@
  * \brief Defines a DBC network configuration object.
  */
 #pragma once
+
+#include <cstdint>
+#include <string>
 #include <vector>
 #include <map>
+
 #include "dbc/envvar.h"
 #include "dbc/attribute.h"
 #include "dbc/node.h"

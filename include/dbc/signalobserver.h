@@ -6,10 +6,14 @@
  * \brief The sample observer holds sample values for a signal.
  */
 #pragma once
-#include "dbc/isampleobserver.h"
-#include "dbc/signal.h"
+
+#include <cstdint>
 #include <utility>
 #include <memory>
+
+#include "dbc/isampleobserver.h"
+#include "dbc/signal.h"
+
 
 namespace dbc {
 /** \brief The sample observer hold a number of samples.
