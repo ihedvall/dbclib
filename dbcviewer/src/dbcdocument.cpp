@@ -25,6 +25,8 @@
 
 using namespace util::log;
 using namespace dbc;
+
+
 namespace {
 } // end namespace
 
@@ -65,12 +67,13 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
                            "Open CAN Message File", "",
                            "", "MDF Files (*.mf4)|*.mf4|All Files (*.*)|*.*",
                            wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-  const auto ret = open_dialog.ShowModal();
-  if (ret != wxID_OK) {
+  if (const auto ret = open_dialog.ShowModal();
+      ret != wxID_OK) {
     return;
   }
-  const auto* protocol_type = network->GetAttribute("ProtocolType");
-  if (protocol_type == nullptr) {
+
+  if (const auto* protocol_type = network->GetAttribute("ProtocolType");
+      protocol_type == nullptr) {
     ProtocolDialog protocol_dialog(wxGetActiveWindow());
     const auto ret_protocol = protocol_dialog.ShowModal();
     if (ret_protocol != wxID_OK) {
@@ -81,8 +84,8 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
     window->RedrawListView();
   }
 
-
   wxBusyCursor wait;
+
   // Read information about the file
   const auto filename = open_dialog.GetPath().ToStdString();
   mdf::MdfReader reader(filename);
@@ -107,8 +110,6 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
                 << reader.ShortName();
   }
 
-
-
   if (!file_ok || !read_info || header == nullptr || data_group == nullptr) {
     wxMessageBox(
         "Failed to read information from the file.\nMore information in the log file.",
@@ -117,30 +118,52 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
   }
 
   // Search for the master channel name (assuming relative time channel)
-  std::string master_name = "Timestamp";
-  for (const auto* group : data_group->ChannelGroups()) {
-    if (group == nullptr) {
+  mdf::IChannelGroup *selected_group = nullptr;
+  mdf::IChannel *master_channel = nullptr;
+  for (mdf::IChannelGroup* mdf_group : data_group->ChannelGroups()) {
+    if (mdf_group == nullptr || mdf_group->NofSamples() == 0 ) {
       continue;
     }
-    for (const auto* channel : group->Channels()) {
-      if (channel == nullptr) {
+    if (selected_group == nullptr ||
+               mdf_group->NofSamples() > selected_group->NofSamples()) {
+      selected_group = mdf_group;
+      master_channel = nullptr;
+    } else {
+      continue;
+    }
+
+    for (mdf::IChannel* mdf_channel : mdf_group->Channels()) {
+      if (mdf_channel == nullptr) {
         continue;
       }
-      if (channel->Type() == mdf::ChannelType::Master) {
-        master_name = channel->Name();
-        break;
+      if (mdf_channel->Type() == mdf::ChannelType::Master &&
+          mdf_channel->Sync() == mdf::ChannelSyncType::Time) {
+        master_channel = mdf_channel;
       }
     }
   }
 
   const auto base_time = header->StartTime(); // Absolute time reference
 
-  auto rel_time = mdf::CreateChannelObserver(*data_group, master_name);
-  if (!rel_time) {
-    LOG_ERROR() << "Time channel 'Timestamp' is missing. File: "
-                << reader.ShortName();
+  mdf::ChannelObserverPtr rel_time;
+  mdf::ChannelObserverPtr can_id;
+  mdf::ChannelObserverPtr data_bytes;
+  if (selected_group != nullptr && master_channel != nullptr) {
+    rel_time = mdf::CreateChannelObserver(*data_group, *selected_group, *master_channel);
+    if (auto* can_id_channel = selected_group->GetChannel("CAN_DataFrame.ID");
+        can_id_channel != nullptr) {
+      can_id = mdf::CreateChannelObserver(*data_group, *selected_group,*can_id_channel);
+    }
+    if (auto* data_bytes_channel = selected_group->GetChannel("CAN_DataFrame.DataBytes");
+        data_bytes_channel != nullptr) {
+      data_bytes = mdf::CreateChannelObserver(*data_group, *selected_group,
+                                              *data_bytes_channel);
+    }
   }
-  auto can_id = mdf::CreateChannelObserver(*data_group, "CAN_DataFrame.ID");
+
+  if (!rel_time) {
+    LOG_ERROR() << "Master time channel is missing. File: " << reader.ShortName();
+  }
   if (!can_id) {
     LOG_ERROR() << "CAN ID channel 'CAN_DataFrame.ID' is missing. File: "
                 << reader.ShortName();
@@ -153,8 +176,6 @@ void DbcDocument::OnImportCanMessageFile(wxCommandEvent &event) {
                 << reader.ShortName();
   }
 */
-  auto data_bytes = mdf::CreateChannelObserver(*data_group,
-                                                "CAN_DataFrame.DataBytes");
   if (!data_bytes) {
     LOG_ERROR() << "Data bytes channel 'CAN_DataFrame.DataBytes' is missing. File: "
                 << reader.ShortName();
