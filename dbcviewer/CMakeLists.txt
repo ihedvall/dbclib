@@ -6,10 +6,7 @@ project(MdfViewer
         DESCRIPTION "Simple DBC file browser"
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
-include("../script/boost.cmake")
-include("../script/zlib.cmake")
-include("../script/utillib.cmake")
-include("../script/mdflib.cmake")
+
 message(STATUS "ZLIB Libraries: " ${ZLIB_LIBRARIES})
 add_executable(dbcview
         src/dbcviewer.cpp src/dbcviewer.h

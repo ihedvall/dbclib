@@ -33,6 +33,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_DEBUG_POSTFIX d)
 
 if (DBC_TOOLS)
+    include(script/boost.cmake)
+    include(script/zlib.cmake)
+    include(script/utillib.cmake)
+    include(script/mdflib.cmake)
     include(script/wxwidgets.cmake)
 endif()
 

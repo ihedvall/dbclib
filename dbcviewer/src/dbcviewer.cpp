@@ -4,6 +4,7 @@
  */
 #include <filesystem>
 #define BOOST_LOCALE_HIDE_AUTO_PTR
+#include <boost/asio.hpp>
 #include <boost/process.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/locale.hpp>
@@ -25,6 +26,10 @@
 using namespace util::log;
 
 wxIMPLEMENT_APP(dbc::viewer::DbcViewer);
+
+namespace {
+  boost::asio::io_context kIoContext;
+}
 
 namespace dbc::viewer {
 
@@ -63,11 +68,13 @@ bool DbcViewer::OnInit() {
 
   // Find the path to the 'gnuplot.exe'
   try {
-    auto gp = boost::process::search_path("gnuplot");
+    auto gp = boost::process::environment::find_executable("gnuplot");
     gnuplot_ = gp.string();
     LOG_INFO() << "GnuPlot found. Path: " << gnuplot_;
   } catch(const std::exception& ) {
     gnuplot_.clear();
+  }
+  if (gnuplot_.empty()) {
     LOG_INFO() << "GnuPlot was not found.";
   }
 
@@ -161,7 +168,8 @@ void DbcViewer::OnUpdateGnuPlotDownloadPage(wxUpdateUIEvent &event) {
 
 void DbcViewer::OpenFile(const std::string& filename) const {
   if (!notepad_.empty()) {
-    boost::process::spawn(notepad_, filename);
+    boost::process::process proc(kIoContext, notepad_, {filename});
+    proc.detach();
   }
 }
 

@@ -3,29 +3,38 @@
  * SPDX-License-Identifier: MIT
  */
 #include <sstream>
+#include <map>
+
+#include <boost/filesystem.hpp>
+#include <boost/asio.hpp>
+#include <boost/process.hpp>
+#include <boost/process/windows/show_window.hpp>
+
 #include <wx/sizer.h>
 #include <wx/bitmap.h>
+
 #include <util/timestamp.h>
 #include <util/stringutil.h>
+#include <util/csvwriter.h>
+#include <util/logstream.h>
+
+#include <dbc/signalobserver.h>
+
 #include "childframe.h"
 #include "dbcdocument.h"
 #include "windowid.h"
-#include <map>
-#include <dbc/signalobserver.h>
 #include "signalobserverframe.h"
-#include <boost/filesystem.hpp>
+
 #include "dbcviewer.h"
-#include <util/csvwriter.h>
-#include <util/logstream.h>
-#include <boost/process.hpp>
-#if (_MSC_VER)
-#include <boost/process/windows.hpp>
-#endif
+
+
 using namespace util::log;
 
 namespace {
 #include "img/sub.xpm"
 #include "img/tree_list.xpm"
+
+boost::asio::io_context kIoContext;
 
 // Bitmap index for the tree control (tree_list.bmp)
 constexpr int TREE_NETWORK = 0;
@@ -1403,13 +1412,9 @@ void ChildFrame::OnPlotSignalData(wxCommandEvent &event) {
     wxMessageBox("Failed to create CSV or GP files.\nMore information in log file.");
     return;
   }
-#if (_MSC_VER)
-  boost::process::spawn(app.GnuPlot(), "--persist", gp_file, boost::process::windows::hide);
-#else
-  // TODO: how to hide?
-  boost::process::spawn(app.GnuPlot(), "--persist", gp_file);
-#endif
-
+  boost::process::process proc(kIoContext, app.GnuPlot(),
+    {"--persist", gp_file}, boost::process::windows::show_window_hide );
+  proc.detach();
 }
 
 void ChildFrame::OnUpdatePlotSignalData(wxUpdateUIEvent &event) {
