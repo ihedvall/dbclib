@@ -14,7 +14,7 @@ DbcScanner::DbcScanner(std::ifstream& message)
 
 Network& DbcScanner::GetNetwork() {
   if (!network_) {
-    network_ .reset(new Network);
+    network_  = std::make_unique<Network>();
   }
   return *network_;
 }

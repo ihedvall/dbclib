@@ -4,11 +4,16 @@
  */
 
 #include "dbchelper.h"
+
 #include <cstring>
 #include <fstream>
+
+#include "dbc/signal.h"
+
 namespace {
 constexpr uint8_t kMask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
-using signed64 = union {
+
+union Signed64 {
   int64_t val1 : 1;
   int64_t val2 : 2;
   int64_t val3 : 3;
@@ -74,6 +79,8 @@ using signed64 = union {
   int64_t val63 : 63;
   int64_t val64 : 64;
 };
+
+using signed64 = union Signed64;
 
 } // end namespace empty
 
@@ -595,6 +602,54 @@ void DbcHelper::SetAllBits(size_t start, size_t length, uint8_t* raw ) {
     const auto byte = bit / 8;
     bit %= 8;
     raw[byte] |= kMask[bit];
+  }
+}
+
+void DbcHelper::ParseJ1939Flags(Signal& signal,
+             const std::vector<uint8_t>& message) {
+  auto& channelValue = signal.GetSignalValue();
+  channelValue.not_available = false;
+  channelValue.error = false;
+  channelValue.reserved = false;
+  const size_t bit_length = signal.BitLength();
+
+  if (message.empty() || bit_length < 1 || !channelValue.out_of_range ) {
+    return; // Cannot parse J1939 flags
+  }
+  const uint8_t* raw = message.data();
+  const size_t bit_start = signal.BitStart();
+  size_t error_bit = bit_start + bit_length - 1; // Big Endian
+  if (signal.LittleEndian()) {
+    error_bit = bit_start;
+    if (bit_length > 8) {
+      error_bit += 7;
+    } else {
+      error_bit += bit_length - 1;
+    }
+  }
+  bool error = false;
+  bool reserved = false;
+  for (size_t index = 0; index < bit_length; ++index) {
+    size_t bit = bit_start + index;
+    const bool error_b = bit == error_bit;
+    const auto byte = bit / 8;
+    bit %= 8;
+    if ((raw[byte] & kMask[bit]) == 0 ) {
+      if (error_b) {
+        error = true;
+        reserved = false;
+      } else {
+        error = false;
+        reserved = true;
+      }
+    }
+  }
+  if (reserved) {
+    channelValue.reserved = true;
+  } else if (error) {
+    channelValue.error = true;
+  } else {
+    channelValue.not_available = true;
   }
 }
 

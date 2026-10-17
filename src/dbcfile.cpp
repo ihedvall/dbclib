@@ -88,7 +88,7 @@ void DbcFile::AddMessage(size_t index, const DbcMessage& message) {
   }
 }
 
-bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
+bool DbcFile::ParseNMEA2000(const DbcMessage& message) const {
   bool parse = false;
   if (!network_) {
     return parse;
@@ -113,7 +113,7 @@ bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
   // Check if fast package message
   if (mess->NofBytes() > 8) {
     const auto& bytes = message.Data();
-    const auto pack_id = !bytes.empty() ? bytes[0] >> 5 : 0;
+    // const auto pack_id = !bytes.empty() ? bytes[0] >> 5 : 0;
     const uint8_t seq_no = !bytes.empty() ? bytes[0] & 0x1F : 0;
     const size_t offset = seq_no > 0 ? 1 : 2;
     const size_t data_index = seq_no > 0 ? 6 + ((seq_no - 1) * 7) : 0;
@@ -121,8 +121,8 @@ bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
       mess->ResetSequenceNumber();
     }
     if (seq_no == mess->NextSequenceNumber()) {
-      const auto last = mess->UpdateData(message.Data(), offset, data_index);
-      if (last) {
+      if (const bool last = mess->UpdateData(message.Data(), offset, data_index);
+          last) {
         mess->ParseMessage(message.Time(), message.CanId());
         mess->StepSampleCounter();
         parse = true;
@@ -137,7 +137,7 @@ bool DbcFile::ParseNMEA2000(const DbcMessage& message) {
   return parse;
 }
 
-bool DbcFile::ParseJ1939(const DbcMessage& message) {
+bool DbcFile::ParseJ1939(const DbcMessage& message) const {
   bool parse = false;
   if (!network_) {
     return parse;
@@ -166,7 +166,7 @@ bool DbcFile::ParseJ1939(const DbcMessage& message) {
   return parse;
 }
 
-bool DbcFile::ParseStandardCAN(const DbcMessage& message) {
+bool DbcFile::ParseStandardCAN(const DbcMessage& message) const {
   bool parse = false;
   if (!network_) {
     return false;
@@ -191,7 +191,7 @@ void DbcFile::ResetSampleCounter() const {
   }
 }
 
-bool DbcFile::ParseMessage(const DbcMessage& message) {
+bool DbcFile::ParseMessage(const DbcMessage& message) const {
   if (!network_) {
     return false;
   }
@@ -213,14 +213,15 @@ bool DbcFile::ParseMessage(const DbcMessage& message) {
   return parse;
 }
 
-void DbcFile::ReparseMessageList() {
+void DbcFile::ReparseMessageList() const {
   ResetSampleCounter();
   for (const auto& message : message_list_) {
+    // ReSharper disable once CppExpressionWithoutSideEffects
     ParseMessage(message);
   }
 }
 
-void DbcFile::ClearObserverList() {
+void DbcFile::ClearObserverList() const {
   if (!network_) {
     return;
   }

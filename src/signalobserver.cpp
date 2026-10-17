@@ -14,9 +14,7 @@ SignalObserver::SignalObserver(const Signal& signal)
   MaxSamples(signal.SampleCounter());
 }
 
-SignalObserver::~SignalObserver() {
-
-}
+SignalObserver::~SignalObserver() = default;
 
 std::shared_ptr<SignalObserver> SignalObserver::CreateSignalObserver(
     const Signal& signal) {

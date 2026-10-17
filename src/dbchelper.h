@@ -8,7 +8,11 @@
 #include <string>
 #include <vector>
 
+
 namespace dbc {
+
+class Signal;
+
 class DbcHelper {
  public:
   static void DoubleToRaw(bool little_endian, size_t start, size_t length,
@@ -40,6 +44,7 @@ class DbcHelper {
 
   static void SetAllBits(size_t start, size_t length, uint8_t* raw);
 
+  static void ParseJ1939Flags(Signal& signal, const std::vector<uint8_t>& message);
   static bool IsAllBitsSet(size_t start, size_t length, const uint8_t* raw);
 
   static std::string GetStem(const std::string& path);

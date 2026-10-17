@@ -43,15 +43,15 @@ bool Signal::IsMultiplexed() const {
 }
 
 void Signal::ParseMessage(const std::vector<uint8_t>& message,
-                          uint64_t ns1970, uint32_t can_id) {
+                          uint64_t ns1970, uint32_t can_id, bool j1939) {
   SampleCanId(can_id);
   SampleTime(ns1970);
-  if (!Valid()) {
-    channel_value_.Clear();
-    FireOnSample();
-    return;
-  }
+
   channel_value_.valid = true;
+  channel_value_.out_of_range = false;
+  channel_value_.not_available = false;
+  channel_value_.error = false;
+  channel_value_.reserved = false;
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
@@ -63,12 +63,12 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
 
     case SignalDataType::UnsignedData: {
       if (IsArrayValue()) {
-        auto temp = DbcHelper::RawToByteArray(bit_start_, bit_length_,
+        std::vector<uint8_t> temp = DbcHelper::RawToByteArray(bit_start_, bit_length_,
                                               message.data());
-        channel_value_.array_value = temp;
+        channel_value_.array_value = std::move(temp);
       } else {
-        const uint64_t temp = DbcHelper::RawToUnsigned(
-            little_endian_, bit_start_, bit_length_, message.data());
+        const uint64_t temp = DbcHelper::RawToUnsigned(little_endian_,
+          bit_start_, bit_length_, message.data());
         channel_value_.unsigned_value = temp;
       }
       break;
@@ -92,6 +92,49 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
       channel_value_.Clear();
       break;
   }
+
+  // Check if out of range
+  if (max_ > min_) {
+    // Check out of range
+    if (!enum_list_.empty()) {
+      // Enumerate list converts to a string
+      double key_value = 0.0;
+      ChannelValue(key_value);
+      if (key_value < min_ || key_value > max_) {
+        channel_value_.out_of_range = true;
+      } else if (j1939) {
+        // In range but test if the enum string is 'Error' or 'NotAvailable
+        const std::string enum_string = GetEnumString(static_cast<int64_t>(key_value));
+        if (enum_string == "Error" ) {
+          channel_value_.error = true;
+        } else if (enum_string == "NotAvailable") {
+          channel_value_.not_available = true;
+        }
+
+      }
+    } else if (!IsArrayValue()) {
+      double eng_value = 0.0;
+      EngValue(eng_value);
+      if (eng_value < min_ || eng_value > max_) {
+        channel_value_.out_of_range = true;
+      }
+    }
+  }
+
+  // Check if it is not available and error
+  if (j1939 && channel_value_.out_of_range) {
+    DbcHelper::ParseJ1939Flags(*this, message);
+    channel_value_.not_available = DbcHelper::IsAllBitsSet(BitStart(),
+      BitLength(), message.data());
+  }
+
+  if (channel_value_.out_of_range ||
+      channel_value_.not_available ||
+      channel_value_.reserved ||
+      channel_value_.error ) {
+    channel_value_.valid = false;
+  }
+
   FireOnSample();
 }
 
@@ -108,13 +151,12 @@ std::string Signal::GetEnumString(int64_t index) const {
 
 template <>
 bool Signal::ChannelValue(std::string& value) const {
-  bool valid = false;
+  bool valid = true;
   value.clear();
 
   switch (data_type_) {
     case SignalDataType::SignedData: {
       try {
-        valid = channel_value_.valid && Valid();
         const auto temp = channel_value_.signed_value;
         value = std::to_string(temp);
       } catch (const std::exception&) {
@@ -126,8 +168,8 @@ bool Signal::ChannelValue(std::string& value) const {
     case SignalDataType::UnsignedData: {
       if (IsArrayValue()) {
         try {
-          valid = channel_value_.valid && Valid();
           const auto temp = channel_value_.array_value;
+          // Assume that it is an ASCII string
           std::ostringstream out;
           for (const auto input : temp) {
             if (input == 0 || input == 0xFF) {
@@ -141,7 +183,6 @@ bool Signal::ChannelValue(std::string& value) const {
         }
       } else {
         try {
-          valid = channel_value_.valid && Valid();
           const auto temp = channel_value_.unsigned_value;
           value = std::to_string(temp);
         } catch (const std::exception&) {
@@ -154,7 +195,6 @@ bool Signal::ChannelValue(std::string& value) const {
     case SignalDataType::DoubleData:
     case SignalDataType::FloatData: {
       try {
-        valid = channel_value_.valid && Valid();
         const auto temp = channel_value_.float_value;
         std::ostringstream temp_text;
         temp_text << temp;
@@ -171,28 +211,26 @@ bool Signal::ChannelValue(std::string& value) const {
   if (!valid) {
     value = "*";
   }
-  return valid;
+  return channel_value_.valid && valid;
 }
 
 template <>
 bool Signal::ChannelValue(std::vector<uint8_t>& value) const {
-  const bool valid = channel_value_.valid && Valid();
   value = channel_value_.array_value;
-  return valid;
+  return channel_value_.valid;
 }
 
 template <>
 bool Signal::ChannelValue(SignalValue& value) const {
-  bool valid = channel_value_.valid && Valid();
   value = channel_value_;
-  return valid;
+  return channel_value_.valid;
 }
 
 
 template <>
 bool Signal::EngValue(std::string& value) const {
-  bool valid = false;
-  value = {};
+  bool valid = true;
+  value = "*";
   bool need_to_convert = true;
   // If it is an enumerate. We could convert the enum string but that's weird.
   if (!enum_list_.empty()) {
@@ -214,11 +252,11 @@ bool Signal::EngValue(std::string& value) const {
         temp += offset_;
         std::ostringstream conv;
         conv << temp;
-        value = conv.str();
+        value = std::move(conv.str());
       } else if (!enum_list_.empty()) {
-        value = GetEnumString(channel);
+        value = std::move(GetEnumString(channel));
       } else {
-        value = std::to_string(channel);
+        value = std::move(std::to_string(channel));
       }
       break;
     }
@@ -282,12 +320,11 @@ bool Signal::EngValue(std::string& value) const {
     }
 
     default:
+      valid = false;
       break;
   }
-  if (!valid) {
-    value = "*";
-  }
-  return valid;
+
+  return channel_value_.valid && valid;
 }
 
 std::string Signal::DataTypeAsString() const {
@@ -366,7 +403,7 @@ void Signal::ClearObserverList() const {
   observer_list_.clear();
 }
 
-void Signal::FireOnSample() {
+void Signal::FireOnSample() const {
   for (auto& observer : observer_list_) {
     if (observer != nullptr) {
       observer->OnSample();

@@ -2,18 +2,24 @@
  * Copyright 2022 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
+// ReSharper disable CppMemberFunctionMayBeStatic
+// ReSharper disable CppMemberFunctionMayBeConst
+// ReSharper disable CppParameterMayBeConstPtrOrRef
 #include <string>
 #include <filesystem>
 
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
 
-#include "dbc/dbcfile.h"
-
+#include <util/logstream.h>
 #include "mainframe.h"
 #include "windowid.h"
+#include "dbcviewer.h"
+
+
 
 namespace {
+  // ReSharper disable once CppUnusedIncludeDirective
 #include "img/app.xpm"
 }
 
@@ -27,16 +33,15 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame)
   EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
   EVT_CLOSE(MainFrame::OnClose)
   EVT_DROP_FILES(MainFrame::OnDropFiles)
+  EVT_MENU_RANGE(kIdAppearanceSystem, kIdAppearanceLight, MainFrame::OnAppearance)
 wxEND_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSize& start_size, bool maximized)
     : wxDocMDIParentFrame(wxDocManager::GetDocumentManager(), nullptr, wxID_ANY, title, start_pos, start_size) {
-#ifdef _WIN32
-  wxIcon app("APP_ICON", wxBITMAP_TYPE_ICO_RESOURCE);
-#else
-  wxIcon app {wxICON(app)};
-#endif
+
+  wxIcon app(wxICON(app));
   SetIcon(app);
+
   wxWindow::SetName("DbcTopWindow");
 #if (_MSC_VER)
   wxTopLevelWindowMSW::Maximize(maximized);
@@ -66,7 +71,31 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   menu_data->AppendSeparator();
   menu_data->Append(kIdImportMessageFile, "Import CAN Message File");
 
+  // SYSTEM COLOR
+  auto* menu_system_color = new wxMenu;
+  menu_system_color->AppendRadioItem(kIdAppearanceSystem,
+    "System Mode","Let the system choose the light or dark mode");
+  menu_system_color->AppendRadioItem(kIdAppearanceDark,
+    "Dark Mode", "Select the dark mode");
+  menu_system_color->AppendRadioItem(kIdAppearanceLight,
+    "Light Mode", "Select the light mode");
+  auto& dbc_app = wxGetApp();
+  switch (dbc_app.GetAppearance()) {
+    case wxApp::Appearance::System:
+      menu_system_color->Check(kIdAppearanceSystem, true);
+      break;
 
+    case wxApp::Appearance::Dark:
+      menu_system_color->Check(kIdAppearanceDark, true);
+      break;
+
+    case wxApp::Appearance::Light:
+      menu_system_color->Check(kIdAppearanceLight, true);
+      break;
+
+    default:
+      break;
+  }
   // ABOUT
   auto* menu_about = new wxMenu;
   menu_about->Append(kIdOpenLogFile, "Open Log File");
@@ -77,6 +106,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   auto* menu_bar = new wxMenuBar;
   menu_bar->Append(menu_file, wxGetStockLabel(wxID_FILE));
   menu_bar->Append(menu_data, "Data");
+  menu_bar->Append(menu_system_color, "System Color");
   menu_bar->Append(menu_about, wxGetStockLabel(wxID_HELP));
   wxFrameBase::SetMenuBar(menu_bar);
 }
@@ -105,7 +135,7 @@ void MainFrame::OnClose(wxCloseEvent &event) {
   event.Skip(true);
 }
 
-void MainFrame::OnAbout(wxCommandEvent&) {
+void MainFrame::OnAbout(wxCommandEvent&) { // NOLINT(*-convert-member-functions-to-static)
   wxAboutDialogInfo info;
   info.SetName("DBC Viewer");
   info.SetVersion("1.0");
@@ -147,7 +177,7 @@ void MainFrame::OnAbout(wxCommandEvent&) {
   wxAboutBox(info);
 }
 
-void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {
+void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {// NOLINT(*-convert-member-functions-to-static)
   auto* man = wxDocManager::GetDocumentManager();
   auto* doc = man != nullptr ? man->GetCurrentDocument() : nullptr;
   if (doc == nullptr) {
@@ -155,7 +185,7 @@ void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {
   }
 }
 
-void MainFrame::OnDropFiles(wxDropFilesEvent& event) {
+void MainFrame::OnDropFiles(wxDropFilesEvent& event) {// NOLINT(*-convert-member-functions-to-static)
   const int count = event.GetNumberOfFiles();
   const auto* list = event.GetFiles();
   auto* man = wxDocManager::GetDocumentManager();
@@ -183,6 +213,43 @@ void MainFrame::OnDropFiles(wxDropFilesEvent& event) {
       // Not much to do here
       continue;
     }
+  }
+}
+
+  void MainFrame::OnAppearance(wxCommandEvent& event) {
+  auto& app = wxGetApp();
+  wxMenuBar* menu_bar = GetMenuBar();
+  if (menu_bar == nullptr) {
+    LOG_ERROR() << "Menu bar is not initialized.";
+    return;
+  }
+
+  wxApp::Appearance old_appearance = app.GetAppearance();
+  wxApp::Appearance new_appearance = old_appearance;
+  switch (event.GetId()) {
+    case kIdAppearanceDark:
+      new_appearance = wxApp::Appearance::Dark;
+      break;
+
+    case kIdAppearanceLight:
+      new_appearance = wxApp::Appearance::Light;
+      break;
+
+    case kIdAppearanceSystem:
+    default:
+      new_appearance = wxApp::Appearance::System;
+      break;
+  }
+  if (new_appearance != old_appearance) {
+    if (auto* app_config = wxConfig::Get(); app_config != nullptr) {
+      app_config->Write("MainWin/Appearance",
+        static_cast<int>(new_appearance));
+    }
+    wxMessageBox(
+      "You need to restart the application\n"
+        "before the changes take effect.",
+        "Restart the application",
+        wxOK | wxCENTER | wxICON_INFORMATION);
   }
 }
 

@@ -51,7 +51,7 @@ class Attribute {
     Attribute() = default; ///< Default constructor
 
     /** \brief Constructor for an attribute or definition. */
-    Attribute( AttributeType type, const std::string& name );
+    Attribute( AttributeType type, std::string  name );
 
     /** \brief Sets the name of the attribute. */
     void Name(const std::string& name) { name_ = name; }

@@ -3,12 +3,14 @@
 * SPDX-License-Identifier: MIT
  */
 
+#include <utility>
+
 #include "dbc/attribute.h"
 
 namespace dbc {
-Attribute::Attribute(AttributeType type, const std::string& name)
+Attribute::Attribute(AttributeType type, std::string  name)
 : type_(type),
-  name_(name) {
+  name_(std::move(name)) {
 
 }
 

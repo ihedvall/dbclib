@@ -4,11 +4,10 @@
  */
 #pragma once
 #include <string>
-#include <wx/wx.h>
 
-#if !wxUSE_DOC_VIEW_ARCHITECTURE
-#error You must set wxUSE_DOC_VIEW_ARCHITECTURE to 1 in setup.h!
-#endif
+#include <boost/asio.hpp>
+
+#include <wx/wx.h>
 
 namespace dbc::viewer {
 
@@ -19,7 +18,7 @@ class DbcViewer : public wxApp {
   int OnExit() override;
 
   void OpenFile(const std::string& filename) const;
-
+  [[nodiscard]] Appearance GetAppearance() const { return appearance_; }
   const std::string& GetMyTempDir() const {
     return my_temp_dir_;
   }
@@ -28,6 +27,8 @@ class DbcViewer : public wxApp {
     return gnuplot_;
   }
  private:
+  Appearance appearance_ = Appearance::System;
+  boost::asio::io_context ctx_;
   std::string notepad_; ///< Path to notepad.exe if it exist
   std::string gnuplot_; ///< Path to gnuplot.exe if it exist
   std::string my_temp_dir_; ///< Temporary directory for this application

@@ -91,16 +91,29 @@ bool DbcViewer::OnInit() {
     LOG_ERROR() << "Error when creating temporary directory. Error:" << error.what();
   }
 
+  int appearance = static_cast<int>(Appearance::System);
+  wxSize start_size(1200,800);
+  wxPoint start_pos(wxDefaultPosition);
 
-  auto* app_config = wxConfig::Get();
-  wxPoint start_pos;
-  app_config->Read("/MainWin/X",&start_pos.x, wxDefaultPosition.x);
-  app_config->Read("/MainWin/Y",&start_pos.y, wxDefaultPosition.x);
-  wxSize start_size;
-  app_config->Read("/MainWin/XWidth",&start_size.x, 1200);
-  app_config->Read("/MainWin/YWidth",&start_size.y, 800);
   bool maximized = false;
-  app_config->Read("/MainWin/Max",&maximized, maximized);
+  if (auto* app_config = wxConfig::Get(); app_config != nullptr) {
+    appearance_ = static_cast<Appearance>(app_config->Read(
+            "/MainWin/Appearance", appearance));
+    app_config->Read("/MainWin/X",&start_pos.x, wxDefaultPosition.x);
+    app_config->Read("/MainWin/Y",&start_pos.y, wxDefaultPosition.y);
+
+    app_config->Read("/MainWin/XWidth",&start_size.x, 1200);
+    app_config->Read("/MainWin/YWidth",&start_size.y, 800);
+
+    app_config->Read("/MainWin/Max",&maximized, maximized);
+  }
+
+  AppearanceResult result = SetAppearance(appearance_);
+  if (result == AppearanceResult::Failure) {
+    LOG_ERROR() << "Failed to set the appearance. Appearance: " << appearance;
+  } else if (result == AppearanceResult::CannotChange) {
+    LOG_INFO() << "Cannot change appearance. Appearance: " << appearance;
+  }
 
   auto* doc_manager = new wxDocManager;
   new wxDocTemplate(doc_manager, "DBC File","*.dbc","",

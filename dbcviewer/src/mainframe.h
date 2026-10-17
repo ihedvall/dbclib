@@ -15,6 +15,7 @@ class MainFrame : public wxDocMDIParentFrame {
   void OnAbout(wxCommandEvent& event);
   void OnUpdateNoDoc(wxUpdateUIEvent& event);
   void OnDropFiles(wxDropFilesEvent& event);
+  void OnAppearance(wxCommandEvent& event);
 wxDECLARE_EVENT_TABLE();
 };
 }

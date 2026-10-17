@@ -21,6 +21,10 @@ namespace dbc {
 /** \brief Support function that holds the channel value for a signal. */
 struct SignalValue {
   bool valid = false; ///< True if the value is valid.
+  bool out_of_range = false;
+  bool not_available = false;
+  bool error = false;
+  bool reserved = false;
   int64_t signed_value = 0; ///< Integer value.
   uint64_t unsigned_value = 0; ///< Unsigned value.
   double float_value = 0; ///< Float value.
@@ -28,6 +32,10 @@ struct SignalValue {
   /** \brief Resets the value. */
   void Clear() {
     valid = false;
+    out_of_range = false;
+    not_available = false;
+    error = false;
+    reserved = false;
     signed_value = 0;
     unsigned_value = 0;
     float_value = 0;
@@ -183,7 +191,7 @@ class Signal {
 
   /** \brief Parse out the signal value from a message data buffer. */
   void ParseMessage(const std::vector<uint8_t>& message, uint64_t ns1970,
-                    uint32_t can_id);
+                    uint32_t can_id, bool j1939);
   /** \brief Resets the sample counter. */
   void ResetSampleCounter() const {sample_counter_ = 0;}
   /** \brief Steps the sample counter. */
@@ -201,9 +209,14 @@ class Signal {
   /** \brief Returns the CAN ID for latest sample. */
   [[nodiscard]] uint64_t SampleCanId() const {return sample_can_id_;}
 
-  void Valid(bool valid) {valid_ = valid;} ///< Set to true if valid value.
-  [[nodiscard]] bool Valid() const {return valid_;} ///< Trie if value is valid.
+   void Valid(bool valid) {channel_value_.valid = valid;} ///< Set to true if valid value.
+  [[nodiscard]] bool Valid() const {return channel_value_.valid;} ///< True if value is valid.
 
+  [[nodiscard]] bool IsValid() const {return channel_value_.valid;}
+  [[nodiscard]] bool IsOutOfRange() const {return channel_value_.out_of_range;}
+  [[nodiscard]] bool IsNotAvailable() const {return channel_value_.not_available;}
+  [[nodiscard]] bool IsError() const {return channel_value_.error;}  [[nodiscard]]
+  bool IsReserved() const {return channel_value_.reserved;}
   /**
    * \brief Returns a reference to the internal signal value-
    *
@@ -212,6 +225,9 @@ class Signal {
    * @return Reference to the internal signal value object.
    */
   [[nodiscard]] const SignalValue& GetSignalValue() const {
+    return channel_value_;
+  }
+  [[nodiscard]] SignalValue& GetSignalValue() {
     return channel_value_;
   }
   /** \brief Returns the channel value. */
@@ -253,18 +269,18 @@ class Signal {
 
   uint64_t message_id_ = 0; ///< Message ID of last message.
   mutable size_t sample_counter_ = 0; ///< Number of samples received.
-  bool valid_ = true; ///< Trie if valid.
+
   uint64_t sample_time_ = 0;    ///< Last sample time
   uint32_t sample_can_id_ = 0;  ///< Last Can ID
 
   mutable std::vector<std::shared_ptr<ISampleObserver>> observer_list_; ///< Observer list.
-  void FireOnSample(); ///< Fire OnSample event.
+  void FireOnSample() const; ///< Fire OnSample event.
 
 };
 
 template <typename T>
 bool Signal::ChannelValue(T& value) const {
-  bool valid = channel_value_.valid && Valid();
+  bool valid = true;
   value = {};
 
   switch (data_type_) {
@@ -295,7 +311,8 @@ bool Signal::ChannelValue(T& value) const {
       valid = false;
       break;
    }
-   return valid;
+
+   return channel_value_.valid && valid;
 }
 
 /**
@@ -326,7 +343,7 @@ bool Signal::ChannelValue(SignalValue& value) const;
 
 template <typename T>
 bool Signal::EngValue(T& value) const {
-  bool valid = false;
+  bool valid = true;
   value = {};
   bool need_to_convert = true;
   // If it is an enumerate. We could convert the enum string but that's weird.
@@ -397,9 +414,10 @@ bool Signal::EngValue(T& value) const {
     }
 
     default:
+      valid = false;
       break;
   }
-  return valid;
+  return channel_value_.valid && valid;
 }
 
 /** \brief Returns the engineering value as a string value */

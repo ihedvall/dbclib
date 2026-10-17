@@ -137,7 +137,7 @@ class Message {
    Signal& CreateSignal(const std::string& name);
 
   private:
-   uint64_t ident_; ///< Message ID
+   uint64_t ident_ = 0; ///< Message ID
    std::string name_; ///< Message name.
    std::string comment_; ///< Message description.
    std::string node_; ///< Node (ECU) sender name.

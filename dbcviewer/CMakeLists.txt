@@ -1,13 +1,20 @@
 # Copyright 2022 Ingemar Hedvall
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
-project(MdfViewer
+project(DbcViewer
         VERSION 1.0
         DESCRIPTION "Simple DBC file browser"
         LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
+
+include(../script/boost.cmake)
+include(../script/zlib.cmake)
+include(../script/utillib.cmake)
+include(../script/mdflib.cmake)
+include(../script/wxwidgets.cmake)
 
 message(STATUS "ZLIB Libraries: " ${ZLIB_LIBRARIES})
+
 add_executable(dbcview
         src/dbcviewer.cpp src/dbcviewer.h
         src/mainframe.cpp src/mainframe.h

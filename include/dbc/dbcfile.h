@@ -62,7 +62,7 @@ class DbcFile {
   /** \brief Adds a message to the message queue. */
   void AddMessage(size_t index, const DbcMessage& message);
   /** \brief Parses the message into signal values. */
-  bool ParseMessage(const DbcMessage& message);
+  bool ParseMessage(const DbcMessage& message) const;
   /** \brief Resets the sample counter for all signals. */
   void ResetSampleCounter() const;
   /** \brief Reparse the message queue.
@@ -73,15 +73,15 @@ class DbcFile {
    * reparse the message queue.
    *
    */
-  void ReparseMessageList();
-  void ClearObserverList();
+  void ReparseMessageList() const;
+  void ClearObserverList() const;
  private:
   /** \brief Parses standard CAN messages. */
-  bool ParseStandardCAN(const DbcMessage& message);
+  bool ParseStandardCAN(const DbcMessage& message) const;
   /** \brief Parses J1939 messages. */
-  bool ParseJ1939(const DbcMessage& message);
+  bool ParseJ1939(const DbcMessage& message) const;
   /** \brief Parses NMEA2000 messages. */
-  bool ParseNMEA2000(const DbcMessage& message);
+  bool ParseNMEA2000(const DbcMessage& message) const;
   std::string filename_; ///< Full path name
   mutable std::string last_error_; ///< Last error message
   std::unique_ptr<Network> network_; ///< Pointer to the network object.

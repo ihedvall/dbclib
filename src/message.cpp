@@ -62,10 +62,10 @@ void Message::ParseMessage(uint64_t ns1970, uint32_t can_id) {
       uses_mux = true;
       continue;
     }
-    const auto valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
-                                           signal.BitLength(), data_.data());
-    signal.Valid(valid);
-    signal.ParseMessage(data_, ns1970, can_id);
+    // const auto valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+    //                                       signal.BitLength(), data_.data());
+    signal.Valid(true);
+    signal.ParseMessage(data_, ns1970, can_id, j1939);
     signal.StepSampleCounter();
   }
 
@@ -92,13 +92,13 @@ void Message::ParseMessage(uint64_t ns1970, uint32_t can_id) {
     }
     // Get the mux value
     size_t mux_value = 0;
-    auto valid = multiplexor->EngValue(mux_value);
+    const bool valid = multiplexor->EngValue(mux_value);
     // Check if value is in range
     if (valid && mux.InRange(mux_value)) {
-      valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
-                                             signal.BitLength(), data_.data());
-      signal.Valid(valid);
-      signal.ParseMessage(data_,ns1970, can_id);
+      //valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+      //                                       signal.BitLength(), data_.data());
+      signal.Valid(true);
+      signal.ParseMessage(data_,ns1970, can_id, j1939);
       signal.StepSampleCounter();
     }
   }
@@ -119,12 +119,12 @@ void Message::ParseMessage(uint64_t ns1970, uint32_t can_id) {
       continue;
     }
     size_t mux_value = 0;
-    auto valid = multiplexor->EngValue(mux_value);
+    const bool valid = multiplexor->EngValue(mux_value);
     if (valid && signal.MuxValue() == mux_value) {
-      valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
-                                             signal.BitLength(), data_.data());
-      signal.Valid(valid);
-      signal.ParseMessage(data_,ns1970, can_id);
+      //valid = !j1939 || !DbcHelper::IsAllBitsSet(signal.BitStart(),
+      //                                       signal.BitLength(), data_.data());
+      signal.Valid(true);
+      signal.ParseMessage(data_,ns1970, can_id, j1939);
       signal.StepSampleCounter();
     }
   }

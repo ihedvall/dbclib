@@ -17,4 +17,8 @@ constexpr wxWindowID kIdSignalList = 10;
 constexpr wxWindowID kIdNodeList = 11;
 constexpr wxWindowID kIdSignalGroupList = 12;
 constexpr wxWindowID kIdImportMessageFile = 13;
+
+constexpr wxWindowID kIdAppearanceSystem = 100;
+constexpr wxWindowID kIdAppearanceDark = 101;
+constexpr wxWindowID kIdAppearanceLight = 102;
 }
