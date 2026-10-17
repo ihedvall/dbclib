@@ -13,7 +13,7 @@ using namespace dbc;
 
 namespace pydbc {
 
-void InitSignal(pybind11::module& m) {
+extern void InitSignal(const module& m) {
 
   constexpr std::string_view signal_value_doc = R"(
 Support object that purpose is to hold one signal value.
@@ -25,6 +25,10 @@ object hold the last parsed messages signal value.
                 signal_value_doc.data());
   value.def(init<>());
   value.def_readwrite("valid", &SignalValue::valid);
+  value.def_readwrite("not_available", &SignalValue::not_available);
+  value.def_readwrite("error", &SignalValue::error);
+  value.def_readwrite("reserved", &SignalValue::reserved);
+  value.def_readwrite("out_of_range", &SignalValue::out_of_range);
   value.def_readwrite("signed_value", &SignalValue::signed_value);
   value.def_readwrite("unsigned_value", &SignalValue::unsigned_value);
   value.def_readwrite("float_value", &SignalValue::float_value);
@@ -75,48 +79,48 @@ value which makes every thing confusing.
                                  "Interface against a DBC signal object." );
   signal.def(init<>());
   signal.def_property("name",
-                    [](Signal& self) {return self.Name();},
+                    [](const Signal& self) {return self.Name();},
                     [](Signal& self,const std::string& name) {self.Name(name);});
   signal.def_property("unit",
-                      [](Signal& self) {return self.Unit();},
+                      [](const Signal& self) {return self.Unit();},
                       [](Signal& self,const std::string& unit) {self.Unit(unit);});
   signal.def_property("comment",
-                      [](Signal& self) {return self.Comment();},
+                      [](const Signal& self) {return self.Comment();},
                       [](Signal& self,const std::string& comment) {self.Comment(comment);});
   signal.def_property("data_type",
-                      [](Signal& self) {return self.DataType();},
+                      [](const Signal& self) {return self.DataType();},
                       [](Signal& self, SignalDataType type) {self.DataType(type);});
   signal.def_property("mux",
-                      [](Signal& self) {return self.Mux();},
+                      [](const Signal& self) {return self.Mux();},
                       [](Signal& self, MuxType type) {self.Mux(type);},
                       "Specifies if and what type of multiplexer. Default is not multiplexed");
   signal.def_property("mux_value",
-                      [](Signal& self) {return self.MuxValue();},
+                      [](const Signal& self) {return self.MuxValue();},
                       [](Signal& self, int value) {self.MuxValue(value);});
   signal.def_property("bit_start",
-                      [](Signal& self) {return self.BitStart();},
+                      [](const Signal& self) {return self.BitStart();},
                       [](Signal& self, size_t start) {self.BitStart(start);});
   signal.def_property("bit_length",
-                      [](Signal& self) {return self.BitLength();},
+                      [](const Signal& self) {return self.BitLength();},
                       [](Signal& self, size_t length) {self.BitLength(length);});
   signal.def_property("little_endian",
-                      [](Signal& self) {return self.LittleEndian();},
+                      [](const Signal& self) {return self.LittleEndian();},
                       [](Signal& self, bool endian) {self.LittleEndian(endian);},
                       "Defines the byte order.");
   signal.def_property("scale",
-                      [](Signal& self) {return self.Scale();},
+                      [](const Signal& self) {return self.Scale();},
                       [](Signal& self, double scale) {self.Scale(scale);});
   signal.def_property("offset",
-                      [](Signal& self) {return self.Offset();},
+                      [](const Signal& self) {return self.Offset();},
                       [](Signal& self, double offset) {self.Offset(offset);});
   signal.def_property("min",
-                      [](Signal& self) {return self.Min();},
+                      [](const Signal& self) {return self.Min();},
                       [](Signal& self, double min) {self.Min(min);});
   signal.def_property("max",
-                      [](Signal& self) {return self.Max();},
+                      [](const Signal& self) {return self.Max();},
                       [](Signal& self, double max) {self.Max(max);});
   signal.def_property("enumerate",
-                      [](Signal& self) {
+                      [](const Signal& self) {
                         dict temp_list = cast(self.EnumList());
                         return temp_list;
                       },
@@ -124,7 +128,7 @@ value which makes every thing confusing.
                         self.EnumList(enum_list.cast<std::map<int64_t, std::string>>());
                       });
   signal.def_property("receivers",
-                      [](Signal& self) {
+                      [](const Signal& self) {
                         list temp_list = cast(self.Receivers());
                         return temp_list;
                       },
@@ -132,7 +136,7 @@ value which makes every thing confusing.
                         self.Receivers(receivers.cast<std::vector<std::string>>());
                       });
   signal.def_property("attributes",
-                      [](Signal& self) {
+                      [](const Signal& self) {
                         const auto& attr_list = self.Attributes();
                         list temp_list(attr_list.size());
                         for (size_t index = 0; index < temp_list.size(); ++index) {
@@ -151,7 +155,7 @@ value which makes every thing confusing.
                        self.Attributes(temp_list);
                       });
   signal.def_property("message_id",
-                      [](Signal& self) {return self.MessageId();},
+                      [](const Signal& self) {return self.MessageId();},
                       [](Signal& self, uint64_t message_id ) {self.MessageId(message_id);},
                       "Specifies which CAN message the signal belongs to.");
 
@@ -170,11 +174,11 @@ value which makes every thing confusing.
              "Returns the enumerate text for a specific value.",
              "index"_a);
   signal.def("parse_message", [](Signal& self, const list& message,
-                                         uint64_t ns1970, uint32_t can_id) {
+                                         uint64_t ns1970, uint32_t can_id, bool j1939) {
              const auto temp_list = message.cast<std::vector<uint8_t>>();
-             self.ParseMessage(temp_list, ns1970, can_id); },
+             self.ParseMessage(temp_list, ns1970, can_id, j1939); },
              "Parses out the signal value, in a CAN message.",
-             "message"_a, "ns1970"_a, "can_id"_a);
+             "message"_a, "ns1970"_a, "can_id"_a, "j1939"_a);
 
   signal.def("reset_sample_counter", &Signal::ResetSampleCounter );
   signal.def("step_sample_counter", &Signal::StepSampleCounter );
@@ -182,18 +186,23 @@ value which makes every thing confusing.
 
   signal.def_property_readonly("sample_counter", &Signal::SampleCounter);
   signal.def_property("sample_time",
-                      [](Signal& self) {return self.SampleTime();},
+                      [](const Signal& self) {return self.SampleTime();},
                       [](Signal& self, uint64_t ns1970) {self.SampleTime(ns1970);},
                       "The sample time. Note absolute time, nano-seconds since 1970");
   signal.def_property("valid",
-                      [](Signal& self) {return self.Valid();},
+                      [](const Signal& self) {return self.Valid();},
                       [](Signal& self, bool valid) {self.Valid(valid);});
+  signal.def_property_readonly("out_of_range", &Signal::IsOutOfRange);
+  signal.def_property_readonly("not_available", &Signal::IsNotAvailable);
+  signal.def_property_readonly("error", &Signal::IsError);
+  signal.def_property_readonly("reserved", &Signal::IsReserved);
 
-  signal.def_property_readonly("signal_value", &Signal::GetSignalValue,
+  signal.def_property_readonly("signal_value",
+      static_cast<const SignalValue& (Signal::*)() const>(&Signal::GetSignalValue),
                                return_value_policy::reference_internal,
                                "Returns a reference to the internal signal value object");
 
-  signal.def_property_readonly("channel_value", [] (Signal& self) -> tuple  {
+  signal.def_property_readonly("channel_value", [] (const Signal& self) -> tuple  {
 
     switch (self.DataType()) {
       case SignalDataType::SignedData: {
@@ -235,12 +244,12 @@ value which makes every thing confusing.
         break;
     }
 
-    const std::pair<bool, int64_t> invalid = {false, 0};
+    constexpr std::pair<bool, int64_t> invalid = {false, 0};
     return cast(invalid);
 
   }, "Returns a tuple (valid,value) of the latest signal value.");
 
-  signal.def_property_readonly("channel_array_value", [](Signal& self) -> tuple {
+  signal.def_property_readonly("channel_array_value", [](const Signal& self) -> tuple {
     std::vector<uint8_t> temp_list;
     const bool valid = self.ChannelValue(temp_list);
     const list byte_array = cast(temp_list);
@@ -248,21 +257,21 @@ value which makes every thing confusing.
     return cast(value);
     }, "Returns a tuple (valid,list) of the latest array value.");
 
-  signal.def_property_readonly("channel_text_value", [](Signal& self) -> tuple {
+  signal.def_property_readonly("channel_text_value", [](const Signal& self) -> tuple {
     std::string text;
     const bool valid = self.ChannelValue(text);
     const std::pair<bool,std::string> value(valid,text);
     return cast(value);
   }, "Returns a tuple (valid,str) of the latest value.");
 
-  signal.def_property_readonly("eng_value", [](Signal& self) -> tuple {
+  signal.def_property_readonly("eng_value", [](const Signal& self) -> tuple {
     double temp = 0.0;
     const bool valid = self.EngValue(temp);
     const std::pair<bool,double> value(valid,temp);
     return cast(value);
   }, "Returns a tuple (valid,double) of the latest scaled value.");
 
-  signal.def_property_readonly("eng_text", [](Signal& self) -> tuple {
+  signal.def_property_readonly("eng_text", [](const Signal& self) -> tuple {
     std::string text;
     const bool valid = self.EngValue(text);
     const std::pair<bool,std::string> value(valid,text);
