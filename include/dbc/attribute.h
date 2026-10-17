@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -92,7 +93,7 @@ class Attribute {
     AttributeType      type_ = AttributeType::DbcNetwork; ///< Attribute type
     std::string        name_; ///< Name of attribute.
     AttributeValueType value_type_ =
-        AttributeValueType::StringValue; ///< Attribute data type.
+    AttributeValueType::StringValue; ///< Attribute data type.
     double             value_float_ = 0.0; ///< Attribute float value.
     std::string        value_string_; ///< Attribute text value.
     std::vector<std::string> enum_list_; ///< Attribute enumerate list.
