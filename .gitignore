@@ -1,4 +1,5 @@
 .idea/
+.junie/
 
 # CMake
 cmake-build-*/

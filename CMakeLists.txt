@@ -32,13 +32,7 @@ project(dbclib
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_DEBUG_POSTFIX d)
 
-if (DBC_TOOLS)
 
-endif()
-
-if (DBC_TEST)
-    include(script/googletest.cmake)
-endif()
 
 if (DBC_DOC)
     include(script/doxygen.cmake)

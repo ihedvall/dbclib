@@ -124,8 +124,8 @@ void Signal::ParseMessage(const std::vector<uint8_t>& message,
   // Check if it is not available and error
   if (j1939 && channel_value_.out_of_range) {
     DbcHelper::ParseJ1939Flags(*this, message);
-    channel_value_.not_available = DbcHelper::IsAllBitsSet(BitStart(),
-      BitLength(), message.data());
+    channel_value_.not_available = DbcHelper::IsAllBitsSet(LittleEndian(),
+      BitStart(), BitLength(), message.data());
   }
 
   if (channel_value_.out_of_range ||

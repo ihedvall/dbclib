@@ -42,10 +42,10 @@ class DbcHelper {
   static uint64_t RawToUnsigned(bool little_endian, size_t start, size_t length,
                          const uint8_t* raw);
 
-  static void SetAllBits(size_t start, size_t length, uint8_t* raw);
+  static void SetAllBits(bool little_endian, size_t start, size_t length, uint8_t* raw);
 
   static void ParseJ1939Flags(Signal& signal, const std::vector<uint8_t>& message);
-  static bool IsAllBitsSet(size_t start, size_t length, const uint8_t* raw);
+  static bool IsAllBitsSet(bool little_endian, size_t start, size_t length, const uint8_t* raw);
 
   static std::string GetStem(const std::string& path);
 

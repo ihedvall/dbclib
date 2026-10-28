@@ -97,10 +97,11 @@ void DbcHelper::DoubleToRaw(bool little_endian, size_t start, size_t length,
   uint64_t temp = 0;
   memcpy(&temp, &value, sizeof(temp));
 
-  auto byte = (little_endian ?
-                 static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
-
+  auto byte = (little_endian ? static_cast<int>(start + length - 1) :
+                                  static_cast<int>(start) ) / 8;
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if ((temp & mask) != 0) {
@@ -133,7 +134,9 @@ void DbcHelper::FloatToRaw(bool little_endian, size_t start, size_t length,
 
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if ((temp & mask) != 0) {
@@ -364,7 +367,9 @@ void DbcHelper::SignedToRaw(bool little_endian, size_t start, size_t length,
   memcpy(&temp, &temp_val, sizeof(temp));
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if ((temp & mask) != 0) {
@@ -390,7 +395,9 @@ void DbcHelper::UnsignedToRaw(bool little_endian, size_t start, size_t length,
   uint64_t mask = 1ULL << (length - 1);
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if ((value & mask) != 0) {
@@ -411,7 +418,7 @@ std::vector<uint8_t> DbcHelper::RawToByteArray(size_t start, size_t length,
                                   const unsigned char* raw )
 {
   // Only byte aligned strings are supported
-  if ( raw == nullptr || (length % 8) != 0 || (start % 8) != 0) {
+  if ( raw == nullptr || (length % 8) != 0) {
     return {};
   }
   const auto byte_start = start / 8;
@@ -430,7 +437,9 @@ double DbcHelper::RawToDouble(bool little_endian, size_t start, size_t length,
   uint64_t mask = 1ULL << ( length - 1 );
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index ) {
     if ((raw[byte] & kMask[bit] ) != 0) {
@@ -455,7 +464,9 @@ float DbcHelper::RawToFloat(bool little_endian, size_t start, size_t length,
   uint32_t mask = 1ULL << ( length - 1 );
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index ) {
     if ((raw[byte] & kMask[bit] ) != 0) {
@@ -480,7 +491,9 @@ int64_t DbcHelper::RawToSigned(bool little_endian, size_t start, size_t length,
   uint64_t temp = 0;
   auto byte = (little_endian ?
                static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if ( index > 0 ) temp <<= 1;
@@ -574,7 +587,9 @@ uint64_t DbcHelper::RawToUnsigned(bool little_endian, size_t start,
   uint64_t value = 0;
   auto byte = (little_endian ?
       static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
-  auto bit = static_cast<int>( (start + length - 1) % 8);
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
 
   for (size_t index = 0; index < length; ++index) {
     if (index > 0) {
@@ -592,16 +607,24 @@ uint64_t DbcHelper::RawToUnsigned(bool little_endian, size_t start,
   return value;
 }
 
-void DbcHelper::SetAllBits(size_t start, size_t length, uint8_t* raw ) {
+void DbcHelper::SetAllBits(bool little_endian, size_t start, size_t length, uint8_t* raw ) {
   if (raw == nullptr) {
     return;
   }
 
-  for ( size_t index = 0; index < length; ++index) {
-    auto bit = start + index;
-    const auto byte = bit / 8;
-    bit %= 8;
+  auto byte = (little_endian ?
+      static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
+
+  for (size_t index = 0; index < length; ++index) {
     raw[byte] |= kMask[bit];
+    --bit;
+    if (bit < 0) {
+      bit = 7;
+      little_endian ? --byte : ++byte;
+    }
   }
 }
 
@@ -613,20 +636,12 @@ void DbcHelper::ParseJ1939Flags(Signal& signal,
   channelValue.reserved = false;
   const size_t bit_length = signal.BitLength();
 
-  if (message.empty() || bit_length < 1 || !channelValue.out_of_range ) {
+  if (message.empty() || bit_length < 1 || !channelValue.out_of_range || !signal.LittleEndian()) {
     return; // Cannot parse J1939 flags
   }
   const uint8_t* raw = message.data();
   const size_t bit_start = signal.BitStart();
-  size_t error_bit = bit_start + bit_length - 1; // Big Endian
-  if (signal.LittleEndian()) {
-    error_bit = bit_start;
-    if (bit_length > 8) {
-      error_bit += 7;
-    } else {
-      error_bit += bit_length - 1;
-    }
-  }
+  const size_t error_bit = bit_start;
   bool error = false;
   bool reserved = false;
   for (size_t index = 0; index < bit_length; ++index) {
@@ -653,19 +668,25 @@ void DbcHelper::ParseJ1939Flags(Signal& signal,
   }
 }
 
-bool DbcHelper::IsAllBitsSet(size_t start, size_t length, const uint8_t* raw) {
+bool DbcHelper::IsAllBitsSet(bool little_endian, size_t start, size_t length, const uint8_t* raw) {
   if (raw == nullptr) {
-    return true;
+    return false;
   }
-  if (length <= 1) {
-    return false; // 1 bit cannot have an invalid flag
-  }
+
+  auto byte = (little_endian ?
+      static_cast<int>(start + length - 1) : static_cast<int>(start) ) / 8;
+  auto bit = little_endian ?
+             static_cast<int>( (start + length - 1) % 8) :
+             static_cast<int>( start % 8);
+
   for (size_t index = 0; index < length; ++index) {
-    auto bit = start + index;
-    const auto byte = bit / 8;
-    bit %= 8;
-    if ((raw[byte] & kMask[bit]) == 0 ) {
+    if ((raw[byte] & kMask[bit]) == 0) {
       return false;
+    };
+    --bit;
+    if (bit < 0) {
+      bit = 7;
+      little_endian ? --byte : ++byte;
     }
   }
   return true;
@@ -714,7 +735,7 @@ bool DbcHelper::FileExist(const std::string& path) {
 
 bool DbcHelper::IsLittleEndian() {
   constexpr int temp = 1;
-  return *((const int8_t*) &temp) == 1;
+  return *reinterpret_cast<const int8_t *>(&temp) == 1;
 }
 
 }

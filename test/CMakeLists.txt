@@ -7,6 +7,9 @@ project(TestDbc
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
+include(../script/googletest.cmake)
+include(../script/boost.cmake)
+
 add_executable(test_dbc
         testread.cpp testread.h
         test_dbchelper.cpp)
@@ -21,6 +24,7 @@ elseif (MSVC)
 endif ()
 
 target_link_libraries(test_dbc PRIVATE dbc)
+target_link_libraries(test_dbc PRIVATE Boost::headers)
 target_link_libraries(test_dbc PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
