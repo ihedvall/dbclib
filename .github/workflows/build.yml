@@ -26,7 +26,8 @@ jobs:
             os: ubuntu-latest
             ninja_platform: linux
             cmake_env: {}
-
+            vcpkg_file: /usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake
+            vcpkg_target: x64-linux
 #          - name: macos
 #            os: macos-12
 #            ninja_platform: mac
@@ -39,8 +40,8 @@ jobs:
             os: windows-latest
             ninja_platform: win
             cmake_env: {}
-
-#
+            vcpkg_file: c:/vcpkg/scripts/buildsystems/vcpkg.cmake
+            vcpkg_target: x64-windows-static-md
 #          - name: win32
 #            os: windows-latest
 #            ninja_platform: win
@@ -74,13 +75,16 @@ jobs:
 
       - name: CMAKE Configure
         env: ${{ matrix.env.cmake_env }}
-        run: cmake -G Ninja -B ${{github.workspace}}/build -D DBC_TEST=ON -D DBC_PYTHON=ON
-
+        run: > 
+          cmake -G Ninja -B ${{github.workspace}}/build 
+          -D DBC_TEST=ON -D DBC_PYTHON=ON
+          -D CMAKE_TOOLCHAIN_FILE=${{matrix.env.vcpkg_file}}
+          -D VCPKG_TARGET_TRIPLET=${{matrix.env.vcpkg_target}}
+          
       - name: CMAKE Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: CTEST Unit Test
-        if: ${{ matrix.env.ninja_platform != 'win'}}
         working-directory: ${{github.workspace}}/build
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail

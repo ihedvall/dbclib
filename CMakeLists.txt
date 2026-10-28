@@ -1,6 +1,10 @@
 # Copyright 2023 Ingemar Hedvall
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_DEBUG_POSTFIX d)
+
 include(CMakePrintHelpers)
 
 if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
@@ -22,24 +26,23 @@ if(DBC_TEST AND USE_VCPKG)
     list(APPEND VCPKG_MANIFEST_FEATURES "tests")
 endif()
 
+if(DBC_TOOLS AND USE_VCPKG)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tools")
+endif()
 
 project(dbclib
         VERSION 1.0
         DESCRIPTION "CAN DBC C++ library."
         LANGUAGES CXX)
 
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_DEBUG_POSTFIX d)
-
-
-
 if (DBC_DOC)
     include(script/doxygen.cmake)
 endif()
 
-include(script/flex.cmake)
-include(script/bison.cmake)
+if (DBC_FLEX)
+  include(script/flex.cmake)
+  include(script/bison.cmake)
+endif()
 
 if (BISON_FOUND AND DBC_FLEX)
     BISON_TARGET(DBC_PARSER src/dbcparser.y ${CMAKE_CURRENT_SOURCE_DIR}/src/dbcparser.cpp
