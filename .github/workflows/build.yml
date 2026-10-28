@@ -77,7 +77,7 @@ jobs:
         env: ${{ matrix.env.cmake_env }}
         run: > 
           cmake -G Ninja -B ${{github.workspace}}/build 
-          -D DBC_TEST=ON -D DBC_PYTHON=ON
+          -D DBC_TEST=ON -D DBC_PYTHON=OFF
           -D CMAKE_TOOLCHAIN_FILE=${{matrix.env.vcpkg_file}}
           -D VCPKG_TARGET_TRIPLET=${{matrix.env.vcpkg_target}}
           
